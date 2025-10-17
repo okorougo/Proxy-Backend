@@ -7,7 +7,7 @@ export const getDashboardStats = async (req: AuthRequest, res: Response) => {
   try {
     const users = await prisma.user.count();
     const listings = await prisma.listing.count();
-    const kycPending = await prisma.kyc.count({ where: { status: "PENDING" } });
+    const kycPending = await prisma.kycVerification.count({ where: { status: "PENDING" } });
     const reports = await prisma.report.count({ where: { resolved: false } });
 
     res.json({
@@ -24,14 +24,14 @@ export const getDashboardStats = async (req: AuthRequest, res: Response) => {
 
 // List all KYC requests
 export const listKycRequests = async (req: AuthRequest, res: Response) => {
-  const kycs = await prisma.kyc.findMany({ include: { user: true } });
+  const kycs = await prisma.kycVerification.findMany({ include: { user: true } });
   res.json(kycs);
 };
 
 // Approve/Reject KYC
 export const updateKycStatus = async (req: AuthRequest, res: Response) => {
   const { kycId, status } = req.body; // status = "APPROVED" | "REJECTED"
-  const updated = await prisma.kyc.update({
+  const updated = await prisma.kycVerification.update({
     where: { id: kycId },
     data: { status },
   });

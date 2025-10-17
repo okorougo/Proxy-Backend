@@ -8,6 +8,7 @@ import reportRoutes from "./routes/report.routes";
 import paymentRoutes from "./routes/payment.routes";
 import messageRoutes from "./routes/message.route";
 import sessionRoutes from "./routes/session.routes";
+import vendor from "./routes/vendor.route";
 import http from "http";
 import { Server } from "socket.io";
 import prisma from "./lib/prisma"
@@ -18,11 +19,16 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import xss from "xss-clean";
 import rateLimit from 'express-rate-limit';
+import "./lib/passport";
+import passport from "passport";
+
 
 
 const app = express();
 const PORT = process.env.PORT || 4321;
 const server = http.createServer(app);
+
+app.use(passport.initialize());
 
 const io = new Server(server, {
   cors: {
@@ -42,6 +48,7 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/sessions", sessionRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/vendor", vendor);
 // Cookie parser
 app.use(cookieParser());
 
@@ -57,6 +64,17 @@ app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true }));
 const limiter = rateLimit({ windowMs: 60 * 1000, max: 100 });
 app.use(limiter);
+app.use(passport.initialize());
+
+app.get("/auth/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+app.get("/auth/google/callback",
+  passport.authenticate("google", { failureRedirect: "/login" }),
+  (req, res) => res.send("Logged in successfully!")
+);
+
 
 io.on("connection", (socket) => {
   console.log("socket connected", socket.id);
@@ -240,6 +258,8 @@ io.on("connection", (socket) => {
     }
   });
 });
+
+
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

@@ -1,5 +1,0 @@
--- AlterTable
-ALTER TABLE `user` ADD COLUMN `otpCode` VARCHAR(191) NULL,
-    ADD COLUMN `otpExpiresAt` DATETIME(3) NULL,
-    ADD COLUMN `provider` VARCHAR(191) NULL,
-    ADD COLUMN `providerId` VARCHAR(191) NULL;

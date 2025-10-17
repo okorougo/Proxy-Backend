@@ -1,4 +1,0 @@
--- AlterTable
-ALTER TABLE `message` ADD COLUMN `deliveredAt` DATETIME(3) NULL,
-    ADD COLUMN `readAt` DATETIME(3) NULL,
-    ADD COLUMN `status` ENUM('SENT', 'DELIVERED', 'READ') NOT NULL DEFAULT 'SENT';

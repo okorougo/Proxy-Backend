@@ -1,6 +1,6 @@
 import { Response } from "express";
 import prisma from "../lib/prisma";
-import cloudinary from "../lib/cloudinary";
+import cloudinary, { uploadToCloudinary } from "../lib/cloudinary";
 import { AuthRequest } from "../middleware/auth";
 
 export const uploadKycDocument = async (req: AuthRequest, res: Response) => {
@@ -35,6 +35,43 @@ export const uploadKycDocument = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: "KYC upload failed" });
   }
 };
+
+export const submitKyc = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const { nin } = req.body;
+
+    if (!nin) {
+      res.status(400).json({ error: "NIN is required" });
+      return;
+    }
+
+    let selfieUrl: string | undefined;
+    let idCardUrl: string | undefined;
+
+    if (req.files && "selfie" in req.files) {
+      const uploaded = await uploadToCloudinary((req.files as any).selfie[0].path, "kyc/selfies");
+      selfieUrl = uploaded.secure_url;
+    }
+
+    if (req.files && "idCard" in req.files) {
+      const uploaded = await uploadToCloudinary((req.files as any).idCard[0].path, "kyc/idcards");
+      idCardUrl = uploaded.secure_url;
+    }
+
+    const kyc = await prisma.kycVerification.upsert({
+      where: { userId },
+      update: { nin, selfieUrl, idCardUrl, status: "PENDING" },
+      create: { userId: userId as string, nin, selfieUrl, idCardUrl },
+    });
+
+    res.json({ message: "KYC submitted successfully", kyc });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "KYC submission failed" });
+  }
+};
+
 
 export const verifyKyc = async (req: AuthRequest, res: Response) => {
   try {

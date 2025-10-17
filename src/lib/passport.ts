@@ -1,6 +1,6 @@
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import { Strategy as AppleStrategy } from "passport-apple";
+// import { Strategy as AppleStrategy } from "passport-apple";
 import prisma from "./prisma";
 
 passport.use(
@@ -31,42 +31,42 @@ passport.use(
 );
 
 // Apple strategy (similar setup)
-passport.use(
-  new AppleStrategy(
-    {
-      clientID: process.env.APPLE_CLIENT_ID!,
-      teamID: process.env.APPLE_TEAM_ID!,
-      keyID: process.env.APPLE_KEY_ID!,
-      privateKeyString: process.env.APPLE_PRIVATE_KEY!,
-      callbackURL: process.env.APPLE_CALLBACK_URL!,
-    },
-    async (accessToken, refreshToken, idToken: any, profile: any, done:any) => {
-      try {
-        // AppleStrategy's profile is usually just a string (user id), so use idToken for user info
-        const email = idToken?.email;
-        const name = idToken?.name || "";
-        const providerId = typeof profile === "string" ? profile : idToken?.sub;
+// passport.use(
+//   new AppleStrategy(
+//     {
+//       clientID: process.env.APPLE_CLIENT_ID!,
+//       teamID: process.env.APPLE_TEAM_ID!,
+//       keyID: process.env.APPLE_KEY_ID!,
+//       privateKeyString: process.env.APPLE_PRIVATE_KEY!,
+//       callbackURL: process.env.APPLE_CALLBACK_URL!,
+//     },
+//     async (accessToken, refreshToken, idToken: any, profile: any, done:any) => {
+//       try {
+//         // AppleStrategy's profile is usually just a string (user id), so use idToken for user info
+//         const email = idToken?.email;
+//         const name = idToken?.name || "";
+//         const providerId = typeof profile === "string" ? profile : idToken?.sub;
 
-        if (!email) {
-          throw new Error("Apple profile email is missing");
-        }
+//         if (!email) {
+//           throw new Error("Apple profile email is missing");
+//         }
 
-        const user = await prisma.user.upsert({
-          where: { email },
-          update: {},
-          create: {
-            provider: "apple",
-            providerId,
-            email,
-            name,
-          },
-        });
-        done(null, user);
-      } catch (err) {
-        done(err, null);
-      }
-    }
-  )
-);
+//         const user = await prisma.user.upsert({
+//           where: { email },
+//           update: {},
+//           create: {
+//             provider: "apple",
+//             providerId,
+//             email,
+//             name,
+//           },
+//         });
+//         done(null, user);
+//       } catch (err) {
+//         done(err, null);
+//       }
+//     }
+//   )
+// );
 
 export default passport;

@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -15,6 +15,12 @@ enum Role {
   USER
   VISITOR
 }
+enum VendorStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 
 model User {
   id                 String        @id @default(uuid())
@@ -34,7 +40,7 @@ model User {
   messagesSent       Message[]     @relation("sentMessages")
   messagesRecv       Message[]     @relation("recvMessages")
   isKycVerified      Boolean       @default(false)
-  kycDocument        Kyc?          @relation("KycDoc")
+  kycDocument        KycVerification?          
   kycDocumentId      String?
   givenReviews       Review[]      @relation("givenReviews")
   receivedReviews    Review[]      @relation("receivedReviews")
@@ -42,22 +48,40 @@ model User {
   isBanned Boolean  @default(false)
   otpCode      String?   // temporary OTP code
   otpExpiresAt DateTime?
+  vendorApplication VendorApplication?
 
   // Social auth
   provider     String?   // "google" | "apple"
   providerId   String?   // Google UID, Apple sub, etc
 }
+model VendorApplication {
+  id            String        @id @default(uuid())
+  user          User          @relation(fields: [userId], references: [id])
+  userId        String        @unique
 
-model Kyc {
-  id           String    @id @default(uuid())
-  user         User      @relation("KycDoc", fields: [userId], references: [id])
-  userId       String    @unique
-  documentUrl  String
-  documentType String? // e.g., "passport", "id_card"
+  description   String?
+  status        VendorStatus  @default(PENDING)
+  rejectionNote String?
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+
+
+model KycVerification {
+  id           String   @id @default(uuid())
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String   @unique
+
+  nin          String?
+  selfieUrl    String?
+  idCardUrl    String?
   status       KycStatus @default(PENDING)
-  adminNote    String?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  rejectionNote String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum KycStatus {
