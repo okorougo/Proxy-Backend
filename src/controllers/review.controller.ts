@@ -20,7 +20,7 @@ export const createReview = async (req: AuthRequest, res: Response) => {
       return res.status(403).json({ error: "Only buyer can leave review" });
     }
 
-    const existing = await prisma.review.findUnique({ where: { transactionId } });
+    const existing = await prisma.review.findFirst({ where: { transactionId } });
     if (existing) return res.status(400).json({ error: "Review already exists for this transaction" });
 
     const review = await prisma.review.create({
