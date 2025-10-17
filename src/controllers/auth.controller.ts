@@ -5,6 +5,7 @@ import prisma from "../lib/prisma";
 import { sendEmail } from "../services/emailService";
 import { AuthRequest } from "../middleware/auth";
 import dotEnv from "dotenv"
+dotEnv.config()
 
 export const register = async (req: Request, res: Response) => {
   try {
