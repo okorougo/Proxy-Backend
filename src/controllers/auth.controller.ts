@@ -33,6 +33,9 @@ export const login = async (req: Request, res: Response) => {
     const ok = await bcrypt.compare(password, user.password || "");
     if (!ok) return res.status(401).json({ error: "Invalid credentials" });
 
+    if(!user.otpCode) return res.status(400).json({message: "User not verified"})
+    
+
     const token = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET as string,
