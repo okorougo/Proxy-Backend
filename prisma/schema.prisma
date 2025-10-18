@@ -30,6 +30,7 @@ model User {
   name               String?
   role               String        @default("USER")
   createdAt          DateTime      @default(now())
+  isEmailVerified   Boolean       @default(false)
   listings           Listing[]
   media              Media[]
   reportsMade        Report[]      @relation("Reporter")

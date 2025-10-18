@@ -85,7 +85,7 @@ export const verifyKyc = async (req: AuthRequest, res: Response) => {
 
     const updated = await prisma.user.update({
       where: { id: userId },
-      data: { isKycVerified: Boolean(approve) },
+      data: { isKycVerified: true },
     });
 
     res.json({ message: approve ? "KYC verified" : "KYC rejected", user: updated });

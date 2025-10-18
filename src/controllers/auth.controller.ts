@@ -144,7 +144,7 @@ export const verifyOtp = async (req: any, res: Response) => {
   // clear OTP after success
   await prisma.user.update({
     where: { id: user.id },
-    data: { otpCode: null, otpExpiresAt: null },
+    data: { otpCode: null, otpExpiresAt: null, isEmailVerified: true },
   });
 
   // issue JWT
