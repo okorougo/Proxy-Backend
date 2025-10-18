@@ -78,7 +78,7 @@ export const login = async (req: Request, res: Response) => {
 export const sendOtp = async (req: AuthRequest, res: Response) => {
   const { email, phone, verifyOption } = req.body;
   if (!email && !phone)
-    return res.status(400).json({ error: "Email or phone required" });
+    return res.status(400).json({ error: "Email or phone required"});
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6 digit
   const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 5 mins
