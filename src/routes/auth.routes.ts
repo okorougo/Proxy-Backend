@@ -1,14 +1,18 @@
 import { Router } from "express";
 import passport from "../lib/passport";
-import { register, login,sendOtp, verifyOtp } from "../controllers/auth.controller";
+import { register, login,sendOtp, verifyOtp,registerVendor, forgotPassword, resetPassword, resendResetOtp } from "../controllers/auth.controller";
 import jwt from "jsonwebtoken"
 
 const router = Router();
 
 router.post("/register", register);
+router.post("/register-vendor", registerVendor);
 router.post("/login", login);
 router.post("/send-otp", sendOtp);
 router.post("/verify-otp", verifyOtp);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
+router.post("/resend-reset-otp", resendResetOtp);
 
 // Google
 router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));

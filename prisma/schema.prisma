@@ -13,7 +13,7 @@ datasource db {
 enum Role {
   ADMIN
   USER
-  VISITOR
+  RIDER
 }
 enum VendorStatus {
   PENDING
@@ -28,7 +28,7 @@ model User {
   password           String?
   phone        String?  @unique
   name               String?
-  role               String        @default("VISITOR")
+  role               String        @default("USER")
   createdAt          DateTime      @default(now())
   listings           Listing[]
   media              Media[]

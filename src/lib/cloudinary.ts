@@ -1,7 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import dotenv from "dotenv";
 import fs from "fs";
-
+import streamifier from "streamifier";
 dotenv.config();
 
 cloudinary.config({
@@ -11,26 +11,17 @@ cloudinary.config({
   secure: true,
 });
 
-export const uploadToCloudinary = async (
-  filePath: string,
-  folder?: string
-): Promise<{ secure_url: string }> => {
-  try {
-    const result = await cloudinary.uploader.upload(filePath, {
-      folder: folder || "uploads",
-      resource_type: "auto", // handles image, video, pdf, etc.
-    });
-
-    // remove temp file
-    fs.unlinkSync(filePath);
-
-    return { secure_url: result.secure_url };
-  } catch (err) {
-    console.error("❌ Cloudinary upload failed:", err);
-    // try to delete the temp file if upload fails
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-    throw err;
-  }
+export const uploadToCloudinary = (buffer: Buffer, folder: string): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      }
+    );
+    streamifier.createReadStream(buffer).pipe(uploadStream);
+  });
 };
 
 export default cloudinary;

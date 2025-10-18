@@ -42,20 +42,21 @@ export const submitKyc = async (req: AuthRequest, res: Response) => {
     const { nin } = req.body;
 
     if (!nin) {
-      res.status(400).json({ error: "NIN is required" });
-      return;
+      return res.status(400).json({ error: "NIN is required" });
     }
 
     let selfieUrl: string | undefined;
     let idCardUrl: string | undefined;
 
-    if (req.files && "selfie" in req.files) {
-      const uploaded = await uploadToCloudinary((req.files as any).selfie[0].path, "kyc/selfies");
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
+
+    if (files?.selfie?.[0]) {
+      const uploaded = await uploadToCloudinary(files.selfie[0].buffer, "kyc/selfies");
       selfieUrl = uploaded.secure_url;
     }
 
-    if (req.files && "idCard" in req.files) {
-      const uploaded = await uploadToCloudinary((req.files as any).idCard[0].path, "kyc/idcards");
+    if (files?.idCard?.[0]) {
+      const uploaded = await uploadToCloudinary(files.idCard[0].buffer, "kyc/idcards");
       idCardUrl = uploaded.secure_url;
     }
 
@@ -67,10 +68,11 @@ export const submitKyc = async (req: AuthRequest, res: Response) => {
 
     res.json({ message: "KYC submitted successfully", kyc });
   } catch (err) {
-    console.error(err);
+    console.error("submitKyc error:", err);
     res.status(500).json({ error: "KYC submission failed" });
   }
 };
+
 
 
 export const verifyKyc = async (req: AuthRequest, res: Response) => {
