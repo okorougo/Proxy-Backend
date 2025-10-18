@@ -17,6 +17,10 @@ export const register = async (req: Request, res: Response) => {
 
     const userExists = await prisma.user.findUnique({ where: { email } });
     const userPhoneExists = await prisma.user.findUnique({ where: { phone } });
+
+    if(userPhoneExists && userExists && !userExists.isEmailVerified ){
+      return res.status(409).json({ error: "Email hasn't been verified", details: {email: userExists?.email, phone: userExists?.phone} });
+    }
     if (userPhoneExists)
       return res.status(409).json({ error: "Phone number already exists" });
     if (userExists)
@@ -43,6 +47,10 @@ export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) return res.status(401).json({ error: "Invalid credentials" });
+
+    if(user  && !user.isEmailVerified ){
+      return res.status(409).json({ error: "Email hasn't been verified", details: {email: user?.email, phone: user?.phone} });
+    }
 
     const ok = await bcrypt.compare(password, user.password || "");
     if (!ok) return res.status(401).json({ error: "Invalid credentials" });
