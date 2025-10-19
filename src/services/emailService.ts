@@ -1,30 +1,19 @@
 // src/services/emailService.ts
-import nodemailer from "nodemailer";
+import SibApiV3Sdk from "@sendinblue/client";
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465, // use SSL port
-  secure: true, // must be true for port 465
-  auth: {
-    user: "ajayisegun2003@gmail.com",
-    pass: "spudyopyvqaljvmy",
-  },
-   pool: true, // reuses connection
-  maxConnections: 2,
-  maxMessages: 30,
-  connectionTimeout: 20000, // 20 seconds
-  socketTimeout: 20000,
-});
-
+const brevo = new SibApiV3Sdk.TransactionalEmailsApi();
+brevo.setApiKey(SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY!);
+// 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
 export async function sendEmail(to: string, subject: string, html: string) {
   try {
-    await transporter.sendMail({
-      from: `"Proxy" <${process.env.SMTP_USER}>`,
-      to,
+    const response = await brevo.sendTransacEmail({
+      sender: { name: "Proxy App", email: "ajayisegun2003@gmail.com" },
+      to: [{ email: to }],
       subject,
-      html,
+      htmlContent: html,
     });
-    console.log(`✅ Email sent to ${to}`);
+
+    console.log(`✅ Email sent to ${to}`, response);
   } catch (error) {
     console.error("❌ Email failed:", error);
     throw new Error("Failed to send email");
