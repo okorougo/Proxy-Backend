@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import prisma from "../lib/prisma";
 import { sendEmail } from "../services/emailService";
+import { errorResponse, successResponse } from "../utils/response";
 
 // User applies to become vendor
 export const applyVendor = async (req: Request, res: Response) => {
@@ -11,17 +12,17 @@ export const applyVendor = async (req: Request, res: Response) => {
 
     const existing = await prisma.vendorApplication.findUnique({ where: { userId } });
     if (existing) {
-        res.status(400).json({ error: "You have already applied" });
+        return errorResponse(res, "You have already applied to become a vendor");
       return;
     }
     const app = await prisma.vendorApplication.create({
       data: { userId: userId as string, description, status: "PENDING" },
     });
 
-    res.status(201).json({ message: "Vendor application submitted", application: app });
+    return successResponse(res, "Vendor application submitted successfully", app);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Failed to submit vendor application" });
+    return errorResponse(res, "Failed to submit vendor application");
   }
 };
 
@@ -53,10 +54,10 @@ export const approveVendor = async (req: Request, res: Response) => {
     `;
     await sendEmail(app.user.email, "Vendor Access Granted", html);
 
-    res.json({ message: "Vendor approved successfully", app });
+    return successResponse(res, "Vendor approved successfully", app);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Failed to approve vendor" });
+    return errorResponse(res, "Failed to approve vendor");
   }
 };
 
@@ -85,10 +86,10 @@ export const rejectVendor = async (req: Request, res: Response) => {
     `;
     await sendEmail(app.user.email, "Vendor Application Rejected", html);
 
-    res.json({ message: "Vendor rejected", app });
+    return successResponse(res, "Vendor rejected successfully", app);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Failed to reject vendor" });
+    return errorResponse(res, "Failed to reject vendor");
   }
 };
 
@@ -98,9 +99,9 @@ export const getAllVendorApplications = async (req: Request, res: Response) => {
             include: { user: true },
             orderBy: { createdAt: "desc" },
         });
-        res.json({ applications });
+        return successResponse(res, "Vendor applications fetched successfully", applications);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: "Failed to fetch vendor applications" });
+        return errorResponse(res, "Failed to fetch vendor applications");
     }
 }

@@ -5,32 +5,33 @@ import prisma from "../lib/prisma";
 import { sendEmail } from "../services/emailService";
 import { AuthRequest } from "../middleware/auth";
 import dotEnv from "dotenv";
+import { errorResponse, successResponse } from "../utils/response";
 dotEnv.config();
 
 export const register = async (req: Request, res: Response) => {
   try {
     const { email, password, name, phone } = req.body;
     if (!email || !password || !phone)
-      return res
-        .status(400)
-        .json({ error: "Email, password, and phone required" });
+      return errorResponse(res, "Email, password, and phone are required", "Field_ERROR", 400);
 
     const userExists = await prisma.user.findUnique({ where: { email } });
     const userPhoneExists = await prisma.user.findUnique({ where: { phone } });
 
     if(userPhoneExists && userExists && !userExists.isEmailVerified ){
-      return res.status(409).json({ error: "Email hasn't been verified", details: {email: userExists?.email, phone: userExists?.phone} });
+        return errorResponse(res, "Email hasn't been verified", "EMAIL_NOT_VERIFIED", 409, {
+        email: userExists.email,
+        phone: userExists.phone,
+      });
     }
     if (userPhoneExists)
-      return res.status(409).json({ error: "Phone number already exists" });
-    if (userExists)
-      return res.status(409).json({ error: "Email already exists" });
+        if (userExists) return errorResponse(res, "Email already exists",  "EMAIL_EXISTS", 409);
+    if (userPhoneExists) return errorResponse(res, "Phone number already exists", "PHONE_EXISTS", 409);
 
     const hashed = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
       data: { email, password: hashed, name, phone },
     });
-    res.json({
+      return successResponse(res, "Registration successful", {
       id: user.id,
       email: user.email,
       name: user.name,
@@ -46,17 +47,16 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) return res.status(401).json({ error: "Invalid credentials" });
+    if (!user) return errorResponse(res, "Invalid credentials", "INVALID_CREDENTIALS", 401);
 
-    if(user  && !user.isEmailVerified ){
-      return res.status(409).json({ error: "Email hasn't been verified", details: {email: user?.email, phone: user?.phone} });
-    }
+     if (!user.isEmailVerified)
+      return errorResponse(res, "Email hasn't been verified", "EMAIL_NOT_VERIFIED", 409, {
+        email: user.email,
+        phone: user.phone,
+      });
 
-    const ok = await bcrypt.compare(password, user.password || "");
-    if (!ok) return res.status(401).json({ error: "Invalid credentials" });
-
-    if (!user.otpCode)
-      return res.status(400).json({ message: "User not verified" });
+    const match = await bcrypt.compare(password, user.password || "");
+    if (!match) return errorResponse(res, "Invalid credentials", "INVALID_CREDENTIALS", 401);
 
     const token = jwt.sign(
       { id: user.id, email: user.email },
@@ -66,19 +66,19 @@ export const login = async (req: Request, res: Response) => {
       }
     );
 
-    res.json({
+    return successResponse(res, "Login successful", {
       token,
       user: { id: user.id, email: user.email, name: user.name },
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Server error" });
+    return errorResponse(res, "Internal server error", "SERVER_ERROR", 500);
   }
 };
 export const sendOtp = async (req: AuthRequest, res: Response) => {
   const { email, phone, verifyOption } = req.body;
   if (!email && !phone)
-    return res.status(400).json({ error: "Email or phone required"});
+    return errorResponse(res, "Email or phone required", "FIELD_ERROR", 400);
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6 digit
   const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 5 mins
@@ -113,7 +113,6 @@ export const sendOtp = async (req: AuthRequest, res: Response) => {
     </div>
   </div>
 `;
-  console.log(email, phone, verifyOption, otp, expiresAt);
   // TODO: integrate email (nodemailer) or SMS (Twilio) here
   if (verifyOption === "email") {
     sendEmail(email, "Verify your Proxy account - OTP Code", html).catch(
@@ -121,10 +120,10 @@ export const sendOtp = async (req: AuthRequest, res: Response) => {
         console.error("Email send error:", err);
       }
     );
-    res.json({ message: "OTP sent to email" });
+    return successResponse(res, "OTP sent to email");
   } else if (verifyOption === "phone") {
     // Integrate SMS sending service here
-    res.json({ message: "OTP sent to phone" });
+    return successResponse(res, "OTP sent to phone");
   }
 };
 
@@ -137,16 +136,14 @@ export const verifyOtp = async (req: any, res: Response) => {
     where: { OR: [{ email }, { phone }] },
   });
   if (!user)
-    return res
-      .status(400)
-      .json({ error: "User not found", message: "Email or phone not correct" });
+    return errorResponse(res, "User not found", "USER_NOT_FOUND", 404);
 
   if (
     user.otpCode !== otp ||
     !user.otpExpiresAt ||
     user.otpExpiresAt < new Date()
   ) {
-    return res.status(400).json({ error: "Invalid or expired OTP" });
+    return errorResponse(res, "Invalid or expired OTP", "INVALID_OTP", 400);
   }
 
   // clear OTP after success
@@ -164,7 +161,7 @@ export const verifyOtp = async (req: any, res: Response) => {
     }
   );
 
-  res.json({ token, user });
+  return successResponse(res, "OTP verified successfully", { token, user });
 };
 export const registerVendor = async (req: Request, res: Response) => {
   try {
@@ -213,9 +210,7 @@ export const registerVendor = async (req: Request, res: Response) => {
       });
 
       if (existingVendor) {
-        return res
-          .status(400)
-          .json({ message: "You already have a vendor application." });
+        return errorResponse(res, "Vendor application already submitted", "VENDOR_EXISTS", 409);
       }
 
       // Create vendor application
@@ -226,14 +221,14 @@ export const registerVendor = async (req: Request, res: Response) => {
         },
       });
 
-      return res.status(201).json({
-        message: "Vendor registration submitted successfully.",
-        vendor,
-      });
+    return successResponse(res, "Vendor application submitted", {
+      vendorId: vendor.id,
+      status: vendor.status,
+    });
     
   } catch (err) {
     console.error("registerVendor error:", err);
-    return res.status(500).json({ message: "Internal server error." });
+    return errorResponse(res, "Internal server error", "SERVER_ERROR", 500);
   }
 };
 export const vendorLogin = async (req: Request, res: Response) => {
@@ -241,7 +236,7 @@ export const vendorLogin = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     if (!email || !password)
-      return res.status(400).json({ error: "Email and password are required" });
+      return errorResponse(res, "Email and password are required", "FIELD_ERROR", 400);
 
     // find user
     const user = await prisma.user.findUnique({
@@ -250,31 +245,24 @@ export const vendorLogin = async (req: Request, res: Response) => {
     });
 
     if (!user)
-      return res.status(404).json({ error: "No account found for this email" });
+      return errorResponse(res, "Account not found", "INVALID_CREDENTIALS", 401);
 
     // verify password
     const isMatch = await bcrypt.compare(password, user.password || "");
     if (!isMatch)
-      return res.status(401).json({ error: "Invalid credentials" });
+      return errorResponse(res, "Invalid credentials", "INVALID_CREDENTIALS", 401);
 
     // check if user has a vendor record
     if (!user.vendorApplication)
-      return res.status(403).json({
-        message:
-          "You are not registered as a vendor. Please apply first.",
-      });
+      return errorResponse(res, "No vendor application found", "VENDOR_NOT_FOUND", 404);
 
     // check vendor approval status
     if (user.vendorApplication.status === "PENDING") {
-      return res.status(403).json({
-        message: "Your vendor application is still under review.",
-      });
+     return errorResponse(res, "Vendor application is still pending", "VENDOR_PENDING", 403);
     }
 
     if (user.vendorApplication.status === "REJECTED") {
-      return res.status(403).json({
-        message: "Your vendor application was rejected. Please contact support.",
-      });
+      return errorResponse(res, "Vendor application was rejected", "VENDOR_REJECTED", 403);
     }
 
     // if approved → allow login
@@ -283,15 +271,14 @@ export const vendorLogin = async (req: Request, res: Response) => {
       process.env.JWT_SECRET!,
       { expiresIn: "7d" }
     );
-
-    res.status(200).json({
-      message: "Vendor login successful",
+    return successResponse(res, "Vendor login successful", {
       token,
-      vendor: {
-        id: user.vendorApplication.id,
+      user: {
+        id: user.id,
         email: user.email,
         name: user.name,
-        status: user.vendorApplication.status,
+        vendorApplicationId: user.vendorApplication.id,
+        vendorStatus: user.vendorApplication.status,
       },
     });
   } catch (err) {
@@ -302,10 +289,10 @@ export const vendorLogin = async (req: Request, res: Response) => {
 export const forgotPassword = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
-    if (!email) return res.status(400).json({ error: "Email is required" });
+    if (!email) return errorResponse(res, "Email is required", "FIELD_ERROR", 400);
 
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) return res.status(404).json({ error: "No user found with this email" });
+    if (!user) return errorResponse(res, "No user found with this email", "USER_NOT_FOUND", 404);
 
     // generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -337,10 +324,10 @@ export const forgotPassword = async (req: Request, res: Response) => {
     `;
 
     await sendEmail(user.email, "Proxy Password Reset Code", html);
-    res.json({ message: "OTP sent to your email for password reset" });
+    return successResponse(res, "OTP sent to your email for password reset");
   } catch (err) {
     console.error("forgotPassword error:", err);
-    res.status(500).json({ error: "Internal server error" });
+    return errorResponse(res, "Internal server error", "SERVER_ERROR", 500);
   }
 };
 export const resetPassword = async (req: Request, res: Response) => {
@@ -348,18 +335,18 @@ export const resetPassword = async (req: Request, res: Response) => {
     const { email, otp, newPassword } = req.body;
 
     if (!email || !otp || !newPassword)
-      return res.status(400).json({ error: "Email, OTP and new password are required" });
+      return errorResponse(res, "Email, OTP, and new password are required", "FIELD_ERROR", 400);
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user)
-      return res.status(404).json({ error: "No user found with this email" });
+      return errorResponse(res, "User not found", "USER_NOT_FOUND", 404);
 
     if (
       user.otpCode !== otp ||
       !user.otpExpiresAt ||
       user.otpExpiresAt < new Date()
     ) {
-      return res.status(400).json({ error: "Invalid or expired OTP" });
+      return errorResponse(res, "Invalid or expired OTP", "INVALID_OTP", 400);
     }
 
     // hash new password
@@ -387,10 +374,10 @@ export const resetPassword = async (req: Request, res: Response) => {
     `;
 
     await sendEmail(user.email, "Proxy Password Changed Successfully", html);
-    res.json({ message: "Password reset successful and confirmation email sent." });
+    return successResponse(res, "Password reset successful and confirmation email sent.");
   } catch (err) {
     console.error("resetPassword error:", err);
-    res.status(500).json({ error: "Internal server error" });
+    return errorResponse(res, "Internal server error", "SERVER_ERROR", 500);
   }
 };
 export const resendResetOtp = async (req: Request, res: Response) => {
@@ -399,7 +386,7 @@ export const resendResetOtp = async (req: Request, res: Response) => {
     if (!email) return res.status(400).json({ error: "Email is required" });
 
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) return res.status(404).json({ error: "User not found" });
+    if (!user) return errorResponse(res, "No user found with this email", "USER_NOT_FOUND", 404);
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
@@ -426,10 +413,11 @@ export const resendResetOtp = async (req: Request, res: Response) => {
     `;
 
     await sendEmail(user.email, "Proxy Password Reset Code", html);
-    res.json({ message: "New OTP sent to your email." });
+    return successResponse(res, "New OTP sent to your email for password reset");
+    
   } catch (err) {
     console.error("resendResetOtp error:", err);
-    res.status(500).json({ error: "Internal server error" });
+    return errorResponse(res, "Internal server error", "SERVER_ERROR", 500);
   }
 };
 

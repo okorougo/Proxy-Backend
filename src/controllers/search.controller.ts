@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../lib/prisma";
+import { errorResponse, successResponse } from "../utils/response";
 
 export const searchByRadius = async (req: Request, res: Response) => {
   try {
@@ -8,7 +9,7 @@ export const searchByRadius = async (req: Request, res: Response) => {
     const radiusKm = Number(req.query.radiusKm || 10);
     const limit = Number(req.query.limit || 50);
 
-    if (isNaN(lat) || isNaN(lng)) return res.status(400).json({ error: "lat asnd lng required" });
+    if (isNaN(lat) || isNaN(lng)) return errorResponse(res, "Invalid latitude or longitude", "INVALID_COORDINATES", 400);
 
     const earth = 6371;
     const sql = `
@@ -31,10 +32,10 @@ export const searchByRadius = async (req: Request, res: Response) => {
     `;
 
     const results = await prisma.$queryRawUnsafe(sql, lat, lng, radiusKm, limit);
-    res.json({ results });
+    return successResponse(res, "Search completed successfully", results);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Search failed" });
+    return errorResponse(res, "Search by radius failed");
   }
 };
 export const searchListings = async (req: Request, res: Response) => {
@@ -73,9 +74,9 @@ export const searchListings = async (req: Request, res: Response) => {
       orderBy: { createdAt: "desc" },
     });
 
-    res.json({ listings });
+    return successResponse(res, "Search completed successfully", listings);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Search failed" });
+    return errorResponse(res, "Search listings failed");
   }
 };

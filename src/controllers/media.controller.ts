@@ -2,6 +2,7 @@ import { Response } from "express";
 import prisma from "../lib/prisma";
 import cloudinary from "../lib/cloudinary";
 import { AuthRequest } from "../middleware/auth";
+import { errorResponse, successResponse } from "../utils/response";
 
 export const uploadMedia = async (req: AuthRequest, res: Response) => {
   try {
@@ -22,10 +23,11 @@ export const uploadMedia = async (req: AuthRequest, res: Response) => {
         user: { connect: { id: req.user!.id } },
       },
     });
+    return successResponse(res, "Media uploaded successfully", media);
 
-    res.json({ media });
+
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Upload failed" });
+    return errorResponse(res, "Media upload failed");
   }
 };

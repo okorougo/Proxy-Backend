@@ -2,6 +2,7 @@ import { Response } from "express";
 import prisma from "../lib/prisma";
 import cloudinary, { uploadToCloudinary } from "../lib/cloudinary";
 import { AuthRequest } from "../middleware/auth";
+import { errorResponse, successResponse } from "../utils/response";
 
 export const uploadKycDocument = async (req: AuthRequest, res: Response) => {
   try {
@@ -66,10 +67,10 @@ export const submitKyc = async (req: AuthRequest, res: Response) => {
       create: { userId: userId as string, nin, selfieUrl, idCardUrl },
     });
 
-    res.json({ message: "KYC submitted successfully", kyc });
+    return successResponse(res, "KYC submitted successfully", kyc);
   } catch (err) {
     console.error("submitKyc error:", err);
-    res.status(500).json({ error: "KYC submission failed" });
+    return errorResponse(res, "KYC submission failed");
   }
 };
 
@@ -88,9 +89,9 @@ export const verifyKyc = async (req: AuthRequest, res: Response) => {
       data: { isKycVerified: true },
     });
 
-    res.json({ message: approve ? "KYC verified" : "KYC rejected", user: updated });
+    return successResponse(res, "KYC verified successfully", updated);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "KYC verification failed" });
+    return errorResponse(res, "KYC verification failed");
   }
 };

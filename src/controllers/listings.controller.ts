@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import prisma from "../lib/prisma";
 import { AuthRequest } from "../middleware/auth";
 import geohash from "ngeohash";
+import { errorResponse, successResponse } from "../utils/response";
 
 export const createListing = async (req: AuthRequest, res: Response) => {
   try {
@@ -37,7 +38,7 @@ export const createListing = async (req: AuthRequest, res: Response) => {
     res.json({ listing });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Create listing failed" });
+    return successResponse(res, "Listing creation failed");
   }
 };
 
@@ -52,9 +53,10 @@ export const getListingById = async (req: Request, res: Response) => {
         media: true,
       },
     });
-    if (!listing) return res.status(404).json({ error: "Not found" });
+    if (!listing) return errorResponse(res, "Listing not found", "LISTING_NOT_FOUND", 404);
     res.json({ listing });
   } catch (err) {
-    res.status(500).json({ error: "Fetch listing failed" });
+    console.error(err);
+    return errorResponse(res, "Failed to retrieve listing");
   }
 };

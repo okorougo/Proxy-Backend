@@ -1,6 +1,7 @@
 import { Response } from "express";
 import prisma from "../lib/prisma";
 import { AuthRequest } from "../middleware/auth";
+import { errorResponse, successResponse } from "../utils/response";
 
 /**
  * ✅ Register or update a user session (device)
@@ -9,7 +10,7 @@ import { AuthRequest } from "../middleware/auth";
 export const registerDevice = async (req: AuthRequest, res: Response) => {
   try {
     const { device, deviceToken, devicePlatform, sessionId } = req.body;
-    if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+    if (!req.user) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
 
     let session;
 
@@ -41,10 +42,10 @@ export const registerDevice = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    res.json({ message: "Device session registered successfully", session });
+    return successResponse(res, "Device registered successfully", session);
   } catch (err) {
     console.error("registerDevice error:", err);
-    res.status(500).json({ error: "Device registration failed" });
+    return errorResponse(res, "Device registration failed");
   }
 };
 
@@ -60,10 +61,10 @@ export const getUserSessions = async (req: AuthRequest, res: Response) => {
       orderBy: { createdAt: "desc" },
     });
 
-    res.json({ sessions });
+    return successResponse(res, "User sessions fetched successfully", sessions);
   } catch (err) {
     console.error("getUserSessions error:", err);
-    res.status(500).json({ error: "Failed to fetch user sessions" });
+    return errorResponse(res, "Failed to fetch user sessions");
   }
 };
 
@@ -85,10 +86,10 @@ export const updateSession = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.json({ message: "Session updated", session });
+    return successResponse(res, "Session updated successfully", session);
   } catch (err) {
     console.error("updateSession error:", err);
-    res.status(500).json({ error: "Failed to update session" });
+    return errorResponse(res, "Session update failed");
   }
 };
 
@@ -97,17 +98,17 @@ export const updateSession = async (req: AuthRequest, res: Response) => {
  */
 export const logoutSession = async (req: AuthRequest, res: Response) => {
   try {
-    if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+    if (!req.user) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
 
     await prisma.session.updateMany({
       where: { userId: req.user.id },
       data: { isOnline: false, lastSeen: new Date(), socketId: null },
     });
 
-    res.json({ message: "User logged out successfully" });
+    return successResponse(res, "Logged out from all sessions successfully");
   } catch (err) {
     console.error("logoutSession error:", err);
-    res.status(500).json({ error: "Logout failed" });
+    return errorResponse(res, "Logout failed");
   }
 };
 
@@ -121,9 +122,9 @@ export const getAllSessions = async (_req: AuthRequest, res: Response) => {
       orderBy: { createdAt: "desc" },
     });
 
-    res.json({ sessions });
+    return successResponse(res, "All sessions fetched successfully", sessions);
   } catch (err) {
     console.error("getAllSessions error:", err);
-    res.status(500).json({ error: "Failed to fetch all sessions" });
+    return errorResponse(res, "Failed to fetch all sessions");
   }
 };

@@ -2,6 +2,7 @@ import { Response } from "express";
 import prisma from "../lib/prisma";
 import cloudinary from "../lib/cloudinary";
 import { AuthRequest } from "../middleware/auth";
+import { errorResponse, successResponse } from "../utils/response";
 
 // Create a meetup transaction
 export const createTransaction = async (req: AuthRequest, res: Response) => {
@@ -9,10 +10,10 @@ export const createTransaction = async (req: AuthRequest, res: Response) => {
     const { listingId, method, amountCents } = req.body;
 
     const listing = await prisma.listing.findUnique({ where: { id: listingId } });
-    if (!listing) return res.status(404).json({ error: "Listing not found" });
+    if (!listing) return errorResponse(res, "Listing not found", "LISTING_NOT_FOUND", 404);
 
     if (listing.sellerId === req.user!.id) {
-      return res.status(400).json({ error: "Seller cannot buy their own listing" });
+      return errorResponse(res, "Cannot buy your own listing", "INVALID_TRANSACTION");
     }
 
     const tx = await prisma.transaction.create({
@@ -26,10 +27,12 @@ export const createTransaction = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.json({ message: "Transaction created", transaction: tx });
+    return successResponse(res, "Transaction created successfully", tx);
+
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Transaction creation failed" });
+    return errorResponse(res, "Transaction creation failed");
+    
   }
 };
 
@@ -39,13 +42,13 @@ export const uploadReceipt = async (req: AuthRequest, res: Response) => {
     const file = (req.files as any)?.file;
     const { transactionId } = req.body;
 
-    if (!file) return res.status(400).json({ error: "No file uploaded" });
+    if (!file) return errorResponse(res, "No file uploaded");
 
     const tx = await prisma.transaction.findUnique({ where: { id: transactionId } });
-    if (!tx) return res.status(404).json({ error: "Transaction not found" });
+    if (!tx) return errorResponse(res, "Transaction not found", "TRANSACTION_NOT_FOUND", 404);
 
     if (![tx.buyerId, tx.sellerId].includes(req.user!.id)) {
-      return res.status(403).json({ error: "Not authorized" });
+      return errorResponse(res, "Not authorized to upload receipt for this transaction", "NOT_AUTHORIZED");
     }
 
     const result = await cloudinary.uploader.upload(file.tempFilePath, {
@@ -58,10 +61,10 @@ export const uploadReceipt = async (req: AuthRequest, res: Response) => {
       data: { receiptUrl: result.secure_url },
     });
 
-    res.json({ message: "Receipt uploaded", transaction: updated });
+    return successResponse(res, "Receipt uploaded successfully", updated);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Receipt upload failed" });
+    return errorResponse(res, "Receipt upload failed");
   }
 };
 
@@ -71,10 +74,10 @@ export const completeTransaction = async (req: AuthRequest, res: Response) => {
     const { transactionId } = req.body;
 
     const tx = await prisma.transaction.findUnique({ where: { id: transactionId } });
-    if (!tx) return res.status(404).json({ error: "Transaction not found" });
+    if (!tx) return errorResponse(res, "Transaction not found", "TRANSACTION_NOT_FOUND", 404);
 
     if (![tx.buyerId, tx.sellerId].includes(req.user!.id)) {
-      return res.status(403).json({ error: "Not authorized" });
+      return errorResponse(res, "Not authorized to complete this transaction", "NOT_AUTHORIZED");
     }
 
     const updated = await prisma.transaction.update({
@@ -82,9 +85,9 @@ export const completeTransaction = async (req: AuthRequest, res: Response) => {
       data: { status: "COMPLETED" },
     });
 
-    res.json({ message: "Transaction marked completed", transaction: updated });
+    return successResponse(res, "Transaction completed successfully", updated);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Failed to complete transaction" });
+    return errorResponse(res, "Failed to complete transaction");
   }
 };

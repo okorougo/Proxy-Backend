@@ -2,12 +2,13 @@ import { Response } from "express";
 import prisma from "../lib/prisma";
 import { AuthRequest } from "../middleware/auth";
 import { sendFcm, sendExpo } from "../lib/notifications";
+import { errorResponse, successResponse } from "../utils/response";
 
 // Send message
 export const sendMessageRest = async (req: AuthRequest, res: Response) => {
   try {
     const { receiverId, listingId, content } = req.body;
-    if (!receiverId || !content) return res.status(400).json({ error: 'receiverId and content required' });
+    if (!receiverId || !content) return errorResponse(res, "receiverId and content are required");
 
     const message = await prisma.message.create({
       data: {
@@ -32,10 +33,10 @@ export const sendMessageRest = async (req: AuthRequest, res: Response) => {
       }
     }
 
-    res.json({ message });
+    return successResponse(res, "Message sent", message);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Send message failed' });
+    return errorResponse(res, "Message send failed");
   }
 };
 
@@ -57,7 +58,7 @@ export const getConversation = async (req: AuthRequest, res: Response) => {
     res.json({ messages });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Fetch conversation failed" });
+    return errorResponse(res, "Failed to load conversation");
   }
 };
 
@@ -65,7 +66,7 @@ export const getConversation = async (req: AuthRequest, res: Response) => {
 export const markDelivered = async (req: AuthRequest, res: Response) => {
   try {
     const { messageIds } = req.body; // array of message ids
-    if (!Array.isArray(messageIds)) return res.status(400).json({ error: 'messageIds array required' });
+    if (!Array.isArray(messageIds)) return errorResponse(res, "messageIds must be an array");
 
     const now = new Date();
     await prisma.message.updateMany({
@@ -73,10 +74,11 @@ export const markDelivered = async (req: AuthRequest, res: Response) => {
       data: { status: "DELIVERED", deliveredAt: now },
     });
 
-    res.json({ ok: true });
+    return successResponse(res, "Messages marked as delivered");
+
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Mark delivered failed' });
+    return errorResponse(res, "Mark delivered failed");
   }
 };
 
@@ -84,7 +86,7 @@ export const markDelivered = async (req: AuthRequest, res: Response) => {
 export const markAsRead = async (req: AuthRequest, res: Response) => {
   try {
     const { senderId } = req.body;
-    if (!senderId) return res.status(400).json({ error: 'senderId required' });
+    if (!senderId) return errorResponse(res, "senderId is required");
 
     const now = new Date();
     const result = await prisma.message.updateMany({
@@ -100,10 +102,10 @@ export const markAsRead = async (req: AuthRequest, res: Response) => {
       else await sendFcm(s.deviceToken!, "Messages read", body, { type: "read", by: req.user!.id });
     }
 
-    res.json({ updatedCount: result.count });
+    return successResponse(res, "Messages marked as read", { count: result.count });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Mark as read failed' });
+    return errorResponse(res, "Mark as read failed");
   }
 };
 
@@ -120,10 +122,14 @@ export const getUnreadCounts = async (req: AuthRequest, res: Response) => {
       GROUP BY senderId
     `);
 
-    res.json({ counts: raw });
+    const counts: { [key: string]: number } = {};
+    for (const row of raw as any[]) {
+      counts[row.senderId] = Number(row.unread);
+    }
+    return successResponse(res, "Unread counts retrieved", counts);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Get unread counts failed' });
+    return errorResponse(res, "Failed to get unread counts");
   }
 };
 

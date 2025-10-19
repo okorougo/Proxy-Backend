@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import prisma from "../lib/prisma";
 import { AuthRequest } from "../middleware/auth";
+import { errorResponse, successResponse } from "../utils/response";
 
 // User submits report
 export const createReport = async (req: AuthRequest, res: Response) => {
@@ -16,10 +17,10 @@ export const createReport = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.json({ message: "Report submitted", report });
+    return successResponse(res, "Report submitted successfully", report);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Report submission failed" });
+    return errorResponse(res, "Failed to submit report");
   }
 };
 
@@ -32,10 +33,11 @@ export const getReports = async (req: Request, res: Response) => {
       orderBy: { createdAt: "desc" },
     });
 
-    res.json({ reports });
+    
+    return  successResponse(res, "Reports fetched successfully", reports);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Failed to fetch reports" });
+    return errorResponse(res, "Failed to fetch reports");
   }
 };
 
@@ -62,9 +64,9 @@ export const resolveReport = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.json({ message: "Report resolved", report });
+    return successResponse(res, "Report resolved successfully", report);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Failed to resolve report" });
+    return errorResponse(res, "Failed to resolve report");
   }
 };

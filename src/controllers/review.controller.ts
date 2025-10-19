@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import prisma from "../lib/prisma";
 import { AuthRequest } from "../middleware/auth";
+import { errorResponse, successResponse } from "../utils/response";
 
 // Buyer leaves review for seller
 export const createReview = async (req: AuthRequest, res: Response) => {
@@ -11,17 +12,17 @@ export const createReview = async (req: AuthRequest, res: Response) => {
       where: { id: transactionId },
       include: { listing: true },
     });
-    if (!tx) return res.status(404).json({ error: "Transaction not found" });
+    if (!tx) return errorResponse(res, "Transaction not found", "TRANSACTION_NOT_FOUND", 404);
     if (tx.status !== "COMPLETED") {
-      return res.status(400).json({ error: "Cannot review incomplete transaction" });
+      return errorResponse(res, "Cannot review incomplete transaction", "INVALID_TRANSACTION");
     }
 
     if (tx.buyerId !== req.user!.id) {
-      return res.status(403).json({ error: "Only buyer can leave review" });
+      return errorResponse(res, "Not authorized to review this transaction", "NOT_AUTHORIZED");
     }
 
     const existing = await prisma.review.findFirst({ where: { transactionId } });
-    if (existing) return res.status(400).json({ error: "Review already exists for this transaction" });
+    if (existing) return errorResponse(res, "Review already exists for this transaction", "REVIEW_EXISTS");
 
     const review = await prisma.review.create({
       data: {
@@ -33,10 +34,10 @@ export const createReview = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.json({ message: "Review created", review });
+    return successResponse(res, "Review created successfully", review);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Create review failed" });
+    return errorResponse(res, "Failed to create review");
   }
 };
 
@@ -59,13 +60,14 @@ export const getUserReviews = async (req: Request, res: Response) => {
       _count: { rating: true },
     });
 
-    res.json({
+    return successResponse(res, "Reviews fetched successfully", {
       reviews,
-      averageRating: avg._avg.rating,
+      averageRating: avg._avg.rating || 0,
       totalReviews: avg._count.rating,
     });
+    
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Fetch reviews failed" });
+    return errorResponse(res, "Failed to fetch reviews");
   }
 };
