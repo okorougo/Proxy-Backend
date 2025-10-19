@@ -62,7 +62,15 @@ app.use(xss());
 app.use(morgan("dev"));
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true }));
-const limiter = rateLimit({ windowMs: 60 * 1000, max: 100 });
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per window
+  message: {
+    success: false,
+    message: "Too many requests, please try again later.",
+  },
+})
+app.set("trust proxy", 1);
 app.use(limiter);
 app.use(passport.initialize());
 
