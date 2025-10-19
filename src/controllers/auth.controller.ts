@@ -23,7 +23,6 @@ export const register = async (req: Request, res: Response) => {
         phone: userExists.phone,
       });
     }
-    if (userPhoneExists)
         if (userExists) return errorResponse(res, "Email already exists",  "EMAIL_EXISTS", 409);
     if (userPhoneExists) return errorResponse(res, "Phone number already exists", "PHONE_EXISTS", 409);
 
@@ -39,7 +38,7 @@ export const register = async (req: Request, res: Response) => {
     });
   } catch (err: any) {
     console.error(err);
-    res.status(500).json({ error: "Server error" });
+    return errorResponse(res, "Internal server error", "SERVER_ERROR", 500);
   }
 };
 
