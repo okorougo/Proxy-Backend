@@ -9,6 +9,12 @@ const transporter = nodemailer.createTransport({
     user: "ajayisegun2003@gmail.com",
     pass: "spudyopyvqaljvmy",
   },
+  pool: true, // reuse connection
+  maxConnections: 3,
+  maxMessages: 50,
+  connectionTimeout: 10000, // 10s
+  greetingTimeout: 5000,
+  socketTimeout: 10000,
 });
 
 export async function sendEmail(to: string, subject: string, html: string) {
