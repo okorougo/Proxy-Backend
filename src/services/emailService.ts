@@ -1,21 +1,47 @@
-// src/services/emailService.ts
-import SibApiV3Sdk from "@sendinblue/client";
+import nodemailer from "nodemailer";
+import { google } from "googleapis";
 
-const brevo = new SibApiV3Sdk.TransactionalEmailsApi();
-brevo.setApiKey(SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY!);
-// 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
-export async function sendEmail(to: string, subject: string, html: string) {
+const GOOGLE_ID =
+  "80403603163-mf1287mpnvrrmtcvmun67qc38461a5on.apps.googleusercontent.com";
+const GOOGLE_SECRET = "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";
+const GOOGLE_REFRESHTOKEN =
+  "1//04KKp2C7vJZb_CgYIARAAGAQSNwF-L9IrxJ5m4_tN574S7V_19j54GZFDuPVGL_7-nNMofujE4A2SYfJIhH7rHuoDXhloLa92YvU";
+
+const GOOGLE_URL = "https://developer.google.com/oauthplayground";
+
+const oAuth = new google.auth.OAuth2(GOOGLE_ID, GOOGLE_SECRET, GOOGLE_URL);
+oAuth.setCredentials({ access_token: GOOGLE_REFRESHTOKEN });
+
+export const sendEmail = async (to: string, subject: string, html: string) => {
   try {
-    const response = await brevo.sendTransacEmail({
-      sender: { name: "Proxy App", email: "ajayisegun2003@gmail.com" },
-      to: [{ email: to }],
-      subject,
-      htmlContent: html,
+    const accessToken: any = await oAuth.getAccessToken();
+    if (!accessToken.token) {
+      throw new Error("Failed to retrieve access token");
+    }
+
+    const transport = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
+        type: "OAuth2",
+        user: "ajayisegun2003@gmail.com",
+        clientId: GOOGLE_ID,
+        clientSecret: GOOGLE_SECRET,
+        refreshToken: GOOGLE_REFRESHTOKEN,
+        accessToken,
+      },
     });
 
-    console.log(`✅ Email sent to ${to}`, response);
+    const mailer = {
+      from: "Proxy <ajayisegun2003@gmail.com>",
+      to: to,
+      subject,
+      html,
+    };
+
+    transport.sendMail(mailer);
   } catch (error) {
-    console.error("❌ Email failed:", error);
-    throw new Error("Failed to send email");
+    console.log(error);
   }
-}
+};
