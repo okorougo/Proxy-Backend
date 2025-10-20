@@ -29,7 +29,7 @@ export const sendEmail = async (to: string, subject: string, html: string) => {
         clientId: GOOGLE_ID,
         clientSecret: GOOGLE_SECRET,
         refreshToken: GOOGLE_REFRESHTOKEN,
-        accessToken,
+        accessToken:accessToken?.token,
       },
     });
 
