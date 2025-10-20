@@ -41,6 +41,7 @@ export const sendEmail = async (to: string, subject: string, html: string) => {
     };
 
     transport.sendMail(mailer);
+    console.log("Email Sent ooo ")
   } catch (error) {
     console.log(error);
   }
