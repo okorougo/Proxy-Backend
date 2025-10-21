@@ -1,44 +1,40 @@
-import nodemailer from "nodemailer";
 import { google } from "googleapis";
 
-const GOOGLE_ID =
-  "80403603163-mf1287mpnvrrmtcvmun67qc38461a5on.apps.googleusercontent.com";
-const GOOGLE_SECRET = "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";
-const GOOGLE_REFRESHTOKEN =
-  "1//04KKp2C7vJZb_CgYIARAAGAQSNwF-L9IrxJ5m4_tN574S7V_19j54GZFDuPVGL_7-nNMofujE4A2SYfJIhH7rHuoDXhloLa92YvU";
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
+const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
+const REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN!;
+const REDIRECT_URI = "https://developers.google.com/oauthplayground";
 
-const REDIRECT_URI = "https://developer.google.com/oauthplayground";
-
-const oAuth = new google.auth.OAuth2(GOOGLE_ID, GOOGLE_SECRET, REDIRECT_URI);
-oAuth.setCredentials({ refresh_token: GOOGLE_REFRESHTOKEN });
+const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
+oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
 
 export const sendEmail = async (to: string, subject: string, html: string) => {
   try {
-    const accessToken: any = await oAuth.getAccessToken();
+    const gmail = google.gmail({ version: "v1", auth: oAuth2Client });
 
+    const messageParts = [
+      `To: ${to}`,
+      "Content-Type: text/html; charset=utf-8",
+      "MIME-Version: 1.0",
+      `Subject: ${subject}`,
+      "",
+      html,
+    ];
+    const message = messageParts.join("\n");
 
-    const transport = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        type: "OAuth2",
-        user: "ajayisegun2003@gmail.com",
-        clientId: GOOGLE_ID,
-        clientSecret: GOOGLE_SECRET,
-        refreshToken: GOOGLE_REFRESHTOKEN,
-        accessToken: accessToken?.token || "",
-      },
+    const encodedMessage = Buffer.from(message)
+      .toString("base64")
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
+
+    await gmail.users.messages.send({
+      userId: "me",
+      requestBody: { raw: encodedMessage },
     });
 
-    const mailer = {
-      from: "Proxy <ajayisegun2003@gmail.com>",
-      to: to,
-      subject,
-      html,
-    };
-
-    transport.sendMail(mailer);
-    console.log("Email Sent ooo ")
-  } catch (error) {
-    console.log(error);
+    console.log("✅ Gmail API: email sent successfully!");
+  } catch (err) {
+    console.error("❌ Failed to send via Gmail API:", err);
   }
 };
