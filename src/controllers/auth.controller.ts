@@ -168,6 +168,7 @@ export const registerVendor = async (req: Request, res: Response) => {
 
     let user = await prisma.user.findUnique({ where: { email } });
 
+
     // If user doesn't exist, create one silently
     if (!user) {
       const hashed = await bcrypt.hash(password, 10);
@@ -208,6 +209,9 @@ export const registerVendor = async (req: Request, res: Response) => {
         where: { userId: user.id },
       });
 
+      if(existingVendor && user?.isKycVerified !== true){
+        return errorResponse(res, "KYC verification is pending. Please complete KYC to proceed.", "KYC_PENDING", 403);
+      }
       if (existingVendor) {
         return errorResponse(res, "Vendor application already submitted", "VENDOR_EXISTS", 409);
       }
