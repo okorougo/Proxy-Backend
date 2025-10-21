@@ -2,6 +2,7 @@ import { Response } from "express";
 import prisma from "../lib/prisma";
 import { AuthRequest } from "../middleware/auth";
 import { successResponse, errorResponse } from "../utils/response";
+import { uploadToCloudinary } from "../lib/cloudinary"; 
 
 // Dashboard overview (counts, stats)
 export const getDashboardStats = async (req: AuthRequest, res: Response) => {
@@ -198,5 +199,109 @@ export const removeListing = async (req: AuthRequest, res: Response) => {
     if (err.code === "P2025")
       return errorResponse(res, "Listing not found", "LISTING_NOT_FOUND", 404);
     return errorResponse(res, "Failed to remove listing");
+  }
+};
+export const createCategory = async (req: AuthRequest, res: Response) => {
+  try {
+    if (req.user?.role !== "ADMIN") {
+      return res.status(403).json({ error: "Only admin can create categories" });
+    }
+
+    const { name, description } = req.body;
+    if (!name) return res.status(400).json({ error: "Category name is required" });
+
+    const exists = await prisma.category.findUnique({ where: { name } });
+    if (exists) return res.status(409).json({ error: "Category already exists" });
+
+    let imageUrl: string | undefined;
+
+    // Use buffer from multer (memoryStorage)
+    if (req.file && req.file.buffer) {
+      const uploaded = await uploadToCloudinary(req.file.buffer, "categories");
+      imageUrl = uploaded.secure_url;
+    }
+
+    const category = await prisma.category.create({
+      data: { name, description, imageUrl },
+    });
+
+    res.status(201).json({ message: "Category created successfully", category });
+  } catch (err) {
+    console.error("createCategory error:", err);
+    res.status(500).json({ error: "Failed to create category" });
+  }
+};
+
+export const getCategories = async (req: AuthRequest, res: Response) => {
+  try {
+    const categories = await prisma.category.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+    res.json({ categories });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch categories" });
+  }
+};
+export const updateCategory = async (req: AuthRequest, res: Response) => {
+  try {
+    if (req.user?.role !== "ADMIN") {
+      return res.status(403).json({ error: "Only admin can update categories" });
+    }
+
+    const { id } = req.params;
+    const { name, description } = req.body;
+
+    const category = await prisma.category.findUnique({ where: { id } });
+    if (!category) return res.status(404).json({ error: "Category not found" });
+
+    let imageUrl = category.imageUrl;
+
+    // If a new image is uploaded, replace the old one
+    if (req.file && req.file.buffer) {
+      const uploaded = await uploadToCloudinary(req.file.buffer, "categories");
+      imageUrl = uploaded.secure_url;
+    }
+
+    const updated = await prisma.category.update({
+      where: { id },
+      data: {
+        name: name || category.name,
+        description: description || category.description,
+        imageUrl,
+      },
+    });
+
+    res.json({ message: "Category updated successfully", category: updated });
+  } catch (err) {
+    console.error("updateCategory error:", err);
+    res.status(500).json({ error: "Failed to update category" });
+  }
+};
+export const deleteCategory = async (req: AuthRequest, res: Response) => {
+  try {
+    if (req.user?.role !== "ADMIN") {
+      return res.status(403).json({ error: "Only admin can delete categories" });
+    }
+
+    const { id } = req.params;
+
+    const category = await prisma.category.findUnique({ where: { id } });
+    if (!category) return res.status(404).json({ error: "Category not found" });
+
+    // Optional: check if any listings are under this category
+    const listingCount = await prisma.listing.count({ where: { categoryId: id } });
+    if (listingCount > 0) {
+      return res.status(400).json({
+        error: "Cannot delete category with existing listings",
+      });
+    }
+
+    await prisma.category.delete({ where: { id } });
+
+    res.json({ message: "Category deleted successfully" });
+  } catch (err) {
+    console.error("deleteCategory error:", err);
+    res.status(500).json({ error: "Failed to delete category" });
   }
 };
