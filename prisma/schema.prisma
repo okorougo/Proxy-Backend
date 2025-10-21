@@ -15,70 +15,69 @@ enum Role {
   USER
   RIDER
 }
+
 enum VendorStatus {
   PENDING
   APPROVED
   REJECTED
 }
 
-
 model User {
-  id                 String        @id @default(uuid())
-  email              String        @unique
+  id                 String             @id @default(uuid())
+  email              String             @unique
   password           String?
-  phone        String?  @unique
+  phone              String?            @unique
   name               String?
-  role               String        @default("USER")
-  createdAt          DateTime      @default(now())
-  isEmailVerified   Boolean       @default(false)
+  role               String             @default("USER")
+  createdAt          DateTime           @default(now())
+  isEmailVerified    Boolean            @default(false)
   listings           Listing[]
   media              Media[]
-  reportsMade        Report[]      @relation("Reporter")
-  reportsReviewed    Report[]      @relation("ReviewedBy")
-  buyerTransactions  Transaction[] @relation("buyerTransactions")
-  sellerTransactions Transaction[] @relation("sellerTransactions")
-  auditLogs          AuditLog[]    @relation("Actor")
-  messagesSent       Message[]     @relation("sentMessages")
-  messagesRecv       Message[]     @relation("recvMessages")
-  isKycVerified      Boolean       @default(false)
-  kycDocument        KycVerification?          
+  reportsMade        Report[]           @relation("Reporter")
+  reportsReviewed    Report[]           @relation("ReviewedBy")
+  buyerTransactions  Transaction[]      @relation("buyerTransactions")
+  sellerTransactions Transaction[]      @relation("sellerTransactions")
+  auditLogs          AuditLog[]         @relation("Actor")
+  messagesSent       Message[]          @relation("sentMessages")
+  messagesRecv       Message[]          @relation("recvMessages")
+  isKycVerified      Boolean            @default(false)
+  kycDocument        KycVerification?
   kycDocumentId      String?
-  givenReviews       Review[]      @relation("givenReviews")
-  receivedReviews    Review[]      @relation("receivedReviews")
+  givenReviews       Review[]           @relation("givenReviews")
+  receivedReviews    Review[]           @relation("receivedReviews")
   Session            Session[]
-  isBanned Boolean  @default(false)
-  otpCode      String?   // temporary OTP code
-  otpExpiresAt DateTime?
-  vendorApplication VendorApplication?
+  isBanned           Boolean            @default(false)
+  otpCode            String? // temporary OTP code
+  otpExpiresAt       DateTime?
+  vendorApplication  VendorApplication?
 
   // Social auth
-  provider     String?   // "google" | "apple"
-  providerId   String?   // Google UID, Apple sub, etc
+  provider   String? // "google" | "apple"
+  providerId String? // Google UID, Apple sub, etc
 }
+
 model VendorApplication {
-  id            String        @id @default(uuid())
-  user          User          @relation(fields: [userId], references: [id])
-  userId        String        @unique
+  id     String @id @default(uuid())
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique
 
   description   String?
-  status        VendorStatus  @default(PENDING)
+  status        VendorStatus @default(PENDING)
   rejectionNote String?
 
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-
-
 model KycVerification {
-  id           String   @id @default(uuid())
-  user         User     @relation(fields: [userId], references: [id])
-  userId       String   @unique
+  id     String @id @default(uuid())
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique
 
-  nin          String?
-  selfieUrl    String?
-  idCardUrl    String?
-  status       KycStatus @default(PENDING)
+  nin           String?
+  selfieUrl     String?
+  idCardUrl     String?
+  status        KycStatus @default(PENDING)
   rejectionNote String?
 
   createdAt DateTime @default(now())
@@ -96,7 +95,7 @@ model Listing {
   title        String
   description  String
   priceCents   Int
-  price       Float
+  price        Float
   currency     String        @default("NGN")
   isDigital    Boolean       @default(false)
   seller       User          @relation(fields: [sellerId], references: [id])
@@ -109,8 +108,7 @@ model Listing {
   media        Media[]
   transactions Transaction[]
   Message      Message[]
-  status      ListingStatus @default(PENDING)
-  
+  status       ListingStatus @default(PENDING)
 }
 
 model Location {
@@ -139,22 +137,23 @@ model Media {
 }
 
 model Message {
-  id          String   @id @default(uuid())
-  content     String
-  sender      User     @relation("sentMessages", fields: [senderId], references: [id])
+  id          String        @id @default(uuid())
+  content     String?
+  sender      User          @relation("sentMessages", fields: [senderId], references: [id])
   senderId    String
-  recipient   User     @relation("recvMessages", fields: [recipientId], references: [id])
-  listing     Listing? @relation(fields: [listingId], references: [id])
+  recipient   User          @relation("recvMessages", fields: [recipientId], references: [id])
+  listing     Listing?      @relation(fields: [listingId], references: [id])
   listingId   String?
   recipientId String
+  mediaUrl    String? // For image or PDF
+  messageType String        @default("TEXT") // TEXT | IMAGE | PDF
   text        String?
-  status     MessageStatus @default(SENT)
+  status      MessageStatus @default(SENT)
   deliveredAt DateTime?
-  readAt     DateTime?
-  read        Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
+  readAt      DateTime?
+  read        Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
 
 model Report {
@@ -170,7 +169,7 @@ model Report {
   reviewedBy   User?        @relation("ReviewedBy", fields: [reviewedById], references: [id])
   reviewedById String?
   reviewedAt   DateTime?
-  resolved     Boolean @default(false)
+  resolved     Boolean      @default(false)
 }
 
 enum ReportStatus {
@@ -179,6 +178,7 @@ enum ReportStatus {
   ACTIONED
   REJECTED
 }
+
 enum MessageStatus {
   SENT
   DELIVERED
@@ -223,8 +223,8 @@ model Session {
   createdAt      DateTime @default(now())
   lastSeen       DateTime @default(now())
   revoked        Boolean  @default(false)
-  socketId       String?    // active socket connection
-  isOnline       Boolean    @default(false)
+  socketId       String? // active socket connection
+  isOnline       Boolean  @default(false)
 }
 
 model Review {
@@ -242,6 +242,7 @@ model Review {
   comment   String?
   createdAt DateTime @default(now())
 }
+
 enum ListingStatus {
   PENDING
   APPROVED

@@ -20,6 +20,7 @@ import cookieParser from "cookie-parser";
 import xss from "xss-clean";
 import rateLimit from 'express-rate-limit';
 import "./lib/passport";
+import { uploadToCloudinary } from "../src/lib/cloudinary";
 import passport from "passport";
 
 
@@ -135,41 +136,78 @@ io.on("connection", (socket) => {
   });
 
   // send message realtime
-  socket.on("send_message", async (payload: { receiverId: string; listingId?: string; content: string; tempId?: string }) => {
+  socket.on("send_message", async (payload: { receiverId: string; listingId?: string; content: string; tempId?: string,  media?: string; mediaType?: "image" | "pdf"; }) => {
     try {
       const senderId = socket.data.userId;
-      if (!senderId) return socket.emit("error", { message: "Not joined" });
+        if (!senderId)
+          return socket.emit("error", { message: "Not joined" });
 
-      // Save message (status = SENT)
-      const message = await prisma.message.create({
-        data: {
-          senderId,
-          recipientId: payload.receiverId,
-          listingId: payload.listingId,
-          content: payload.content,
-          status: "SENT",
-        },
-      });
+        let mediaUrl: string | null = null;
+        let messageType: "TEXT" | "IMAGE" | "PDF" = "TEXT";
 
-      // Find all online sessions for receiver
-      const receiverSessions = await prisma.session.findMany({
-        where: { userId: payload.receiverId, isOnline: true, socketId: { not: null } },
-      });
+        // ✅ Handle image or PDF upload
+        if (payload.media && payload.mediaType) {
+          const folder =
+            payload.mediaType === "image"
+              ? "messages/images"
+              : "messages/pdfs";
 
-      if (receiverSessions.length > 0) {
-        // Deliver to all online sessions
-        for (const s of receiverSessions) {
-          io.to(s.socketId!).emit("receive_message", message);
+          // Validate allowed types
+          if (
+            payload.mediaType !== "image" &&
+            payload.mediaType !== "pdf"
+          ) {
+            return socket.emit("error", {
+              message: "Only image or PDF uploads allowed",
+            });
+          }
+
+          const buffer = Buffer.from(payload.media, 'base64');
+          const upload = await uploadToCloudinary(buffer, folder);
+          mediaUrl = upload.secure_url;
+          messageType =
+            payload.mediaType === "image" ? "IMAGE" : "PDF";
         }
 
-        // Update status to DELIVERED
-        const delivered = await prisma.message.update({
-          where: { id: message.id },
-          data: { status: "DELIVERED", deliveredAt: new Date() },
+        // ✅ Create message record
+        const message = await prisma.message.create({
+          data: {
+            senderId,
+            recipientId: payload.receiverId,
+            listingId: payload.listingId,
+            content: payload.content || null,
+            mediaUrl,
+            messageType,
+            status: "SENT",
+          },
         });
 
+        // ✅ Deliver message
+        const receiverSessions = await prisma.session.findMany({
+          where: {
+            userId: payload.receiverId,
+            isOnline: true,
+            socketId: { not: null },
+          },
+        });
+
+        if (receiverSessions.length > 0) {
+          for (const s of receiverSessions) {
+            io.to(s.socketId!).emit("receive_message", message);
+          }
+
+          await prisma.message.update({
+            where: { id: message.id },
+            data: { status: "DELIVERED", deliveredAt: new Date() },
+          });
+
+
         // Notify sender about delivery
-        socket.emit("message_delivered", { id: delivered.id, deliveredAt: delivered.deliveredAt, tempId: payload.tempId });
+         socket.emit("message_delivered", {
+            id: message.id,
+            deliveredAt: new Date(),
+            tempId: payload.tempId,
+          });
       } else {
         // Receiver offline → send push notifications
         const sessions = await prisma.session.findMany({
