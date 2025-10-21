@@ -6,6 +6,7 @@
     "dev": "ts-node-dev --respawn src/server.ts",
     "build": "npx prisma generate && tsc",
     "start": "node dist/server.js",
+    "seed": "ts-node prisma/seed.ts",
     "postinstall": "npx prisma generate"
   },
   "dependencies": {
@@ -45,14 +46,15 @@
     "@types/morgan": "^1.9.10",
     "@types/multer": "^2.0.0",
     "@types/ngeohash": "^0.6.8",
-    "@types/node": "^24.5.2",
+    "@types/node": "^24.9.1",
     "@types/nodemailer": "^7.0.2",
     "@types/passport": "^1.0.17",
     "@types/passport-apple": "^2.0.3",
     "@types/passport-google-oauth20": "^2.0.16",
     "@types/socket.io": "^3.0.1",
     "@types/streamifier": "^0.1.2",
+    "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.3"
   }
 }

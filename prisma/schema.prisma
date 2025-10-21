@@ -55,11 +55,14 @@ model User {
   provider   String? // "google" | "apple"
   providerId String? // Google UID, Apple sub, etc
 }
+
 model Category {
   id          String    @id @default(uuid())
   name        String    @unique
   description String?
   imageUrl    String?
+  iconLib     String?
+  iconName    String?
   listings    Listing[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -117,8 +120,8 @@ model Listing {
   transactions Transaction[]
   Message      Message[]
   status       ListingStatus @default(PENDING)
-  categoryId  String
-  category    Category  @relation(fields: [categoryId], references: [id])
+  categoryId   String
+  category     Category      @relation(fields: [categoryId], references: [id])
 }
 
 model Location {
