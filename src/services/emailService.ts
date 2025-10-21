@@ -7,17 +7,15 @@ const GOOGLE_SECRET = "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";
 const GOOGLE_REFRESHTOKEN =
   "1//04KKp2C7vJZb_CgYIARAAGAQSNwF-L9IrxJ5m4_tN574S7V_19j54GZFDuPVGL_7-nNMofujE4A2SYfJIhH7rHuoDXhloLa92YvU";
 
-const GOOGLE_URL = "https://developer.google.com/oauthplayground";
+const REDIRECT_URI = "https://developer.google.com/oauthplayground";
 
-const oAuth = new google.auth.OAuth2(GOOGLE_ID, GOOGLE_SECRET, GOOGLE_URL);
-oAuth.setCredentials({ access_token: GOOGLE_REFRESHTOKEN });
+const oAuth = new google.auth.OAuth2(GOOGLE_ID, GOOGLE_SECRET, REDIRECT_URI);
+oAuth.setCredentials({ refresh_token: GOOGLE_REFRESHTOKEN });
 
 export const sendEmail = async (to: string, subject: string, html: string) => {
   try {
     const accessToken: any = await oAuth.getAccessToken();
-    if (!accessToken.token) {
-      throw new Error("Failed to retrieve access token");
-    }
+
 
     const transport = nodemailer.createTransport({
       service: "gmail",
@@ -27,7 +25,7 @@ export const sendEmail = async (to: string, subject: string, html: string) => {
         clientId: GOOGLE_ID,
         clientSecret: GOOGLE_SECRET,
         refreshToken: GOOGLE_REFRESHTOKEN,
-        accessToken,
+        accessToken: accessToken?.token || "",
       },
     });
 
