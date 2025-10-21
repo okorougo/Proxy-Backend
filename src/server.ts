@@ -20,7 +20,7 @@ import cookieParser from "cookie-parser";
 import xss from "xss-clean";
 import rateLimit from 'express-rate-limit';
 import "./lib/passport";
-import { uploadToCloudinary } from "../src/lib/cloudinary";
+import { uploadToCloudinary } from "./lib/cloudinary";
 import passport from "passport";
 
 
