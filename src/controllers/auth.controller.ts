@@ -210,10 +210,16 @@ export const registerVendor = async (req: Request, res: Response) => {
       });
 
       if(existingVendor && user?.isKycVerified !== true){
-        return errorResponse(res, "KYC verification is pending. Please complete KYC to proceed.", "KYC_PENDING", 403);
+        return errorResponse(res, "KYC verification is pending. Please complete KYC to proceed.", "KYC_PENDING", 403, {
+          email: user.email,
+          phone: user.phone,
+          vendorId: existingVendor.id,
+          status: existingVendor.status,
+        });
       }
-      if (existingVendor) {
-        return errorResponse(res, "Vendor application already submitted", "VENDOR_EXISTS", 409);
+
+      if (existingVendor?.status === "PENDING" && existingVendor) {
+        return errorResponse(res, "Vendor application already submitted, but haven't been approved yet. Please continue checking your mail to know if your application is approved", "VENDOR_EXISTS", 409);
       }
 
       // Create vendor application
