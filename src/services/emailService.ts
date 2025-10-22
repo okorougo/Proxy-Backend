@@ -1,4 +1,6 @@
 import { google } from "googleapis";
+import dotenv from "dotenv";
+dotenv.config();
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
@@ -31,6 +33,7 @@ export const sendEmail = async (to: string, subject: string, html: string) => {
     await gmail.users.messages.send({
       userId: "me",
       requestBody: { raw: encodedMessage },
+      
     });
 
     console.log("✅ Gmail API: email sent successfully!");
