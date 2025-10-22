@@ -1,6 +1,6 @@
 import { Router } from "express";
 import passport from "../lib/passport";
-import { register, login,sendOtp, verifyOtp,registerVendor, forgotPassword, resetPassword, resendResetOtp } from "../controllers/auth.controller";
+import { register, login,sendOtp, verifyOtp,registerVendor, forgotPassword, resetPassword, resendResetOtp, vendorLogin } from "../controllers/auth.controller";
 import jwt from "jsonwebtoken"
 
 const router = Router();
@@ -8,6 +8,7 @@ const router = Router();
 router.post("/register", register);
 router.post("/register-vendor", registerVendor);
 router.post("/login", login);
+router.post("/login-vendor", vendorLogin);
 router.post("/send-otp", sendOtp);
 router.post("/verify-otp", verifyOtp);
 router.post("/forgot-password", forgotPassword);
