@@ -42,8 +42,13 @@ export const submitKyc = async (req: AuthRequest, res: Response) => {
     const userId = req.user?.id;
     const { nin } = req.body;
 
+    if(!userId){
+      return errorResponse(res, "Unauthorized");
+
+    }
+
     if (!nin) {
-      return res.status(400).json({ error: "NIN is required" });
+      return errorResponse(res, "NIN is required");
     }
 
     let selfieUrl: string | undefined;
