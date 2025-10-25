@@ -248,3 +248,101 @@ export const getDigitalDownload = async (req: AuthRequest, res: Response) => {
     return errorResponse(res, "Failed to generate digital download");
   }
 };
+
+/* ==========================================================
+   🔍 SEARCH + FILTER LISTINGS
+   ========================================================== */
+export const searchListings = async (req: Request, res: Response) => {
+  try {
+    const {
+      q,              // keyword
+      minPrice,
+      maxPrice,
+      categoryId,
+      condition,
+      sortBy,
+      order = "desc",
+      lat,
+      lng,
+      radiusKm = "20", // default 20km radius
+    } = req.query as Record<string, string>;
+
+    const where: any = { status: "APPROVED" };
+
+    // 🔍 Keyword Search (title or description)
+    if (q) {
+      where.OR = [
+        { title: { contains: q, mode: "insensitive" } },
+        { description: { contains: q, mode: "insensitive" } },
+      ];
+    }
+
+    // 💰 Price Range
+    if (minPrice || maxPrice) {
+      where.price = {};
+      if (minPrice) where.price.gte = Number(minPrice);
+      if (maxPrice) where.price.lte = Number(maxPrice);
+    }
+
+    // 🏷️ Category Filter
+    if (categoryId) where.categoryId = categoryId;
+
+    // 📦 Condition Filter
+    if (condition) where.condition = { equals: condition, mode: "insensitive" };
+
+    // 📍 GEO Filter (optional)
+    let nearbyListingIds: string[] = [];
+    if (lat && lng) {
+      const radius = Number(radiusKm);
+      const neighbors = geohash.neighbors(geohash.encode(Number(lat), Number(lng)));
+      const centerHash = geohash.encode(Number(lat), Number(lng));
+      const allHashes = [centerHash, ...neighbors];
+
+      // Find nearby locations based on geohash prefix match
+      const nearbyLocations = await prisma.location.findMany({
+        where: {
+          geohash: { in: allHashes },
+        },
+        select: { id: true },
+      });
+
+      if (nearbyLocations.length > 0) {
+        nearbyListingIds = (
+          await prisma.listing.findMany({
+            where: {
+              locationId: { in: nearbyLocations.map((l) => l.id) },
+              status: "APPROVED",
+            },
+            select: { id: true },
+          })
+        ).map((l) => l.id);
+
+        where.id = { in: nearbyListingIds };
+      }
+    }
+
+    // 🧮 Sorting
+    let orderBy: any = { createdAt: order };
+    if (sortBy === "price") orderBy = { price: order };
+    if (sortBy === "popularity") orderBy = { transactions: { _count: order } };
+
+    // ✅ Fetch Listings
+    const listings = await prisma.listing.findMany({
+      where,
+      include: {
+        category: true,
+        location: true,
+        media: true,
+        seller: { select: { id: true, name: true, email: true } },
+        _count: { select: { transactions: true } },
+      },
+      orderBy,
+      take: 50,
+    });
+
+    return successResponse(res, "Listings fetched successfully", listings);
+  } catch (err) {
+    console.error("❌ searchListings error:", err);
+    return errorResponse(res, "Failed to search listings");
+  }
+};
