@@ -21,7 +21,7 @@ export const createListing = async (req: AuthRequest, res: Response) => {
       lat,
       lng,
       city,
-      region,
+      country,
       categoryId,
       condition,
       stock,
@@ -46,7 +46,7 @@ export const createListing = async (req: AuthRequest, res: Response) => {
     if (lat && lng) {
       const gh = geohash.encode(Number(lat), Number(lng));
       const location = await prisma.location.create({
-        data: { lat: Number(lat), lng: Number(lng), city, region, geohash: gh },
+        data: { lat: Number(lat), lng: Number(lng), city, geohash: gh, country },
       });
       locationId = location.id;
     }
@@ -71,29 +71,52 @@ export const createListing = async (req: AuthRequest, res: Response) => {
     });
 
     // Handle file uploads
+    // Files are in memory via multer; types:
+    // req.files: { [fieldname: string]: Express.Multer.File[] }
     const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
-    if (files && Object.keys(files).length > 0) {
-      const mediaUploads = [];
 
-      for (const field in files) {
-        for (const file of files[field]) {
-          const folder = isDigital ? "digital_listings" : "listing_media";
-          const uploaded = await uploadToCloudinary(file.buffer, folder);
-          const mimeType = file.mimetype;
-          mediaUploads.push({
-            url: uploaded.secure_url,
-            publicId: uploaded.public_id,
-            mimeType,
-            size: file.size,
-            listingId: listing.id,
-          });
-        }
+    // Upload media (images/videos) -> saves to Media table
+    if (files?.media && files.media.length > 0) {
+      const mediaCreates = [];
+      for (const f of files.media) {
+        const uploaded = await uploadToCloudinary(f.buffer, "listings/media");
+        mediaCreates.push({
+          url: uploaded.secure_url,
+          publicId: uploaded.public_id,
+          mimeType: f.mimetype,
+          size: f.size,
+          listingId: listing.id,
+        });
       }
-
-      if (mediaUploads.length > 0) {
-        await prisma.media.createMany({ data: mediaUploads });
+      if (mediaCreates.length > 0) {
+        // createMany will not return ids; we just persist
+        await prisma.media.createMany({ data: mediaCreates });
       }
     }
+
+    // Upload digital files (for digital listings) -> also Media table
+    if (files?.digitalFiles && files.digitalFiles.length > 0) {
+      const digitalCreates = [];
+      for (const f of files.digitalFiles) {
+        const uploaded = await uploadToCloudinary(f.buffer, "listings/digital");
+        digitalCreates.push({
+          url: uploaded.secure_url,
+          publicId: uploaded.public_id,
+          mimeType: f.mimetype,
+          size: f.size,
+          listingId: listing.id,
+        });
+      }
+      if (digitalCreates.length > 0) {
+        await prisma.media.createMany({ data: digitalCreates });
+      }
+    }
+
+    // Return the created listing with media & category
+    const created = await prisma.listing.findUnique({
+      where: { id: listing.id },
+      include: { media: true, category: true, location: true },
+    });
 
     return successResponse(res, "Listing created successfully", listing);
   } catch (err) {

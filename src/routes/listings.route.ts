@@ -12,9 +12,8 @@ router.post(
   "/create",
   authMiddleware,
   upload.fields([
-    { name: "image", maxCount: 5 },   // allow multiple images
-    { name: "video", maxCount: 1 },   // optional video
-    { name: "pdf", maxCount: 3 }      // optional for digital goods
+    { name: "media", maxCount: 10 },       // images/videos from frontend
+    { name: "digitalFiles", maxCount: 5 }, // pdfs/zip for digital listings
   ]),
   createListing
 );
