@@ -3,8 +3,55 @@ import prisma from "../lib/prisma";
 import { AuthRequest } from "../middleware/auth";
 import { successResponse, errorResponse } from "../utils/response";
 import { uploadToCloudinary } from "../lib/cloudinary"; 
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 // Dashboard overview (counts, stats)
+export const adminLogin = async (req: any, res: Response) => {
+  try {
+    const { email, password }:any = req.body;
+
+    if (!email || !password) {
+      return errorResponse(res, "Email and password are required", "MISSING_FIELDS", 400);
+    }
+
+    const admin = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!admin) {
+      return errorResponse(res, "Invalid email or password", "INVALID_CREDENTIALS", 401);
+    }
+
+    if (admin.role !== "ADMIN") {
+      return errorResponse(res, "Access denied — not an admin account", "FORBIDDEN", 403);
+    }
+
+    const validPassword = await bcrypt.compare(password, admin.password || "");
+    if (!validPassword) {
+      return errorResponse(res, "Invalid email or password", "INVALID_CREDENTIALS", 401);
+    }
+
+    const token = jwt.sign(
+      { id: admin.id, email: admin.email, role: admin.role },
+      process.env.JWT_SECRET!,
+      { expiresIn: "7d" }
+    );
+
+    return successResponse(res, "Admin login successful", {
+      token,
+      admin: {
+        id: admin.id,
+        email: admin.email,
+        name: admin.name,
+        role: admin.role,
+      },
+    });
+  } catch (err) {
+    console.error("adminLogin error:", err);
+    return errorResponse(res, "Internal server error", "SERVER_ERROR", 500);
+  }
+};
 export const getDashboardStats = async (req: AuthRequest, res: Response) => {
   try {
     const users = await prisma.user.count();

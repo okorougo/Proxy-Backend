@@ -8,7 +8,16 @@ export const upload = multer({ storage });
 
 const router = Router();
 
-router.post("/", authMiddleware, createListing);
+router.post(
+  "/create",
+  authMiddleware,
+  upload.fields([
+    { name: "image", maxCount: 5 },   // allow multiple images
+    { name: "video", maxCount: 1 },   // optional video
+    { name: "pdf", maxCount: 3 }      // optional for digital goods
+  ]),
+  createListing
+);
 router.put("/update/:id", authMiddleware, updateListing);
 router.delete("/delete/:id", authMiddleware, deleteListing);
 router.get("/vendor", authMiddleware, getAllListingsByVendor);

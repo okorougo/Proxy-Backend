@@ -6,7 +6,8 @@
     "dev": "ts-node-dev --respawn src/server.ts",
     "build": "npx prisma generate && tsc",
     "start": "node dist/server.js",
-    "seed": "ts-node prisma/seed.ts",
+    "seed:category": "ts-node prisma/seed.ts",
+    "seed:admin": "ts-node prisma/adminSeed.ts",
     "postinstall": "npx prisma generate"
   },
   "dependencies": {

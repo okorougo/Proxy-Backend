@@ -124,6 +124,7 @@ model Listing {
   Message      Message[]
   status       ListingStatus @default(PENDING)
   categoryId   String
+  extraDetails Json?  
   category     Category      @relation(fields: [categoryId], references: [id])
 }
 

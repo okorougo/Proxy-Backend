@@ -25,12 +25,22 @@ export const createListing = async (req: AuthRequest, res: Response) => {
       categoryId,
       condition,
       stock,
+      extraDetails,
     } = req.body;
 
     if (!title || !description || !price) {
       return errorResponse(res, "Title, description, and price are required");
     }
 
+    
+    let parsedDetails: { title: string; description: string }[] | null = null;
+    if (extraDetails) {
+      try {
+        parsedDetails = JSON.parse(extraDetails);
+      } catch (err) {
+        return errorResponse(res, "Invalid JSON format for extraDetails");
+      }
+    }
     let locationId: string | null = null;
     // Handle location if provided
     if (lat && lng) {
@@ -56,6 +66,7 @@ export const createListing = async (req: AuthRequest, res: Response) => {
         category: { connect: { id: categoryId } },
         location: locationId ? { connect: { id: locationId } } : undefined,
         status: "PENDING",
+        extraDetails: parsedDetails ?? undefined,
       },
     });
 

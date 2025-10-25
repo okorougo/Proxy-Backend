@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { getDashboardStats, listKycRequests, updateKycStatus, listReports, resolveReport, listUsers, banUser, unbanUser, updateUserRole,listAllListings, approveListing, rejectListing, removeListing, createCategory, getCategories, updateCategory, deleteCategory} from "../controllers/admin.controller";
+import { getDashboardStats, listKycRequests, updateKycStatus, listReports, resolveReport, listUsers, banUser, unbanUser, updateUserRole,listAllListings, approveListing, rejectListing, removeListing, createCategory, getCategories, updateCategory, deleteCategory, adminLogin} from "../controllers/admin.controller";
 import multer from "multer";
 import { authMiddleware } from "../middleware/auth";
 import { adminOnly, modOrAdmin } from "../middleware/admin";
 const upload = multer({ storage: multer.memoryStorage() });
 
 const router = Router();
-
+router.post("/login", adminLogin);
 // Dashboard stats
 router.get("/dashboard", authMiddleware, adminOnly, getDashboardStats);
 
