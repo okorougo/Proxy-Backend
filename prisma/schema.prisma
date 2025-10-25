@@ -110,6 +110,8 @@ model Listing {
   price        Float
   currency     String        @default("NGN")
   isDigital    Boolean       @default(false)
+  condition    String?       // e.g. "new", "used", "refurbished"
+  stock        Int?          // only for physical products
   seller       User          @relation(fields: [sellerId], references: [id])
   sellerId     String
   location     Location?     @relation(fields: [locationId], references: [id])
@@ -117,11 +119,24 @@ model Listing {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   media        Media[]
+  digitalFiles DigitalFile[] // 🔥 new relation
   transactions Transaction[]
   Message      Message[]
   status       ListingStatus @default(PENDING)
   categoryId   String
   category     Category      @relation(fields: [categoryId], references: [id])
+}
+
+model DigitalFile {
+  id          String   @id @default(uuid())
+  listing     Listing  @relation(fields: [listingId], references: [id])
+  listingId   String
+  fileUrl     String   // secure Cloudinary or storage URL
+  publicId    String   // Cloudinary public_id for future deletion
+  filename    String?
+  size        Int?
+  mimeType    String?
+  createdAt   DateTime @default(now())
 }
 
 model Location {
