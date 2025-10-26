@@ -16,5 +16,6 @@ router.get("/applications", authMiddleware, adminOnly, getAllVendorApplications)
 router.patch("/approve/:id", authMiddleware, adminOnly, approveVendor);
 router.patch("/reject/:id", authMiddleware, adminOnly, rejectVendor);
 router.patch("/create-delivery", authMiddleware, createDelivery);
+router.post("/add-location", createDelivery);
 
 export default router;

@@ -3,8 +3,20 @@ import prisma from "../lib/prisma";
 import { sendEmail } from "../services/emailService";
 import { errorResponse, successResponse } from "../utils/response";
 import { AuthRequest } from "../middleware/auth";
+import geohash from "ngeohash";
 
 
+
+function generateGeohash(latitude: number, longitude: number, precision: number = 9): string {
+  // Validate coordinates
+  if (latitude < -90 || latitude > 90) {
+    throw new Error('Invalid latitude');
+  }
+  if (longitude < -180 || longitude > 180) {
+    throw new Error('Invalid longitude');
+  }
+  return geohash.encode(latitude, longitude, precision);
+}
 
 function haversineDistance(lat1:number, lon1:number, lat2:number, lon2:number) {
   const R = 6371; // Earth radius in km
@@ -125,6 +137,32 @@ export const getAllVendorApplications = async (req: Request, res: Response) => {
         return errorResponse(res, "Failed to fetch vendor applications");
     }
 }
+
+export const addeVendorLocation = async (req:Request, res:Response) => {
+  try {
+    const { address, lat, lng, city, country,userId } = req.body;
+    if(!userId){
+      return errorResponse(res, "Unauthorized");
+    }
+    const geohash = generateGeohash(lat, lng);
+
+    const location = await prisma.location.create({
+      data: {
+        Address: address,
+        lat,
+        lng,
+        city,
+        country,
+        geohash,
+        vendor: { connect: { userId } },
+      },
+    });
+    return successResponse(res, "Vendor location added successfully", location);
+  } catch (error) {
+    console.error(error);
+    return errorResponse(res, "Failed to add vendor location");
+  }
+};
 
 
 export const createDelivery = async (req:AuthRequest, res:Response) => {
