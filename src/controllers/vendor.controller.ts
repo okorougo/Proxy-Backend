@@ -157,7 +157,7 @@ export const addeVendorLocation = async (req:Request, res:Response) => {
         city,
         country,
         geohash,
-        vendor: { connect: { userId } },
+        vendorId:userId,
       },
     });
     return successResponse(res, "Vendor location added successfully", location);
