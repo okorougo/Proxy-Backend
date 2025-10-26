@@ -10,6 +10,7 @@ import {
   addeVendorLocation,
   getVendorDashboardStats,
   getVendorById,
+  getVendorOrders,
 } from "../controllers/vendor.controller";
 
 const router = Router();
@@ -20,6 +21,7 @@ router.patch("/approve/:id", authMiddleware, adminOnly, approveVendor);
 router.patch("/reject/:id", authMiddleware, adminOnly, rejectVendor);
 router.patch("/create-delivery", authMiddleware, createDelivery);
 router.post("/add-location",addeVendorLocation );
+router.get("/orders", authMiddleware, getVendorOrders);
 router.get("/dashboard", authMiddleware, getVendorDashboardStats);
 router.get("/get-vendor/:id", authMiddleware, getVendorById);
 export default router;

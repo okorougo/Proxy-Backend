@@ -423,3 +423,74 @@ export const getVendorById = async (req: Request, res: Response) => {
     return errorResponse(res, "Failed to fetch vendor");
   }
 }
+
+export const getVendorOrders = async (req: AuthRequest, res: Response) => {
+  try {
+    const vendorId = req.user?.id;
+    if (!vendorId) {
+      return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
+    }
+
+    // ✅ Optional filters and pagination from query
+    const { status, page = "1", limit = "10" } = req.query;
+
+    const pageNum = parseInt(page as string, 10);
+    const pageSize = parseInt(limit as string, 10);
+
+    const whereClause: any = {
+      sellerId: vendorId,
+    };
+
+    // If a filter status is passed (e.g. ?status=COMPLETED)
+    if (status) {
+      whereClause.status = status;
+    }
+
+    // ✅ Count total
+    const totalOrders = await prisma.transaction.count({ where: whereClause });
+
+    // ✅ Fetch paginated orders
+    const orders = await prisma.transaction.findMany({
+      where: whereClause,
+      include: {
+        buyer: {
+          select: { id: true, name: true, email: true },
+        },
+        listing: {
+          select: {
+            id: true,
+            title: true,
+            price: true,
+            media: true,
+          },
+        },
+        Delivery: {
+          select: {
+            id: true,
+            pickupAddress: true,
+            dropoffAddress: true,
+            fareAmount: true,
+            status: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      skip: (pageNum - 1) * pageSize,
+      take: pageSize,
+    });
+
+    const totalPages = Math.ceil(totalOrders / pageSize);
+
+    return successResponse(res, "Vendor orders fetched successfully", {
+      totalOrders,
+      totalPages,
+      currentPage: pageNum,
+      orders,
+    });
+  } catch (error) {
+    console.error("getVendorOrders error:", error);
+    return errorResponse(res, "Failed to fetch vendor orders");
+  }
+};
