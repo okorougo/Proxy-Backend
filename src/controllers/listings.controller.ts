@@ -218,7 +218,9 @@ export const getPopularListings = async (req: Request, res: Response) => {
         seller: {
           include: {
             kycDocument: true,
-            vendorApplication: true,
+            vendorApplication: {
+              include: { location: true },
+            },
           },
         },
       },
@@ -250,8 +252,9 @@ export const getNewListings = async (req: Request, res: Response) => {
         seller: {
           include: {
             kycDocument: true,
-            vendorApplication: true,
-            
+            vendorApplication: {
+              include: { location: true },
+            },
           },
         },
       },
@@ -430,7 +433,18 @@ export const getListingsByCategory = async (req: Request, res: Response) => {
       where: { categoryId: categoryId as string, status: "APPROVED" },
       include: {
         media: true,
-        seller: { select: { id: true, name: true, email: true, phone: true, kycDocument: true } },
+        seller: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+            kycDocument: true,
+            vendorApplication: {
+              include: { location: true },
+            },
+          },
+        },
       },
       orderBy: { createdAt: "desc" },
       take: pageSize,
@@ -438,7 +452,8 @@ export const getListingsByCategory = async (req: Request, res: Response) => {
       cursor: cursor ? { id: cursor as string } : undefined,
     });
 
-    const nextCursor = listings.length === pageSize ? listings[listings.length - 1].id : null;
+    const nextCursor =
+      listings.length === pageSize ? listings[listings.length - 1].id : null;
 
     return successResponse(res, "Listings fetched successfully", {
       listings,
