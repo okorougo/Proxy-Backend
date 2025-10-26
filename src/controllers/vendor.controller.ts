@@ -306,21 +306,22 @@ export const createDelivery = async (req: AuthRequest, res: Response) => {
 export const getVendorDashboardStats = async (req: AuthRequest, res: Response) => {
   try {
     const vendorId = req.user?.id;
-    if (!vendorId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
+    if (!vendorId)
+      return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
 
     // 1️⃣ Running Orders (active deliveries)
     const runningOrders = await prisma.transaction.count({
       where: {
         sellerId: vendorId,
-        status: { in: ["PENDING"] },
+        status: "PENDING",
       },
     });
 
-    // 2️⃣ Order Requests (awaiting approval or payment)
+    // 2️⃣ Order Requests (awaiting confirmation or not yet processed)
     const orderRequests = await prisma.transaction.count({
       where: {
         sellerId: vendorId,
-        status: { in: ["PENDING"] },
+        status: "PENDING",
       },
     });
 
@@ -335,62 +336,66 @@ export const getVendorDashboardStats = async (req: AuthRequest, res: Response) =
 
     const totalRevenue = (revenue._sum.amountCents ?? 0) / 100;
 
-    // 4️⃣ Monthly Earnings (last 6 months)
+    // 4️⃣ Monthly Revenue (past 6 months)
     const now = new Date();
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(now.getMonth() - 5);
 
-    const monthlyStats = await prisma.transaction.groupBy({
-      by: ["createdAt"],
+    const monthlyStats = await prisma.transaction.findMany({
       where: {
         sellerId: vendorId,
         status: "COMPLETED",
         createdAt: { gte: sixMonthsAgo },
       },
-      _sum: { amountCents: true },
-    });
-
-    // Transform to monthly totals
-    const statsByMonth: Record<string, number> = {};
-    monthlyStats.forEach((t) => {
-      const month = t.createdAt.toLocaleString("default", { month: "short" });
-      statsByMonth[month] = (statsByMonth[month] ?? 0) + (t._sum.amountCents ?? 0) / 100;
-    });
-
-    // 5️⃣ Popular Vendors (top 5 overall)
-    const popularVendors = await prisma.user.findMany({
-      where: {
-        vendorApplication: { status: "APPROVED" },
+      select: {
+        amountCents: true,
+        createdAt: true,
       },
+    });
+
+    // Group by month
+    const monthlyTotals: Record<string, number> = {};
+    for (const t of monthlyStats) {
+      const month = t.createdAt.toLocaleString("default", { month: "short" });
+      monthlyTotals[month] = (monthlyTotals[month] ?? 0) + (t.amountCents ?? 0) / 100;
+    }
+
+    // 5️⃣ Popular Listings (Top 5 listings sold most by this vendor)
+    const popularListings = await prisma.listing.findMany({
+      where: { sellerId: vendorId },
       select: {
         id: true,
-        name: true,
-        email: true,
-        listings: {
-          select: { id: true, title: true },
+        title: true,
+        price: true,
+        media: {
+          take: 1,
+          select: { url: true },
         },
-        sellerTransactions: {
+        transactions: {
           where: { status: "COMPLETED" },
-          select: { amountCents: true },
+          select: { id: true },
         },
       },
     });
 
-    const ranked = popularVendors
-      .map((v) => ({
-        ...v,
-        totalSales:
-          v.sellerTransactions.reduce((sum, t) => sum + (t.amountCents ?? 0), 0) / 100,
+    const rankedListings = popularListings
+      .map((l) => ({
+        id: l.id,
+        title: l.title,
+        price: l.price,
+        totalSold: l.transactions.length,
+        media: l.media[0]?.url ?? null,
       }))
-      .sort((a, b) => b.totalSales - a.totalSales)
+      .filter((l) => l.totalSold > 0)
+      .sort((a, b) => b.totalSold - a.totalSold)
       .slice(0, 5);
 
     return successResponse(res, "Vendor dashboard stats", {
       runningOrders,
       orderRequests,
       totalRevenue,
-      monthlyStats: statsByMonth,
-      popularVendors: ranked,
+      monthlyRevenue: monthlyTotals,
+      popularListings: rankedListings,
     });
   } catch (err) {
     console.error("getVendorDashboardStats error:", err);
