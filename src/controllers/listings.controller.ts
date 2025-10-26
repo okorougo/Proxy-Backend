@@ -417,3 +417,34 @@ export const searchListings = async (req: Request, res: Response) => {
     return errorResponse(res, "Failed to search listings");
   }
 };
+export const getListingsByCategory = async (req: Request, res: Response) => {
+  try {
+    const { categoryId, limit = "10", cursor } = req.query;
+
+    if (!categoryId) return errorResponse(res, "categoryId is required");
+
+    const pageSize = parseInt(limit as string, 10);
+
+    const listings = await prisma.listing.findMany({
+      where: { categoryId: categoryId as string, status: "APPROVED" },
+      include: {
+        media: true,
+        seller: { select: { id: true, name: true, email: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      take: pageSize,
+      skip: cursor ? 1 : 0, // Skip the cursor item itself
+      cursor: cursor ? { id: cursor as string } : undefined,
+    });
+
+    const nextCursor = listings.length === pageSize ? listings[listings.length - 1].id : null;
+
+    return successResponse(res, "Listings fetched successfully", {
+      listings,
+      nextCursor,
+    });
+  } catch (err) {
+    console.error("getListingsByCategory error:", err);
+    return errorResponse(res, "Failed to fetch listings by category");
+  }
+};
