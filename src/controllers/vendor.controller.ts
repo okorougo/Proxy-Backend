@@ -402,3 +402,27 @@ export const getVendorDashboardStats = async (req: AuthRequest, res: Response) =
     return errorResponse(res, "Failed to fetch vendor dashboard stats");
   }
 };
+
+export const getVendorById = async (req: Request, res: Response) => {
+  try {
+    const id = req.user?.id;
+    if(!id){
+      return errorResponse(res, "Unauthorized");
+    }
+    const vendor = await prisma.vendorApplication.findUnique({
+      where: { id },
+      include:{
+        user:{
+          include:{
+            kycDocument:true,
+          }
+        },
+        location:true,
+      }
+    });
+    return successResponse(res, "Vendor fetched successfully", vendor);
+  } catch (err) {
+    console.error(err);
+    return errorResponse(res, "Failed to fetch vendor");
+  }
+}
