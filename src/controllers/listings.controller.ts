@@ -251,6 +251,7 @@ export const getNewListings = async (req: Request, res: Response) => {
           include: {
             kycDocument: true,
             vendorApplication: true,
+            
           },
         },
       },
@@ -429,7 +430,7 @@ export const getListingsByCategory = async (req: Request, res: Response) => {
       where: { categoryId: categoryId as string, status: "APPROVED" },
       include: {
         media: true,
-        seller: { select: { id: true, name: true, email: true } },
+        seller: { select: { id: true, name: true, email: true, phone: true, kycDocument: true } },
       },
       orderBy: { createdAt: "desc" },
       take: pageSize,
