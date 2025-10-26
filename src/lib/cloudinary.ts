@@ -23,5 +23,14 @@ export const uploadToCloudinary = (buffer: Buffer, folder: string): Promise<any>
     streamifier.createReadStream(buffer).pipe(uploadStream);
   });
 };
+export const generateSignedDownloadUrl = (publicId: string) => {
+  const url = cloudinary.url(publicId, {
+    resource_type: "auto",
+    type: "upload",
+    sign_url: true,
+    expires_at: Math.floor(Date.now() / 1000) + 60 * 60, // 1 hour expiry
+  });
+  return url;
+};
 
 export default cloudinary;

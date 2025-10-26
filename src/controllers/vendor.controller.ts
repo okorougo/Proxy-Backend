@@ -4,6 +4,7 @@ import { sendEmail } from "../services/emailService";
 import { errorResponse, successResponse } from "../utils/response";
 import { AuthRequest } from "../middleware/auth";
 import geohash from "ngeohash";
+import { generateSignedDownloadUrl } from "../lib/cloudinary";
 
 
 
@@ -168,25 +169,104 @@ export const addeVendorLocation = async (req:Request, res:Response) => {
 };
 
 
-export const createDelivery = async (req:AuthRequest, res:Response) => {
+export const createDelivery = async (req: AuthRequest, res: Response) => {
   try {
     const { transactionId, dropoffAddress, dropoffLat, dropoffLng } = req.body;
-    const userId = req.user?.id; // from auth middleware
 
+    if (!transactionId) {
+      return res.status(400).json({ message: "Transaction ID is required" });
+    }
 
-
-    // Fetch vendor info for pickup data
-    const vendor = await prisma.location.findUnique({
-      where: { vendorId: userId },
-      select: { Address: true, lat: true, lng: true, city: true, country: true }
+    // ✅ Fetch transaction and related listing + seller (vendor)
+    const transaction = await prisma.transaction.findUnique({
+      where: { id: transactionId },
+      include: {
+        listing: {
+          include: {
+            seller: {
+              include: {
+                vendorApplication: true,
+              },
+            },
+            media: true,
+          },
+        },
+      },
     });
 
-    if (!vendor) return res.status(404).json({ message: "Vendor not found" });
+    if (!transaction)
+      return res.status(404).json({ message: "Transaction not found" });
 
-    // Calculate distance and fare
+    const listing = transaction.listing;
+    if (!listing)
+      return res.status(404).json({ message: "Listing not found" });
+
+    // ✅ If digital listing, skip physical delivery
+    if (listing.isDigital) {
+      // Generate signed download URLs for the buyer (for each digital media)
+      const signedDownloads = await Promise.all(
+        listing.media.map(async (file) => {
+          return {
+            id: file.id,
+            name: file.publicId,
+            url: await generateSignedDownloadUrl(file.publicId),
+          };
+        })
+      );
+
+      // Mark digital delivery as "COMPLETED" immediately
+      const digitalDelivery = await prisma.delivery.create({
+        data: {
+          transactionId,
+          pickupAddress: "Digital Delivery",
+          pickupLat: 0,
+          pickupLng: 0,
+          dropoffAddress: "Digital File",
+          dropoffLat: 0,
+          dropoffLng: 0,
+          distanceKm: 0,
+          fareAmount: 0,
+          status: "DELIVERED",
+          isDigital: true,
+          digitalFiles: JSON.stringify(signedDownloads),
+        },
+      });
+
+      return res.status(200).json({
+        message: "Digital delivery completed successfully",
+        digitalDelivery,
+      });
+    }
+
+    // ✅ If physical listing, calculate fare based on vendor → buyer distance
+    if (!dropoffAddress || !dropoffLat || !dropoffLng) {
+      return res.status(400).json({ message: "Dropoff details required for physical delivery" });
+    }
+
+    const vendor = listing.seller;
+    if (!vendor || !vendor.vendorApplication) {
+      return res.status(404).json({ message: "Vendor location not found" });
+    }
+
+    // Replace with your vendor address/lat/lng storage source
+
+    const vendorLocation = await prisma.location.findUnique({
+      where: { vendorId: vendor.id },
+    });
+
+    if (!vendorLocation) {
+      return res.status(404).json({ message: "Vendor location not found" });
+    }
+
+    const pickupAddress =
+      vendorLocation.Address || "Vendor Address";
+    const pickupLat = vendorLocation.lat; // vendor location latitude
+    const pickupLng = vendorLocation.lng ;
+
+    // 🧮 Compute distance and fare
     const distanceKm = haversineDistance(
-      vendor.lat,
-      vendor.lng,
+      pickupLat,
+      pickupLng,
       dropoffLat,
       dropoffLng
     );
@@ -194,28 +274,126 @@ export const createDelivery = async (req:AuthRequest, res:Response) => {
     const BASE_FARE = 400;
     const RATE_PER_KM = 120;
     const SERVICE_FEE = 100;
-    const fareAmount = BASE_FARE + distanceKm * RATE_PER_KM + SERVICE_FEE;
+    const fareAmount = Math.round(BASE_FARE + distanceKm * RATE_PER_KM + SERVICE_FEE);
 
-    // Create delivery record
-
-
+    // 🚚 Create delivery
     const delivery = await prisma.delivery.create({
       data: {
         transactionId,
-        pickupAddress: vendor.Address,
-        pickupLat: vendor.lat,
-        pickupLng: vendor.lng,
+        pickupAddress,
+        pickupLat,
+        pickupLng,
         dropoffAddress,
         dropoffLat,
         dropoffLng,
         distanceKm,
         fareAmount,
+        status: "PENDING",
+        isDigital: false,
       },
     });
 
-    res.status(201).json({ message: "Delivery created", delivery });
+    return res.status(201).json({
+      message: "Physical delivery created successfully",
+      delivery,
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error creating delivery" });
+    console.error("❌ createDelivery error:", error);
+    return res.status(500).json({ message: "Error creating delivery" });
+  }
+};
+
+export const getVendorDashboardStats = async (req: AuthRequest, res: Response) => {
+  try {
+    const vendorId = req.user?.id;
+    if (!vendorId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
+
+    // 1️⃣ Running Orders (active deliveries)
+    const runningOrders = await prisma.transaction.count({
+      where: {
+        sellerId: vendorId,
+        status: { in: ["PENDING"] },
+      },
+    });
+
+    // 2️⃣ Order Requests (awaiting approval or payment)
+    const orderRequests = await prisma.transaction.count({
+      where: {
+        sellerId: vendorId,
+        status: { in: ["PENDING"] },
+      },
+    });
+
+    // 3️⃣ Revenue Made (sum of all COMPLETED transactions)
+    const revenue = await prisma.transaction.aggregate({
+      where: {
+        sellerId: vendorId,
+        status: "COMPLETED",
+      },
+      _sum: { amountCents: true },
+    });
+
+    const totalRevenue = (revenue._sum.amountCents ?? 0) / 100;
+
+    // 4️⃣ Monthly Earnings (last 6 months)
+    const now = new Date();
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(now.getMonth() - 5);
+
+    const monthlyStats = await prisma.transaction.groupBy({
+      by: ["createdAt"],
+      where: {
+        sellerId: vendorId,
+        status: "COMPLETED",
+        createdAt: { gte: sixMonthsAgo },
+      },
+      _sum: { amountCents: true },
+    });
+
+    // Transform to monthly totals
+    const statsByMonth: Record<string, number> = {};
+    monthlyStats.forEach((t) => {
+      const month = t.createdAt.toLocaleString("default", { month: "short" });
+      statsByMonth[month] = (statsByMonth[month] ?? 0) + (t._sum.amountCents ?? 0) / 100;
+    });
+
+    // 5️⃣ Popular Vendors (top 5 overall)
+    const popularVendors = await prisma.user.findMany({
+      where: {
+        vendorApplication: { status: "APPROVED" },
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        listings: {
+          select: { id: true, title: true },
+        },
+        sellerTransactions: {
+          where: { status: "COMPLETED" },
+          select: { amountCents: true },
+        },
+      },
+    });
+
+    const ranked = popularVendors
+      .map((v) => ({
+        ...v,
+        totalSales:
+          v.sellerTransactions.reduce((sum, t) => sum + (t.amountCents ?? 0), 0) / 100,
+      }))
+      .sort((a, b) => b.totalSales - a.totalSales)
+      .slice(0, 5);
+
+    return successResponse(res, "Vendor dashboard stats", {
+      runningOrders,
+      orderRequests,
+      totalRevenue,
+      monthlyStats: statsByMonth,
+      popularVendors: ranked,
+    });
+  } catch (err) {
+    console.error("getVendorDashboardStats error:", err);
+    return errorResponse(res, "Failed to fetch vendor dashboard stats");
   }
 };

@@ -8,6 +8,7 @@ import {
   getAllVendorApplications,
   createDelivery,
   addeVendorLocation,
+  getVendorDashboardStats,
 } from "../controllers/vendor.controller";
 
 const router = Router();
@@ -18,5 +19,5 @@ router.patch("/approve/:id", authMiddleware, adminOnly, approveVendor);
 router.patch("/reject/:id", authMiddleware, adminOnly, rejectVendor);
 router.patch("/create-delivery", authMiddleware, createDelivery);
 router.post("/add-location",addeVendorLocation );
-
+router.get("/dashboard", authMiddleware, getVendorDashboardStats);
 export default router;

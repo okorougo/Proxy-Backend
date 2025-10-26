@@ -316,6 +316,8 @@ model Delivery {
   distanceKm Float?
   etaMinutes Int?
   fareAmount Float?
+  isDigital  Boolean @default(false)
+  digitalFiles Json? // JSON array of signed download URLs
 
   startedAt   DateTime?
   completedAt DateTime?
