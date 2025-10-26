@@ -21,5 +21,5 @@ router.patch("/reject/:id", authMiddleware, adminOnly, rejectVendor);
 router.patch("/create-delivery", authMiddleware, createDelivery);
 router.post("/add-location",addeVendorLocation );
 router.get("/dashboard", authMiddleware, getVendorDashboardStats);
-router.get("/get-vendor", authMiddleware, getVendorById);
+router.get("/get-vendor/:id", authMiddleware, getVendorById);
 export default router;
