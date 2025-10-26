@@ -144,13 +144,16 @@ export const addeVendorLocation = async (req:Request, res:Response) => {
     if(!userId){
       return errorResponse(res, "Unauthorized");
     }
-    const geohash = generateGeohash(lat, lng);
+    // convert to numbers
+    const latitude = Number(lat);
+    const longitude = Number(lng);
+    const geohash = generateGeohash(latitude, longitude);
 
     const location = await prisma.location.create({
       data: {
         Address: address,
-        lat,
-        lng,
+        lat: latitude,
+        lng:longitude,
         city,
         country,
         geohash,
