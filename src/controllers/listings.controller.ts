@@ -18,10 +18,6 @@ export const createListing = async (req: AuthRequest, res: Response) => {
       priceCents,
       currency = "NGN",
       isDigital = false,
-      lat,
-      lng,
-      city,
-      country,
       categoryId,
       condition,
       stock,
@@ -41,15 +37,6 @@ export const createListing = async (req: AuthRequest, res: Response) => {
         return errorResponse(res, "Invalid JSON format for extraDetails");
       }
     }
-    let locationId: string | null = null;
-    // Handle location if provided
-    if (lat && lng) {
-      const gh = geohash.encode(Number(lat), Number(lng));
-      const location = await prisma.location.create({
-        data: { lat: Number(lat), lng: Number(lng), city, geohash: gh, country },
-      });
-      locationId = location.id;
-    }
 
     // Create listing record
     const listing = await prisma.listing.create({
@@ -64,7 +51,6 @@ export const createListing = async (req: AuthRequest, res: Response) => {
         stock: stock ? Number(stock) : null,
         seller: { connect: { id: req.user!.id } },
         category: { connect: { id: categoryId } },
-        location: locationId ? { connect: { id: locationId } } : undefined,
         status: "PENDING",
         extraDetails: parsedDetails ?? undefined,
       },
@@ -115,7 +101,7 @@ export const createListing = async (req: AuthRequest, res: Response) => {
     // Return the created listing with media & category
     const created = await prisma.listing.findUnique({
       where: { id: listing.id },
-      include: { media: true, category: true, location: true },
+      include: { media: true, category: true },
     });
 
     return successResponse(res, "Listing created successfully", listing);
@@ -324,34 +310,38 @@ export const searchListings = async (req: Request, res: Response) => {
     // 📦 Condition Filter
     if (condition) where.condition = { equals: condition, mode: "insensitive" };
 
-    // 📍 GEO Filter (optional)
-    let nearbyListingIds: string[] = [];
+    // 📍 GEO Filter based on vendor location (optional)
     if (lat && lng) {
       const radius = Number(radiusKm);
-      const neighbors = geohash.neighbors(geohash.encode(Number(lat), Number(lng)));
-      const centerHash = geohash.encode(Number(lat), Number(lng));
-      const allHashes = [centerHash, ...neighbors];
+      const earth = 6371; // Earth's radius in km
 
-      // Find nearby locations based on geohash prefix match
-      const nearbyLocations = await prisma.location.findMany({
-        where: {
-          geohash: { in: allHashes },
-        },
-        select: { id: true },
-      });
-
-      if (nearbyLocations.length > 0) {
-        nearbyListingIds = (
-          await prisma.listing.findMany({
-            where: {
-              locationId: { in: nearbyLocations.map((l) => l.id) },
-              status: "APPROVED",
-            },
-            select: { id: true },
-          })
-        ).map((l) => l.id);
-
-        where.id = { in: nearbyListingIds };
+      // Find listings from vendors within the radius
+      const nearbyListings = await prisma.$queryRaw`
+        WITH nearby_vendors AS (
+          SELECT va.id as vendor_id, va."userId" as vendor_user_id,
+            (${earth} * acos(
+              cos(radians(${Number(lat)})) * cos(radians(l.lat)) *
+              cos(radians(l.lng) - radians(${Number(lng)})) +
+              sin(radians(${Number(lat)})) * sin(radians(l.lat))
+            )) AS distance_km
+          FROM "Location" l
+          JOIN "VendorApplication" va ON va.id = l."vendorId"
+          WHERE va.status = 'APPROVED'
+          HAVING (${earth} * acos(
+            cos(radians(${Number(lat)})) * cos(radians(l.lat)) *
+            cos(radians(l.lng) - radians(${Number(lng)})) +
+            sin(radians(${Number(lat)})) * sin(radians(l.lat))
+          )) <= ${radius}
+        )
+        SELECT listing.id
+        FROM "Listing" listing
+        JOIN nearby_vendors nv ON listing."sellerId" = nv.vendor_user_id
+        WHERE listing.status = 'APPROVED'
+      `;
+      
+      const listingIds = (nearbyListings as any[]).map(l => l.id);
+      if (listingIds.length > 0) {
+        where.id = { in: listingIds };
       }
     }
 
@@ -365,9 +355,19 @@ export const searchListings = async (req: Request, res: Response) => {
       where,
       include: {
         category: true,
-        location: true,
         media: true,
-        seller: { select: { id: true, name: true, email: true } },
+        seller: { 
+          select: { 
+            id: true, 
+            name: true, 
+            email: true,
+            vendorApplication: {
+              select: {
+                location: true
+              }
+            }
+          } 
+        },
         _count: { select: { transactions: true } },
       },
       orderBy,

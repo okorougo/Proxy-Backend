@@ -6,6 +6,7 @@ import {
   approveVendor,
   rejectVendor,
   getAllVendorApplications,
+  createDelivery,
 } from "../controllers/vendor.controller";
 
 const router = Router();
@@ -14,5 +15,6 @@ router.post("/apply", authMiddleware, applyVendor);
 router.get("/applications", authMiddleware, adminOnly, getAllVendorApplications);
 router.patch("/approve/:id", authMiddleware, adminOnly, approveVendor);
 router.patch("/reject/:id", authMiddleware, adminOnly, rejectVendor);
+router.patch("/create-delivery", authMiddleware, createDelivery);
 
 export default router;

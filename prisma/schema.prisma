@@ -54,6 +54,7 @@ model User {
   // Social auth
   provider   String? // "google" | "apple"
   providerId String? // Google UID, Apple sub, etc
+  Delivery   Delivery[]
 }
 
 model Category {
@@ -76,6 +77,7 @@ model VendorApplication {
   description   String?
   status        VendorStatus @default(PENDING)
   rejectionNote String?
+  location      Location?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -110,12 +112,10 @@ model Listing {
   price        Float
   currency     String        @default("NGN")
   isDigital    Boolean       @default(false)
-  condition    String?       // e.g. "new", "used", "refurbished"
-  stock        Int?          // only for physical products
+  condition    String? // e.g. "new", "used", "refurbished"
+  stock        Int? // only for physical products
   seller       User          @relation(fields: [sellerId], references: [id])
   sellerId     String
-  location     Location?     @relation(fields: [locationId], references: [id])
-  locationId   String?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   media        Media[]
@@ -124,32 +124,34 @@ model Listing {
   Message      Message[]
   status       ListingStatus @default(PENDING)
   categoryId   String
-  extraDetails Json?  
+  extraDetails Json?
   category     Category      @relation(fields: [categoryId], references: [id])
 }
 
 model DigitalFile {
-  id          String   @id @default(uuid())
-  listing     Listing  @relation(fields: [listingId], references: [id])
-  listingId   String
-  fileUrl     String   // secure Cloudinary or storage URL
-  publicId    String   // Cloudinary public_id for future deletion
-  filename    String?
-  size        Int?
-  mimeType    String?
-  createdAt   DateTime @default(now())
+  id        String   @id @default(uuid())
+  listing   Listing  @relation(fields: [listingId], references: [id])
+  listingId String
+  fileUrl   String // secure Cloudinary or storage URL
+  publicId  String // Cloudinary public_id for future deletion
+  filename  String?
+  size      Int?
+  mimeType  String?
+  createdAt DateTime @default(now())
 }
 
 model Location {
-  id        String    @id @default(uuid())
+  id        String   @id @default(uuid())
   lat       Float
   lng       Float
   city      String?
   region    String?
   country   String?
-  geohash   String    @db.VarChar(128)
-  createdAt DateTime  @default(now())
-  listings  Listing[]
+  geohash   String   @db.VarChar(128)
+  createdAt DateTime @default(now())
+  Address   String
+  vendorId String    @unique
+  vendor   VendorApplication @relation(fields: [vendorId], references: [id])
 }
 
 model Media {
@@ -239,6 +241,7 @@ model Transaction {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   review      Review[]
+  Delivery    Delivery[]
 }
 
 model Session {
@@ -291,5 +294,40 @@ enum PaymentStatus {
   PENDING
   COMPLETED
   FAILED
+  CANCELLED
+}
+
+model Delivery {
+  id            String      @id @default(uuid())
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  transactionId String
+
+  rider   User?   @relation(fields: [riderId], references: [id])
+  riderId String?
+
+  pickupLat      Float
+  pickupLng      Float
+  dropoffLat     Float
+  dropoffLng     Float
+  pickupAddress  String
+  dropoffAddress String
+
+  status     DeliveryStatus @default(PENDING)
+  distanceKm Float?
+  etaMinutes Int?
+  fareAmount Float?
+
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+enum DeliveryStatus {
+  PENDING // waiting for a rider
+  ACCEPTED // rider accepted
+  PICKED_UP // item picked
+  IN_TRANSIT // en route
+  DELIVERED // delivered successfully
   CANCELLED
 }

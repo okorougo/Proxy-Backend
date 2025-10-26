@@ -20,8 +20,11 @@ export const searchByRadius = async (req: Request, res: Response) => {
           sin(radians($1)) * sin(radians(loc.lat))
         )) AS distance_km
       FROM "Listing" l
-      JOIN "Location" loc ON loc.id = l."locationId"
+      JOIN "User" u ON u.id = l."sellerId"
+      JOIN "VendorApplication" va ON va."userId" = u.id
+      JOIN "Location" loc ON loc.id = va."locationId"
       WHERE l."status" = 'ACTIVE'
+        AND va."status" = 'APPROVED'
       HAVING (${earth} * acos(
           cos(radians($1)) * cos(radians(loc.lat)) *
           cos(radians(loc.lng) - radians($2)) +
@@ -65,8 +68,17 @@ export const searchListings = async (req: Request, res: Response) => {
     const listings = await prisma.listing.findMany({
       where: filters,
       include: {
-        seller: { select: { id: true, name: true } },
-        location: true,
+        seller: {
+          select: {
+            id: true,
+            name: true,
+            vendorApplication: {
+              select: {
+                location: true
+              }
+            }
+          }
+        },
         media: true,
       },
       skip: Number(skip),
