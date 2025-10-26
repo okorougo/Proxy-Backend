@@ -28,7 +28,6 @@ export const createListing = async (req: AuthRequest, res: Response) => {
       return errorResponse(res, "Title, description, and price are required");
     }
 
-    
     let parsedDetails: { title: string; description: string }[] | null = null;
     if (extraDetails) {
       try {
@@ -59,7 +58,9 @@ export const createListing = async (req: AuthRequest, res: Response) => {
     // Handle file uploads
     // Files are in memory via multer; types:
     // req.files: { [fieldname: string]: Express.Multer.File[] }
-    const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
+    const files = req.files as
+      | { [fieldname: string]: Express.Multer.File[] }
+      | undefined;
 
     // Upload media (images/videos) -> saves to Media table
     if (files?.media && files.media.length > 0) {
@@ -119,8 +120,10 @@ export const updateListing = async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const existing = await prisma.listing.findUnique({ where: { id } });
 
-    if (!existing) return errorResponse(res, "Listing not found", "LISTING_NOT_FOUND", 404);
-    if (existing.sellerId !== req.user!.id) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 403);
+    if (!existing)
+      return errorResponse(res, "Listing not found", "LISTING_NOT_FOUND", 404);
+    if (existing.sellerId !== req.user!.id)
+      return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 403);
 
     const updated = await prisma.listing.update({
       where: { id },
@@ -146,13 +149,16 @@ export const deleteListing = async (req: AuthRequest, res: Response) => {
     });
 
     if (!listing) return errorResponse(res, "Listing not found");
-    if (listing.sellerId !== req.user!.id) return errorResponse(res, "Unauthorized");
+    if (listing.sellerId !== req.user!.id)
+      return errorResponse(res, "Unauthorized");
 
     // Delete associated media from Cloudinary
     for (const m of listing.media) {
       if (m.publicId) {
         try {
-          await cloudinary.uploader.destroy(m.publicId, { resource_type: "auto" });
+          await cloudinary.uploader.destroy(m.publicId, {
+            resource_type: "auto",
+          });
         } catch (e) {
           console.warn("Cloudinary deletion error:", e);
         }
@@ -170,7 +176,10 @@ export const deleteListing = async (req: AuthRequest, res: Response) => {
 /* ==========================================================
    🧾 GET ALL LISTINGS BY VENDOR
    ========================================================== */
-export const getAllListingsByVendor = async (req: AuthRequest, res: Response) => {
+export const getAllListingsByVendor = async (
+  req: AuthRequest,
+  res: Response
+) => {
   try {
     const vendorId = req.user!.id;
 
@@ -184,7 +193,11 @@ export const getAllListingsByVendor = async (req: AuthRequest, res: Response) =>
       orderBy: { createdAt: "desc" },
     });
 
-    return successResponse(res, "Vendor listings fetched successfully", listings);
+    return successResponse(
+      res,
+      "Vendor listings fetched successfully",
+      listings
+    );
   } catch (err) {
     console.error("❌ getAllListingsByVendor error:", err);
     return errorResponse(res, "Failed to get vendor listings");
@@ -202,12 +215,22 @@ export const getPopularListings = async (req: Request, res: Response) => {
         _count: { select: { transactions: true } },
         category: true,
         media: true,
+        seller: {
+          include: {
+            kycDocument: true,
+            vendorApplication: true,
+          },
+        },
       },
       orderBy: { transactions: { _count: "desc" } },
       take: 10,
     });
 
-    return successResponse(res, "Popular listings fetched successfully", listings);
+    return successResponse(
+      res,
+      "Popular listings fetched successfully",
+      listings
+    );
   } catch (err) {
     console.error("❌ getPopularListings error:", err);
     return errorResponse(res, "Failed to get popular listings");
@@ -221,7 +244,16 @@ export const getNewListings = async (req: Request, res: Response) => {
   try {
     const listings = await prisma.listing.findMany({
       where: { status: "APPROVED" },
-      include: { category: true, media: true },
+      include: {
+        category: true,
+        media: true,
+        seller: {
+          include: {
+            kycDocument: true,
+            vendorApplication: true,
+          },
+        },
+      },
       orderBy: { createdAt: "desc" },
       take: 10,
     });
@@ -246,7 +278,12 @@ export const getDigitalDownload = async (req: AuthRequest, res: Response) => {
     });
 
     if (!transaction) {
-      return errorResponse(res, "Access denied: not a verified buyer", "FORBIDDEN", 403);
+      return errorResponse(
+        res,
+        "Access denied: not a verified buyer",
+        "FORBIDDEN",
+        403
+      );
     }
 
     const media = await prisma.media.findMany({
@@ -275,7 +312,7 @@ export const getDigitalDownload = async (req: AuthRequest, res: Response) => {
 export const searchListings = async (req: Request, res: Response) => {
   try {
     const {
-      q,              // keyword
+      q, // keyword
       minPrice,
       maxPrice,
       categoryId,
@@ -338,8 +375,8 @@ export const searchListings = async (req: Request, res: Response) => {
         JOIN nearby_vendors nv ON listing."sellerId" = nv.vendor_user_id
         WHERE listing.status = 'APPROVED'
       `;
-      
-      const listingIds = (nearbyListings as any[]).map(l => l.id);
+
+      const listingIds = (nearbyListings as any[]).map((l) => l.id);
       if (listingIds.length > 0) {
         where.id = { in: listingIds };
       }
@@ -356,17 +393,17 @@ export const searchListings = async (req: Request, res: Response) => {
       include: {
         category: true,
         media: true,
-        seller: { 
-          select: { 
-            id: true, 
-            name: true, 
+        seller: {
+          select: {
+            id: true,
+            name: true,
             email: true,
             vendorApplication: {
               select: {
-                location: true
-              }
-            }
-          } 
+                location: true,
+              },
+            },
+          },
         },
         _count: { select: { transactions: true } },
       },

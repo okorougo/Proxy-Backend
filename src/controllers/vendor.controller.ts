@@ -479,15 +479,7 @@ export const getVendorOrders = async (req: AuthRequest, res: Response) => {
             transactions: true,
           },
         },
-        Delivery: {
-          select: {
-            id: true,
-            pickupAddress: true,
-            dropoffAddress: true,
-            fareAmount: true,
-            status: true,
-          },
-        },
+        Delivery: true,
       },
       orderBy: {
         createdAt: "desc",
