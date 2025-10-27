@@ -136,6 +136,7 @@ model DigitalFile {
   publicId  String // Cloudinary public_id for future deletion
   filename  String?
   size      Int?
+  url        String
   mimeType  String?
   createdAt DateTime @default(now())
 }

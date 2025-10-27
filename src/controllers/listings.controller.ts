@@ -210,22 +210,33 @@ export const getAllListingsByVendor = async (
 export const getPopularListings = async (req: Request, res: Response) => {
   try {
     const listings = await prisma.listing.findMany({
-      where: { status: "APPROVED" },
+      where: {
+        status: "APPROVED",
+      },
       include: {
-        _count: { select: { transactions: true } },
         category: true,
         media: true,
         seller: {
-          include: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
             kycDocument: true,
             vendorApplication: {
-              include: { location: true },
+              select: { status: true },
             },
           },
         },
+        _count: {
+          select: { transactions: true },
+        },
       },
-      orderBy: { transactions: { _count: "desc" } },
-      take: 10,
+      orderBy: {
+        transactions: {
+          _count: "desc",
+        },
+      },
+      take: 15, // top 15 popular listings
     });
 
     return successResponse(
