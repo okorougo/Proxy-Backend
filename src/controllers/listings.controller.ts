@@ -222,6 +222,7 @@ export const getPopularListings = async (req: Request, res: Response) => {
             vendorApplication: {
               include: { location: true },
             },
+            Session: true,
           },
         },
         _count: {
@@ -263,6 +264,7 @@ export const getNewListings = async (req: Request, res: Response) => {
             vendorApplication: {
               include: { location: true },
             },
+             Session: true,
           },
         },
       },
@@ -410,9 +412,14 @@ export const searchListings = async (req: Request, res: Response) => {
             id: true,
             name: true,
             email: true,
+            phone: true,
+            kycDocument: true,
+             Session: true,
             vendorApplication: {
-              select: {
+              include: {
                 location: true,
+
+                
               },
             },
           },
@@ -448,6 +455,7 @@ export const getListingsByCategory = async (req: Request, res: Response) => {
             email: true,
             phone: true,
             kycDocument: true,
+              Session: true,
             vendorApplication: {
               include: { location: true },
             },
