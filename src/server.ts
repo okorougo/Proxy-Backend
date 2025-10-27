@@ -307,7 +307,7 @@ io.on("connection", (socket) => {
 
 
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 process.on("uncaughtException", (error) => {
