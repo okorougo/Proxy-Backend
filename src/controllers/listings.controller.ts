@@ -217,13 +217,10 @@ export const getPopularListings = async (req: Request, res: Response) => {
         category: true,
         media: true,
         seller: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
+          include: {
             kycDocument: true,
             vendorApplication: {
-              select: { status: true },
+              include: { location: true },
             },
           },
         },
