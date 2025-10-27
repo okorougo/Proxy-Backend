@@ -132,4 +132,97 @@ export const getUnreadCounts = async (req: AuthRequest, res: Response) => {
     return errorResponse(res, "Failed to get unread counts");
   }
 };
+export const getAllUserChats = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user!.id;
+
+    // 📨 1️⃣ Fetch all messages involving this user
+    const allMessages = await prisma.message.findMany({
+      where: {
+        OR: [{ senderId: userId }, { recipientId: userId }],
+      },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+        senderId: true,
+        recipientId: true,
+        status: true,
+        listingId: true,
+      },
+    });
+
+    if (allMessages.length === 0) {
+      return successResponse(res, "No conversations yet", []);
+    }
+
+    // 🧠 2️⃣ Keep only latest message per other user
+    const chatMap = new Map<string, any>();
+    for (const msg of allMessages) {
+      const otherUserId = msg.senderId === userId ? msg.recipientId : msg.senderId;
+      if (!chatMap.has(otherUserId)) {
+        chatMap.set(otherUserId, msg);
+      }
+    }
+
+    const chatPartnerIds = Array.from(chatMap.keys());
+
+    // 🔢 3️⃣ Count unread messages per partner
+    const unreadCountsRaw = await prisma.message.groupBy({
+      by: ["senderId"],
+      where: {
+        recipientId: userId,
+        status: { notIn: ["READ"] },
+      },
+      _count: { _all: true },
+    });
+
+    const unreadMap: Record<string, number> = {};
+    unreadCountsRaw.forEach((r) => {
+      unreadMap[r.senderId] = r._count._all;
+    });
+
+    // 👥 4️⃣ Fetch user + session details
+    const users = await prisma.user.findMany({
+      where: { id: { in: chatPartnerIds } },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        kycDocument: true,
+        vendorApplication:true,
+        Session: {
+          select: {
+            id: true,
+            devicePlatform: true,
+            deviceToken: true,
+            lastSeen: true,
+            isOnline: true,
+          },
+        },
+      },
+    });
+
+    // ⚙️ 5️⃣ Combine results into structured output
+    const chats = users.map((user) => ({
+      user,
+      lastMessage: chatMap.get(user.id),
+      unreadCount: unreadMap[user.id] || 0,
+    }));
+
+    // 📆 Sort chats by latest message time
+    chats.sort(
+      (a, b) =>
+        new Date(b.lastMessage?.createdAt).getTime() -
+        new Date(a.lastMessage?.createdAt).getTime()
+    );
+
+    return successResponse(res, "Chats retrieved successfully", chats);
+  } catch (err) {
+    console.error("❌ getAllUserChats error:", err);
+    return errorResponse(res, "Failed to get user chats");
+  }
+};
 
