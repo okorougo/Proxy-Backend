@@ -161,12 +161,31 @@ io.on("connection", (socket) => {
               message: "Only image or PDF uploads allowed",
             });
           }
+          // payload.media may be a data URL (e.g. "data:image/jpeg;base64,...").
+          // Strip the prefix if present before converting to buffer.
+          let base64String = payload.media;
+          if (typeof base64String === 'string' && base64String.startsWith('data:')) {
+            const parts = base64String.split(',');
+            base64String = parts[1] ?? '';
+          }
 
-          const buffer = Buffer.from(payload.media, 'base64');
+          const buffer = Buffer.from(base64String, 'base64');
           const upload = await uploadToCloudinary(buffer, folder);
           mediaUrl = upload.secure_url;
           messageType =
             payload.mediaType === "image" ? "IMAGE" : "PDF";
+        }
+
+        // If client already uploaded the media via REST and sent the URL (imageUrl/fileUrl),
+        // accept that and use it directly instead of re-uploading.
+        if (!mediaUrl) {
+          if ((payload as any).imageUrl) {
+            mediaUrl = (payload as any).imageUrl;
+            messageType = "IMAGE";
+          } else if ((payload as any).fileUrl) {
+            mediaUrl = (payload as any).fileUrl;
+            messageType = "PDF";
+          }
         }
 
         // ✅ Create message record
