@@ -5,6 +5,7 @@ import { errorResponse, successResponse } from "../utils/response";
 import { AuthRequest } from "../middleware/auth";
 import geohash from "ngeohash";
 import { generateSignedDownloadUrl } from "../lib/cloudinary";
+import axios from "axios"
 
 function generateGeohash(
   latitude: number,
@@ -174,142 +175,6 @@ export const addeVendorLocation = async (req: Request, res: Response) => {
   } catch (error) {
     console.error(error);
     return errorResponse(res, "Failed to add vendor location");
-  }
-};
-
-export const createDelivery = async (req: AuthRequest, res: Response) => {
-  try {
-    const { transactionId, dropoffAddress, dropoffLat, dropoffLng } = req.body;
-
-    if (!transactionId) {
-      return res.status(400).json({ message: "Transaction ID is required" });
-    }
-
-    // ✅ Fetch transaction and related listing + seller (vendor)
-    const transaction = await prisma.transaction.findUnique({
-      where: { id: transactionId },
-      include: {
-        listing: {
-          include: {
-            seller: {
-              include: {
-                vendorApplication: true,
-              },
-            },
-            media: true,
-          },
-        },
-      },
-    });
-
-    if (!transaction)
-      return res.status(404).json({ message: "Transaction not found" });
-
-    const listing = transaction.listing;
-    if (!listing) return res.status(404).json({ message: "Listing not found" });
-
-    // ✅ If digital listing, skip physical delivery
-    if (listing.isDigital) {
-      // Generate signed download URLs for the buyer (for each digital media)
-      const signedDownloads = await Promise.all(
-        listing.media.map(async (file) => {
-          return {
-            id: file.id,
-            name: file.publicId,
-            url: await generateSignedDownloadUrl(file.publicId),
-          };
-        })
-      );
-
-      // Mark digital delivery as "COMPLETED" immediately
-      const digitalDelivery = await prisma.delivery.create({
-        data: {
-          transactionId,
-          pickupAddress: "Digital Delivery",
-          pickupLat: 0,
-          pickupLng: 0,
-          dropoffAddress: "Digital File",
-          dropoffLat: 0,
-          dropoffLng: 0,
-          distanceKm: 0,
-          fareAmount: 0,
-          status: "DELIVERED",
-          isDigital: true,
-          digitalFiles: JSON.stringify(signedDownloads),
-        },
-      });
-
-      return res.status(200).json({
-        message: "Digital delivery completed successfully",
-        digitalDelivery,
-      });
-    }
-
-    // ✅ If physical listing, calculate fare based on vendor → buyer distance
-    if (!dropoffAddress || !dropoffLat || !dropoffLng) {
-      return res
-        .status(400)
-        .json({ message: "Dropoff details required for physical delivery" });
-    }
-
-    const vendor = listing.seller;
-    if (!vendor || !vendor.vendorApplication) {
-      return res.status(404).json({ message: "Vendor location not found" });
-    }
-
-    // Replace with your vendor address/lat/lng storage source
-
-    const vendorLocation = await prisma.location.findUnique({
-      where: { vendorId: vendor.id },
-    });
-
-    if (!vendorLocation) {
-      return res.status(404).json({ message: "Vendor location not found" });
-    }
-
-    const pickupAddress = vendorLocation.Address || "Vendor Address";
-    const pickupLat = vendorLocation.lat; // vendor location latitude
-    const pickupLng = vendorLocation.lng;
-
-    // 🧮 Compute distance and fare
-    const distanceKm = haversineDistance(
-      pickupLat,
-      pickupLng,
-      dropoffLat,
-      dropoffLng
-    );
-
-    const BASE_FARE = 400;
-    const RATE_PER_KM = 120;
-    const SERVICE_FEE = 100;
-    const fareAmount = Math.round(
-      BASE_FARE + distanceKm * RATE_PER_KM + SERVICE_FEE
-    );
-
-    // 🚚 Create delivery
-    const delivery = await prisma.delivery.create({
-      data: {
-        transactionId,
-        pickupAddress,
-        pickupLat,
-        pickupLng,
-        dropoffAddress,
-        dropoffLat,
-        dropoffLng,
-        distanceKm,
-        fareAmount,
-        status: "PENDING",
-        isDigital: false,
-      },
-    });
-
-    return res.status(201).json({
-      message: "Physical delivery created successfully",
-      delivery,
-    });
-  } catch (error) {
-    console.error("❌ createDelivery error:", error);
-    return res.status(500).json({ message: "Error creating delivery" });
   }
 };
 
@@ -499,5 +364,197 @@ export const getVendorOrders = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error("getVendorOrders error:", error);
     return errorResponse(res, "Failed to fetch vendor orders");
+  }
+};
+type CartItem = { listingId: string; quantity: number };
+
+export const createMultiVendorOrder = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  try {
+    const { reference } = req.query;
+    const userId = req.user?.id;
+    const {
+      items,
+      dropoffAddress,
+      dropoffLat,
+      dropoffLng,
+    } = req.body;
+    if (!reference) return errorResponse(res, "Missing payment reference");
+
+    // 1️⃣ Verify payment from Paystack
+    const response = await axios.get(
+      `https://api.paystack.co/transaction/verify/${reference}`,
+      {
+        headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}` },
+      }
+    );
+
+    const paystackData = response.data;
+    if (paystackData.status !== true)
+      return errorResponse(res, "Invalid payment verification");
+
+    const payment = paystackData.data;
+    if (payment.status !== "success")
+      return errorResponse(res, "Payment not successful");
+
+    const amountPaid = payment.amount / 100;
+    const paystackRef = payment.reference;
+
+    if (!userId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
+    if (!Array.isArray(items) || items.length === 0)
+      return errorResponse(res, "Cart items required");
+
+    // Fetch all listings referenced by the cart (authoritative)
+    const listingIds = Array.from(
+      new Set((items as CartItem[]).map((i) => i.listingId))
+    );
+    const listings = await prisma.listing.findMany({
+      where: { id: { in: listingIds } },
+      include: {
+        seller: {
+          include: {
+            vendorApplication: {
+              include: {
+                /* add location if stored */
+              },
+            },
+          },
+        },
+        media: true,
+      },
+    });
+
+    if (listings.length === 0) return errorResponse(res, "Listings not found");
+
+    // Map listingId -> listing
+    const listingMap = new Map(listings.map((l) => [l.id, l]));
+
+    // Group items by seller (use listing.sellerId — do NOT trust client-provided vendorId)
+    const grouped: Record<string, { listing: any; quantity: number }[]> = {};
+    for (const it of items as CartItem[]) {
+      const listing = listingMap.get(it.listingId);
+      if (!listing)
+        return errorResponse(res, `Listing ${it.listingId} not found`);
+      const vendorId = listing.sellerId;
+      if (!grouped[vendorId]) grouped[vendorId] = [];
+      grouped[vendorId].push({ listing, quantity: Number(it.quantity || 1) });
+    }
+
+    const results: any[] = [];
+
+    // perform each vendor order creation inside the same prisma transaction batch per vendor (but we can batch all writes too)
+    for (const [vendorId, vendorItems] of Object.entries(grouped)) {
+      // calculate totals and prepare order items
+      let totalAmount = 0;
+      const orderItemsCreate = vendorItems.map((v) => {
+        const unitPrice = Number(v.listing.price ?? 0);
+        const qty = Number(v.quantity ?? 1);
+        totalAmount += unitPrice * qty;
+        return {
+          listingId: v.listing.id,
+          quantity: qty,
+          unitPrice,
+        };
+      });
+
+      // create order + orderItems + transaction atomically
+      const [order, transaction] = await prisma
+        .$transaction([
+          // create order
+          prisma.order.create({
+            data: {
+              userId,
+              vendorId,
+              totalAmount,
+              status: "PENDING",
+              isDigital: vendorItems.every((i) => i.listing.isDigital === true),
+              listings: { create: orderItemsCreate },
+            },
+            include: {
+              listings: { include: { listing: true } },
+              vendor: true,
+              user: true,
+            },
+          }),
+          // create transaction associated to the order
+          // we'll create this after the order in a second query so we can reference order.id; using $transaction above is fine, but to keep ordering clearer:
+        ])
+        .then(async ([createdOrder]) => {
+          const txn = await prisma.transaction.create({
+            data: {
+              orderId: createdOrder.id,
+              buyerId: userId,
+              sellerId: vendorId,
+              amountCents: Math.round(totalAmount * 100),
+              status: "PENDING", // payment pending by default
+              method: "PAYSTACK", // or from req.body
+              amountPaid:amountPaid,
+              paystackRef,
+            },
+          });
+          return [createdOrder, txn];
+        })
+        .then((arr) => arr as any[]);
+
+      // optionally auto create delivery for physical items (you might rather create delivery after payment success)
+      let delivery = null;
+      if (
+        !order.isDigital &&
+        dropoffLat &&
+        dropoffLng &&
+        dropoffAddress
+      ) {
+        // try to find vendor location
+        const vendorLocation = await prisma.location.findFirst({
+          where: { /* vendorId field name */ vendorId },
+        });
+        if (vendorLocation) {
+          const distanceKm = haversineDistance(
+            vendorLocation.lat,
+            vendorLocation.lng,
+            Number(dropoffLat),
+            Number(dropoffLng)
+          );
+          const BASE_FARE = 400,
+            RATE_PER_KM = 120,
+            SERVICE_FEE = 100;
+          const fareAmount = Math.round(
+            BASE_FARE + distanceKm * RATE_PER_KM + SERVICE_FEE
+          );
+
+          delivery = await prisma.delivery.create({
+            data: {
+              orderId: order.id,
+              pickupAddress: vendorLocation.Address ?? "Vendor address",
+              pickupLat: vendorLocation.lat,
+              pickupLng: vendorLocation.lng,
+              dropoffAddress,
+              dropoffLat: Number(dropoffLat),
+              dropoffLng: Number(dropoffLng),
+              distanceKm,
+              fareAmount,
+              status: "PENDING",
+              isDigital: false,
+              transactionId: transaction.id,
+            },
+          });
+
+          // update order total to include delivery
+          await prisma.order.update({
+            where: { id: order.id },
+            data: { totalAmount: { increment: fareAmount } },
+          });
+        }
+      }
+
+      results.push({ order, transaction, delivery });
+    }
+
+    return successResponse(res, "Orders created (per vendor)", results);
+  } catch (err) {
+    console.error("createMultiVendorOrder error:", err);
+    return errorResponse(res, "Failed to create orders");
   }
 };

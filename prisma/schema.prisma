@@ -50,6 +50,7 @@ model User {
   otpCode            String? // temporary OTP code
   otpExpiresAt       DateTime?
   vendorApplication  VendorApplication?
+  order              Order[]
 
   // Social auth
   provider   String? // "google" | "apple"
@@ -81,6 +82,7 @@ model VendorApplication {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  order     Order[]
 }
 
 model KycVerification {
@@ -126,6 +128,7 @@ model Listing {
   categoryId   String
   extraDetails Json?
   category     Category      @relation(fields: [categoryId], references: [id])
+  OrderItem    OrderItem[]
 }
 
 model DigitalFile {
@@ -136,23 +139,23 @@ model DigitalFile {
   publicId  String // Cloudinary public_id for future deletion
   filename  String?
   size      Int?
-  url        String
+  url       String
   mimeType  String?
   createdAt DateTime @default(now())
 }
 
 model Location {
-  id        String   @id @default(uuid())
+  id        String            @id @default(uuid())
   lat       Float
   lng       Float
   city      String?
   region    String?
   country   String?
-  geohash   String   @db.VarChar(128)
-  createdAt DateTime @default(now())
+  geohash   String            @db.VarChar(128)
+  createdAt DateTime          @default(now())
   Address   String
-  vendorId String    @unique
-  vendor   VendorApplication @relation(fields: [vendorId], references: [id])
+  vendorId  String            @unique
+  vendor    VendorApplication @relation(fields: [vendorId], references: [id])
 }
 
 model Media {
@@ -166,6 +169,33 @@ model Media {
   listing   Listing? @relation(fields: [listingId], references: [id])
   listingId String?
   createdAt DateTime @default(now())
+}
+
+model Order {
+  id          String            @id @default(uuid())
+  userId      String
+  vendorId    String
+  totalAmount Float
+  status      String            @default("PENDING")
+  createdAt   DateTime          @default(now())
+  listings    OrderItem[]
+  isDigital    Boolean      @default(false)
+  delivery    Delivery?
+  transaction  Transaction?
+  user        User              @relation(fields: [userId], references: [id])
+  vendor      VendorApplication @relation(fields: [vendorId], references: [id])
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  listingId String
+  transaction   Transaction? @relation(fields: [transactionId], references: [id])
+  transactionId String?
+  quantity  Int
+  listing   Listing @relation(fields: [listingId], references: [id])
+  order     Order   @relation(fields: [orderId], references: [id])
+  unitPrice     Float
 }
 
 model Message {
@@ -228,8 +258,9 @@ model AuditLog {
 
 model Transaction {
   id          String        @id @default(uuid())
-  listing     Listing       @relation(fields: [listingId], references: [id])
-  listingId   String
+  listingId   String?       // keep for single-listing cases
+  listing     Listing?      @relation(fields: [listingId], references: [id])
+  orderId       String   @unique
   buyer       User          @relation("buyerTransactions", fields: [buyerId], references: [id])
   buyerId     String
   seller      User          @relation("sellerTransactions", fields: [sellerId], references: [id])
@@ -243,6 +274,11 @@ model Transaction {
   updatedAt   DateTime      @updatedAt
   review      Review[]
   Delivery    Delivery[]
+  order         Order    @relation(fields: [orderId], references: [id])
+  orderItems  OrderItem[]
+  amountPaid  Float?
+  paystackRef String?
+
 }
 
 model Session {
@@ -305,6 +341,7 @@ model Delivery {
 
   rider   User?   @relation(fields: [riderId], references: [id])
   riderId String?
+  orderId String  @unique
 
   pickupLat      Float
   pickupLng      Float
@@ -313,17 +350,18 @@ model Delivery {
   pickupAddress  String
   dropoffAddress String
 
-  status     DeliveryStatus @default(PENDING)
-  distanceKm Float?
-  etaMinutes Int?
-  fareAmount Float?
-  isDigital  Boolean @default(false)
+  status       DeliveryStatus @default(PENDING)
+  distanceKm   Float?
+  etaMinutes   Int?
+  fareAmount   Float?
+  isDigital    Boolean        @default(false)
   digitalFiles Json? // JSON array of signed download URLs
 
   startedAt   DateTime?
   completedAt DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  order       Order     @relation(fields: [orderId], references: [id])
 }
 
 enum DeliveryStatus {

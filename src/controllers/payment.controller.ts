@@ -4,37 +4,6 @@ import cloudinary from "../lib/cloudinary";
 import { AuthRequest } from "../middleware/auth";
 import { errorResponse, successResponse } from "../utils/response";
 
-// Create a meetup transaction
-export const createTransaction = async (req: AuthRequest, res: Response) => {
-  try {
-    const { listingId, method, amountCents } = req.body;
-
-    const listing = await prisma.listing.findUnique({ where: { id: listingId } });
-    if (!listing) return errorResponse(res, "Listing not found", "LISTING_NOT_FOUND", 404);
-
-    if (listing.sellerId === req.user!.id) {
-      return errorResponse(res, "Cannot buy your own listing", "INVALID_TRANSACTION");
-    }
-
-    const tx = await prisma.transaction.create({
-      data: {
-        listingId,
-        buyerId: req.user!.id,
-        sellerId: listing.sellerId,
-        amountCents: Number(amountCents) || listing.priceCents,
-        method,
-        status: "PENDING",
-      },
-    });
-
-    return successResponse(res, "Transaction created successfully", tx);
-
-  } catch (err) {
-    console.error(err);
-    return errorResponse(res, "Transaction creation failed");
-    
-  }
-};
 
 // Upload receipt (buyer or seller)
 export const uploadReceipt = async (req: AuthRequest, res: Response) => {

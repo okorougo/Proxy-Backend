@@ -6,7 +6,7 @@ import {
   approveVendor,
   rejectVendor,
   getAllVendorApplications,
-  createDelivery,
+  createMultiVendorOrder,
   addeVendorLocation,
   getVendorDashboardStats,
   getVendorById,
@@ -19,7 +19,7 @@ router.post("/apply", authMiddleware, applyVendor);
 router.get("/applications", authMiddleware, adminOnly, getAllVendorApplications);
 router.patch("/approve/:id", authMiddleware, adminOnly, approveVendor);
 router.patch("/reject/:id", authMiddleware, adminOnly, rejectVendor);
-router.patch("/create-delivery", authMiddleware, createDelivery);
+router.patch("/create-delivery", authMiddleware, createMultiVendorOrder);
 router.post("/add-location",addeVendorLocation );
 router.get("/orders", authMiddleware, getVendorOrders);
 router.get("/dashboard", authMiddleware, getVendorDashboardStats);
