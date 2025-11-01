@@ -264,7 +264,7 @@ export const getNewListings = async (req: Request, res: Response) => {
             vendorApplication: {
               include: { location: true },
             },
-             Session: true,
+            Session: true,
           },
         },
       },
@@ -414,12 +414,10 @@ export const searchListings = async (req: Request, res: Response) => {
             email: true,
             phone: true,
             kycDocument: true,
-             Session: true,
+            Session: true,
             vendorApplication: {
               include: {
                 location: true,
-
-                
               },
             },
           },
@@ -455,7 +453,7 @@ export const getListingsByCategory = async (req: Request, res: Response) => {
             email: true,
             phone: true,
             kycDocument: true,
-              Session: true,
+            Session: true,
             vendorApplication: {
               include: { location: true },
             },
@@ -478,5 +476,112 @@ export const getListingsByCategory = async (req: Request, res: Response) => {
   } catch (err) {
     console.error("getListingsByCategory error:", err);
     return errorResponse(res, "Failed to fetch listings by category");
+  }
+};
+export const getUserOrders = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
+
+    // ✅ Fetch all orders for the logged-in user
+    const orders = await prisma.order.findMany({
+      where: { userId },
+      include: {
+        user: true,
+        vendor: {
+          include: {
+            location: true,
+            user: {
+              include: {
+                kycDocument: true,
+              },
+            },
+          },
+        },
+        listings: {
+          include: {
+            listing: {
+              include: { media: true, category: true },
+            },
+          },
+        },
+        transaction: true,
+        delivery: true,
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    if (!orders || orders.length === 0) {
+      return successResponse(res, "No orders found", []);
+    }
+
+    // ✅ Format response neatly
+    const formatted = orders.map((order) => {
+      let digitalFiles: any[] = [];
+
+      // ✅ For digital deliveries, use saved URLs directly
+      if (
+        order.isDigital &&
+        order.delivery?.isDigital &&
+        order.delivery.digitalFiles
+      ) {
+        try {
+          const parsed =
+            typeof order.delivery.digitalFiles === "string"
+              ? JSON.parse(order.delivery.digitalFiles)
+              : order.delivery.digitalFiles;
+          if (Array.isArray(parsed)) {
+            digitalFiles = parsed.map((f: any) => ({
+              id: f.id,
+              name: f.name,
+              url: f.url, // direct file URL
+            }));
+          }
+        } catch (err) {
+          console.error("Error parsing digitalFiles JSON:", err);
+        }
+      }
+
+      return {
+        id: order.id,
+        vendor: {
+          id: order.vendor.id,
+          name: order.vendor.user.name,
+          email: order.vendor.user.email,
+          image: order.vendor.user.kycDocument || null,
+        },
+        totalAmount: order.totalAmount,
+        status: order.status,
+        isDigital: order.isDigital,
+        transaction: {
+          id: order.transaction?.id,
+          amountPaid: order.transaction?.amountPaid,
+          status: order.transaction?.status,
+          reference: order.transaction?.paystackRef,
+        },
+        delivery: order.delivery
+          ? {
+              id: order.delivery.id,
+              status: order.status,
+              fareAmount: order.delivery.fareAmount,
+              isDigital: order.delivery.isDigital,
+              digitalFiles,
+            }
+          : null,
+        listings: order.listings.map((item) => ({
+          id: item.id,
+          title: item.listing.title,
+          price: item.unitPrice,
+          quantity: item.quantity,
+          image: item.listing.media?.[0]?.url || null,
+        })),
+        createdAt: order.createdAt,
+      };
+    });
+
+    return successResponse(res, "User orders fetched successfully", formatted);
+  } catch (error) {
+    console.error("❌ getUserOrders error:", error);
+    return errorResponse(res, "Failed to fetch user orders");
   }
 };
