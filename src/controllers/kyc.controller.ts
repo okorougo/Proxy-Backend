@@ -42,9 +42,8 @@ export const submitKyc = async (req: AuthRequest, res: Response) => {
     const userId = req.user?.id;
     const { nin } = req.body;
 
-    if(!userId){
+    if (!userId) {
       return errorResponse(res, "Unauthorized");
-
     }
 
     if (!nin) {
@@ -54,15 +53,23 @@ export const submitKyc = async (req: AuthRequest, res: Response) => {
     let selfieUrl: string | undefined;
     let idCardUrl: string | undefined;
 
-    const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
+    const files = req.files as
+      | { [fieldname: string]: Express.Multer.File[] }
+      | undefined;
 
     if (files?.selfie?.[0]) {
-      const uploaded = await uploadToCloudinary(files.selfie[0].buffer, "kyc/selfies");
+      const uploaded = await uploadToCloudinary(
+        files.selfie[0].buffer,
+        "kyc/selfies"
+      );
       selfieUrl = uploaded.secure_url;
     }
 
     if (files?.idCard?.[0]) {
-      const uploaded = await uploadToCloudinary(files.idCard[0].buffer, "kyc/idcards");
+      const uploaded = await uploadToCloudinary(
+        files.idCard[0].buffer,
+        "kyc/idcards"
+      );
       idCardUrl = uploaded.secure_url;
     }
 
@@ -79,22 +86,38 @@ export const submitKyc = async (req: AuthRequest, res: Response) => {
   }
 };
 
-
-
 export const verifyKyc = async (req: AuthRequest, res: Response) => {
   try {
     if (req.user?.role !== "ADMIN") {
       return res.status(403).json({ error: "Forbidden" });
     }
 
-    const { userId, approve } = req.body;
+    const { userId, approve, rejectionNote } = req.body;
 
-    const updated = await prisma.user.update({
-      where: { id: userId },
-      data: { isKycVerified: true },
-    });
+    if (approve === "APPROVED") {
+      const updated = await prisma.user.update({
+        where: { id: userId },
+        data: { isKycVerified: true },
+      });
 
-    return successResponse(res, "KYC verified successfully", updated);
+      const updateKycStatus = await prisma.kycVerification.update({
+        where: { userId: userId },
+        data: {
+          status: "APPROVED",
+        },
+      });
+
+      return successResponse(res, "KYC verified successfully", updated);
+    } else if (approve === "REJECTED") {
+      const updateKycStatus = await prisma.kycVerification.update({
+        where: { userId: userId },
+        data: {
+          status: "REJECTED",
+          rejectionNote,
+        },
+      });
+      errorResponse(res, "Successfully rejected kyc");
+    }
   } catch (err) {
     console.error(err);
     return errorResponse(res, "KYC verification failed");
