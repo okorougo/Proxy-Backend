@@ -51,11 +51,12 @@ model User {
   otpExpiresAt       DateTime?
   vendorApplication  VendorApplication?
   order              Order[]
+  riderId            String?
+  rider              Rider?
 
   // Social auth
   provider   String? // "google" | "apple"
   providerId String? // Google UID, Apple sub, etc
-  Delivery   Delivery[]
 }
 
 model Category {
@@ -179,22 +180,22 @@ model Order {
   status      String            @default("PENDING")
   createdAt   DateTime          @default(now())
   listings    OrderItem[]
-  isDigital    Boolean      @default(false)
+  isDigital   Boolean           @default(false)
   delivery    Delivery?
-  transaction  Transaction?
+  transaction Transaction?
   user        User              @relation(fields: [userId], references: [id])
   vendor      VendorApplication @relation(fields: [vendorId], references: [id])
 }
 
 model OrderItem {
-  id        String  @id @default(uuid())
-  orderId   String
-  listingId String
+  id            String       @id @default(uuid())
+  orderId       String
+  listingId     String
   transaction   Transaction? @relation(fields: [transactionId], references: [id])
   transactionId String?
-  quantity  Int
-  listing   Listing @relation(fields: [listingId], references: [id])
-  order     Order   @relation(fields: [orderId], references: [id])
+  quantity      Int
+  listing       Listing      @relation(fields: [listingId], references: [id])
+  order         Order        @relation(fields: [orderId], references: [id])
   unitPrice     Float
 }
 
@@ -258,9 +259,9 @@ model AuditLog {
 
 model Transaction {
   id          String        @id @default(uuid())
-  listingId   String?       // keep for single-listing cases
+  listingId   String? // keep for single-listing cases
   listing     Listing?      @relation(fields: [listingId], references: [id])
-  orderId       String   @unique
+  orderId     String        @unique
   buyer       User          @relation("buyerTransactions", fields: [buyerId], references: [id])
   buyerId     String
   seller      User          @relation("sellerTransactions", fields: [sellerId], references: [id])
@@ -274,11 +275,10 @@ model Transaction {
   updatedAt   DateTime      @updatedAt
   review      Review[]
   Delivery    Delivery[]
-  order         Order    @relation(fields: [orderId], references: [id])
+  order       Order         @relation(fields: [orderId], references: [id])
   orderItems  OrderItem[]
   amountPaid  Float?
   paystackRef String?
-
 }
 
 model Session {
@@ -339,7 +339,7 @@ model Delivery {
   transaction   Transaction @relation(fields: [transactionId], references: [id])
   transactionId String
 
-  rider   User?   @relation(fields: [riderId], references: [id])
+  rider   Rider?  @relation(fields: [riderId], references: [id])
   riderId String?
   orderId String  @unique
 
@@ -364,6 +364,52 @@ model Delivery {
   order       Order     @relation(fields: [orderId], references: [id])
 }
 
+model Rider {
+  id          String        @id @default(uuid())
+  userId      String        @unique
+  user        User          @relation(fields: [userId], references: [id])
+  phone       String
+  address     String?
+  vehicleType String
+  status        RiderStatus @default(PENDING)// PENDING, APPROVED, REJECTED
+  isOnline    Boolean       @default(false)
+  currentLat  Float?
+  currentLng  Float?
+  lastSeenAt  DateTime      @default(now())
+  kyc         RiderKyc?
+  vehicle     RiderVehicle?
+  deliveries  Delivery[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model RiderKyc {
+  id                String   @id @default(uuid())
+  riderId           String   @unique
+  rider             Rider    @relation(fields: [riderId], references: [id])
+  ninNumber         String
+  selfieUrl         String
+  idCardUrl         String?
+  idType            String   @default("NIN")
+  licenseUrl        String?
+  roadWorthinessUrl String?
+  status            String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  createdAt         DateTime @default(now())
+}
+
+model RiderVehicle {
+  id           String   @id @default(uuid())
+  riderId      String   @unique
+  rider        Rider    @relation(fields: [riderId], references: [id])
+  brand        String
+  model        String
+  plateNumber  String?
+  frontViewUrl String?
+  backViewUrl  String?
+  documentUrl  String? // registration doc or insurance
+  createdAt    DateTime @default(now())
+}
+
 enum DeliveryStatus {
   PENDING // waiting for a rider
   ACCEPTED // rider accepted
@@ -371,4 +417,10 @@ enum DeliveryStatus {
   IN_TRANSIT // en route
   DELIVERED // delivered successfully
   CANCELLED
+}
+enum RiderStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
 }

@@ -352,3 +352,132 @@ export const deleteCategory = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: "Failed to delete category" });
   }
 };
+export const getRiderDashboardStats = async (req: AuthRequest, res: Response) => {
+  try {
+    const [pending, approved, rejected, totalDeliveries] = await Promise.all([
+      prisma.rider.count({ where: { status: "PENDING" } }),
+      prisma.rider.count({ where: { status: "APPROVED" } }),
+      prisma.rider.count({ where: { status: "REJECTED" } }),
+      prisma.delivery.count({}),
+    ]);
+
+    const totalRiders = pending + approved + rejected;
+
+    // Get top 5 riders by number of deliveries
+    const topRiders = await prisma.rider.findMany({
+      where: { status: "APPROVED" },
+      include: {
+        user: { select: { name: true, email: true, phone: true } },
+        _count: { select: { deliveries: true } },
+      },
+      orderBy: {
+        deliveries: { _count: "desc" },
+      },
+      take: 5,
+    });
+
+    return successResponse(res, "Rider dashboard stats", {
+      totalRiders,
+      pending,
+      approved,
+      rejected,
+      totalDeliveries,
+      topRiders,
+    });
+  } catch (err) {
+    console.error("getRiderDashboardStats error:", err);
+    return errorResponse(res, "Failed to get rider dashboard stats");
+  }
+};
+
+/** 📋 Paginated Riders List */
+export const getAllRiders = async (req: AuthRequest, res: Response) => {
+  try {
+    const { status, search, page = "1", limit = "10" } = req.query;
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const where: any = {};
+    if (status) where.status = status;
+    if (search) {
+      where.OR = [
+        { user: { name: { contains: String(search), mode: "insensitive" } } },
+        { user: { email: { contains: String(search), mode: "insensitive" } } },
+        { phone: { contains: String(search) } },
+      ];
+    }
+
+    const [riders, total] = await Promise.all([
+      prisma.rider.findMany({
+        where,
+        include: {
+          user: { select: { name: true, email: true } },
+          vehicle: true,
+          kyc: true,
+          _count: { select: { deliveries: true } },
+        },
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: Number(limit),
+      }),
+      prisma.rider.count({ where }),
+    ]);
+
+    return successResponse(res, "Riders fetched successfully", {
+      total,
+      page: Number(page),
+      limit: Number(limit),
+      riders,
+    });
+  } catch (err) {
+    console.error("getAllRiders error:", err);
+    return errorResponse(res, "Failed to fetch riders");
+  }
+};
+
+/** 👤 Get Single Rider Details */
+export const getSingleRider = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const rider = await prisma.rider.findUnique({
+      where: { id },
+      include: {
+        user: { select: { name: true, email: true, phone: true } },
+        vehicle: true,
+        kyc: true,
+        deliveries: {
+          orderBy: { createdAt: "desc" },
+          take: 10,
+        },
+      },
+    });
+
+    if (!rider) return errorResponse(res, "Rider not found", "RIDER_NOT_FOUND", 404);
+
+    return successResponse(res, "Rider details retrieved", rider);
+  } catch (err) {
+    console.error("getSingleRider error:", err);
+    return errorResponse(res, "Failed to get rider details");
+  }
+};
+
+/** 🧾 Rider Analytics per Month (Optional chart data) */
+export const getRiderMonthlyStats = async (req: AuthRequest, res: Response) => {
+  try {
+    const monthlyStats = await prisma.delivery.groupBy({
+      by: ["createdAt"],
+      _count: { id: true },
+      orderBy: { createdAt: "asc" },
+    });
+
+    const stats = monthlyStats.reduce((acc: any, d) => {
+      const month = new Date(d.createdAt).toLocaleString("default", { month: "short" });
+      acc[month] = (acc[month] || 0) + d._count.id;
+      return acc;
+    }, {});
+
+    return successResponse(res, "Monthly delivery stats", stats);
+  } catch (err) {
+    console.error("getRiderMonthlyStats error:", err);
+    return errorResponse(res, "Failed to get monthly stats");
+  }
+};

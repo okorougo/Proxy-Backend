@@ -312,6 +312,25 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("rider_update_location", async (data) => {
+    const { riderId, lat, lng } = data;
+    await prisma.rider.update({
+      where: { userId: riderId },
+      data: { currentLat: lat, currentLng: lng, isOnline: true },
+    });
+
+    // broadcast to all vendors/admins
+    socket.broadcast.emit("rider_location_update", { riderId, lat, lng });
+  });
+
+  socket.on("rider_toggle_online", async (data) => {
+    await prisma.rider.update({
+      where: { userId: data.riderId },
+      data: { isOnline: data.isOnline },
+    });
+    socket.broadcast.emit("rider_status_change", data);
+  });
+
   // disconnect cleanup
   socket.on("disconnect", async () => {
     if (socket.data.sessionId) {

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getDashboardStats, listKycRequests, updateKycStatus, listReports, resolveReport, listUsers, banUser, unbanUser, updateUserRole,listAllListings, approveListing, rejectListing, removeListing, createCategory, getCategories, updateCategory, deleteCategory, adminLogin} from "../controllers/admin.controller";
+import { getDashboardStats, listKycRequests, updateKycStatus, listReports, resolveReport, listUsers, banUser, unbanUser, updateUserRole,listAllListings, approveListing, rejectListing, removeListing, createCategory, getCategories, updateCategory, deleteCategory, adminLogin, getRiderMonthlyStats, getSingleRider, getRiderDashboardStats, getAllRiders} from "../controllers/admin.controller";
 import multer from "multer";
 import { authMiddleware } from "../middleware/auth";
 import { adminOnly, modOrAdmin } from "../middleware/admin";
@@ -9,6 +9,15 @@ const router = Router();
 router.post("/login", adminLogin);
 // Dashboard stats
 router.get("/dashboard", authMiddleware, adminOnly, getDashboardStats);
+router.get("/rider-stats", getRiderDashboardStats);
+
+// 📋 All Riders
+router.get("/", getAllRiders);
+
+
+
+// 📈 Monthly Stats
+router.get("/rider-analytics/monthly", getRiderMonthlyStats);
 
 // KYC management
 router.get("/kyc", authMiddleware, modOrAdmin, listKycRequests);
