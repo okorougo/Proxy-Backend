@@ -566,6 +566,12 @@ export const getUserOrders = async (req: AuthRequest, res: Response) => {
               fareAmount: order.delivery.fareAmount,
               isDigital: order.delivery.isDigital,
               digitalFiles,
+              pickupLat: order.delivery.pickupLat,
+              pickupLng: order.delivery.pickupLng,
+              dropoffLat: order.delivery.dropoffLat,
+              dropoffLng:order.delivery.dropoffLng,
+              pickupAddress: order.delivery.pickupAddress,
+              dropoffAddress: order.delivery.dropoffAddress
             }
           : null,
         listings: order.listings.map((item) => ({
