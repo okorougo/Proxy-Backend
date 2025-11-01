@@ -183,9 +183,18 @@ export const getVendorDashboardStats = async (
   res: Response
 ) => {
   try {
-    const vendorId = req.user?.id;
-    if (!vendorId)
+    const userId = req.user?.id;
+    if (!userId)
       return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
+    const vendor = await prisma.vendorApplication.findUnique({
+      where:{userId: userId}
+    })
+
+    if(!vendor){
+      return errorResponse(res, "Unauthorized", "User not found", 401)
+    }
+
+    const vendorId = vendor.id
 
     // 1️⃣ Running Orders (active deliveries)
     const runningOrders = await prisma.transaction.count({
@@ -417,8 +426,9 @@ export const createMultiVendorOrder = async (
           include: {
             vendorApplication: {
               include: {
-                /* add location if stored */
+                user: true
               },
+
             },
           },
         },
@@ -437,7 +447,9 @@ export const createMultiVendorOrder = async (
       const listing = listingMap.get(it.id);
       if (!listing)
         return errorResponse(res, `Listing ${it.id} not found`);
-      const vendorId = listing.sellerId;
+
+      const vendorId = listing.seller?.vendorApplication?.id as string ;
+
       if (!grouped[vendorId]) grouped[vendorId] = [];
       grouped[vendorId].push({ listing, quantity: Number(it.quantity || 1) });
     }

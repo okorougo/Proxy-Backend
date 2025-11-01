@@ -36,7 +36,6 @@ model User {
   reportsMade        Report[]           @relation("Reporter")
   reportsReviewed    Report[]           @relation("ReviewedBy")
   buyerTransactions  Transaction[]      @relation("buyerTransactions")
-  sellerTransactions Transaction[]      @relation("sellerTransactions")
   auditLogs          AuditLog[]         @relation("Actor")
   messagesSent       Message[]          @relation("sentMessages")
   messagesRecv       Message[]          @relation("recvMessages")
@@ -84,6 +83,7 @@ model VendorApplication {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   order     Order[]
+  sellerTransactions Transaction[]      @relation("sellerTransactions")
 }
 
 model KycVerification {
@@ -264,7 +264,7 @@ model Transaction {
   orderId     String        @unique
   buyer       User          @relation("buyerTransactions", fields: [buyerId], references: [id])
   buyerId     String
-  seller      User          @relation("sellerTransactions", fields: [sellerId], references: [id])
+  seller      VendorApplication          @relation("sellerTransactions", fields: [sellerId], references: [id])
   sellerId    String
   amountCents Int
   currency    String        @default("NGN")
