@@ -366,7 +366,7 @@ export const getVendorOrders = async (req: AuthRequest, res: Response) => {
     return errorResponse(res, "Failed to fetch vendor orders");
   }
 };
-type CartItem = { listingId: string; quantity: number };
+type CartItem = { id: string; quantity: number };
 
 export const createMultiVendorOrder = async (
   req: AuthRequest,
@@ -408,7 +408,7 @@ export const createMultiVendorOrder = async (
 
     // Fetch all listings referenced by the cart (authoritative)
     const listingIds = Array.from(
-      new Set((items as CartItem[]).map((i) => i.listingId))
+      new Set((items as CartItem[]).map((i) => i.id))
     );
     const listings = await prisma.listing.findMany({
       where: { id: { in: listingIds } },
@@ -434,9 +434,9 @@ export const createMultiVendorOrder = async (
     // Group items by seller (use listing.sellerId — do NOT trust client-provided vendorId)
     const grouped: Record<string, { listing: any; quantity: number }[]> = {};
     for (const it of items as CartItem[]) {
-      const listing = listingMap.get(it.listingId);
+      const listing = listingMap.get(it.id);
       if (!listing)
-        return errorResponse(res, `Listing ${it.listingId} not found`);
+        return errorResponse(res, `Listing ${it.id} not found`);
       const vendorId = listing.sellerId;
       if (!grouped[vendorId]) grouped[vendorId] = [];
       grouped[vendorId].push({ listing, quantity: Number(it.quantity || 1) });
