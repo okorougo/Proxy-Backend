@@ -365,41 +365,51 @@ export const searchListings = async (req: Request, res: Response) => {
     if (lat && lng) {
       const radius = Number(radiusKm);
       const earth = 6371; // Earth's radius in km
+      const latNum = Number(lat);
+      const lngNum = Number(lng);
 
-      // Find listings from vendors within the radius
+      // Use parameterized query to avoid injection and use WHERE instead of HAVING.
       const nearbyListings = await prisma.$queryRaw`
         WITH nearby_vendors AS (
-          SELECT va.id as vendor_id, va."userId" as vendor_user_id,
+          SELECT
+            va.id AS vendor_id,
+            va."userId" AS vendor_user_id,
             (${earth} * acos(
-              cos(radians(${Number(lat)})) * cos(radians(l.lat)) *
-              cos(radians(l.lng) - radians(${Number(lng)})) +
-              sin(radians(${Number(lat)})) * sin(radians(l.lat))
+              cos(radians(${latNum})) * cos(radians(l.lat)) *
+              cos(radians(l.lng) - radians(${lngNum})) +
+              sin(radians(${latNum})) * sin(radians(l.lat))
             )) AS distance_km
           FROM "Location" l
           JOIN "VendorApplication" va ON va.id = l."vendorId"
           WHERE va.status = 'APPROVED'
-          HAVING (${earth} * acos(
-            cos(radians(${Number(lat)})) * cos(radians(l.lat)) *
-            cos(radians(l.lng) - radians(${Number(lng)})) +
-            sin(radians(${Number(lat)})) * sin(radians(l.lat))
-          )) <= ${radius}
+            AND (${earth} * acos(
+              cos(radians(${latNum})) * cos(radians(l.lat)) *
+              cos(radians(l.lng) - radians(${lngNum})) +
+              sin(radians(${latNum})) * sin(radians(l.lat))
+            )) <= ${radius}
         )
         SELECT listing.id
         FROM "Listing" listing
         JOIN nearby_vendors nv ON listing."sellerId" = nv.vendor_user_id
         WHERE listing.status = 'APPROVED'
+        -- optional: order by proximity
+        ORDER BY nv.distance_km ASC
+        LIMIT 100;
       `;
 
-      const listingIds = (nearbyListings as any[]).map((l) => l.id);
+      const listingIds = (nearbyListings as any[]).map((r) => r.id);
       if (listingIds.length > 0) {
         where.id = { in: listingIds };
+      } else {
+        // No nearby listings — return empty early
+        return successResponse(res, "Listings fetched successfully", []);
       }
     }
 
     // 🧮 Sorting
-    let orderBy: any = { createdAt: order };
-    if (sortBy === "price") orderBy = { price: order };
-    if (sortBy === "popularity") orderBy = { transactions: { _count: order } };
+    let orderBy: any = { createdAt: order as "asc" | "desc" };
+    if (sortBy === "price") orderBy = { price: order as "asc" | "desc" };
+    if (sortBy === "popularity") orderBy = { transactions: { _count: order as "asc" | "desc" } };
 
     // ✅ Fetch Listings
     const listings = await prisma.listing.findMany({
@@ -434,6 +444,7 @@ export const searchListings = async (req: Request, res: Response) => {
     return errorResponse(res, "Failed to search listings");
   }
 };
+
 export const getListingsByCategory = async (req: Request, res: Response) => {
   try {
     const { categoryId, limit = "10", cursor } = req.query;
