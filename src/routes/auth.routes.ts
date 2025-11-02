@@ -1,7 +1,8 @@
 import { Router } from "express";
 import passport from "../lib/passport";
-import { register, login,sendOtp, verifyOtp,registerVendor, forgotPassword, resetPassword, resendResetOtp, vendorLogin } from "../controllers/auth.controller";
+import { register, login,sendOtp, verifyOtp,registerVendor, forgotPassword, resetPassword, resendResetOtp, vendorLogin, updateUser } from "../controllers/auth.controller";
 import jwt from "jsonwebtoken"
+import { authMiddleware } from "../middleware/auth";
 
 const router = Router();
 
@@ -25,6 +26,7 @@ router.get("/google/callback", passport.authenticate("google", { session: false 
   });
   res.json({ token, user });
 });
+router.put("/user/update", authMiddleware, updateUser);
 
 // Apple (similar flow)
 router.get("/apple", passport.authenticate("apple"));
