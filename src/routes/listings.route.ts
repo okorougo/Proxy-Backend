@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createListing,deleteListing, getAllListingsByVendor, getPopularListings,getNewListings, getDigitalDownload, updateListing, searchListings, getListingsByCategory, getUserOrders } from "../controllers/listings.controller";
+import { createListing,deleteListing, getAllListingsByVendor, getPopularListings,getNewListings, getDigitalDownload, updateListing, searchListings, getListingsByCategory, getUserOrders, getListingById } from "../controllers/listings.controller";
 import { authMiddleware } from "../middleware/auth";
 import multer from "multer";
 
@@ -26,5 +26,6 @@ router.get("/download/:id", authMiddleware, getDigitalDownload);
 router.get("/search", searchListings);
 router.get("/search-category", getListingsByCategory);
 router.get("/get-user-order", authMiddleware, getUserOrders);
+router.get("/listing/:id", getListingById);
 
 export default router;

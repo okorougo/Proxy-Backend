@@ -3,7 +3,7 @@ import prisma from "../lib/prisma";
 import { AuthRequest } from "../middleware/auth";
 import geohash from "ngeohash";
 import { errorResponse, successResponse } from "../utils/response";
-import { uploadToCloudinary } from "../lib/cloudinary";
+import { deleteFromCloudinary, uploadToCloudinary } from "../lib/cloudinary";
 import cloudinary from "../lib/cloudinary";
 
 /* ==========================================================
@@ -118,16 +118,97 @@ export const createListing = async (req: AuthRequest, res: Response) => {
 export const updateListing = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const existing = await prisma.listing.findUnique({ where: { id } });
+    const {
+      title,
+      description,
+      price,
+      priceCents,
+      currency,
+      isDigital,
+      categoryId,
+      condition,
+      stock,
+      extraDetails,
+      replaceMedia, // boolean to indicate whether to replace old media
+    } = req.body;
+
+    const existing = await prisma.listing.findUnique({
+      where: { id },
+      include: { media: true },
+    });
 
     if (!existing)
       return errorResponse(res, "Listing not found", "LISTING_NOT_FOUND", 404);
     if (existing.sellerId !== req.user!.id)
       return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 403);
 
+    // Parse extraDetails safely
+    let parsedDetails: { title: string; description: string }[] | null = null;
+    if (extraDetails) {
+      try {
+        parsedDetails = JSON.parse(extraDetails);
+      } catch (err) {
+        return errorResponse(res, "Invalid JSON format for extraDetails");
+      }
+    }
+
+    // Prepare fields to update (only provided ones)
+    const dataToUpdate: any = {};
+    if (title) dataToUpdate.title = title;
+    if (description) dataToUpdate.description = description;
+    if (price) {
+      dataToUpdate.price = Number(price);
+      dataToUpdate.priceCents = Number(priceCents || price * 100);
+    }
+    if (currency) dataToUpdate.currency = currency;
+    if (condition) dataToUpdate.condition = condition;
+    if (stock !== undefined) dataToUpdate.stock = Number(stock);
+    if (typeof isDigital !== "undefined")
+      dataToUpdate.isDigital = Boolean(isDigital);
+    if (categoryId) dataToUpdate.category = { connect: { id: categoryId } };
+    if (parsedDetails) dataToUpdate.extraDetails = parsedDetails;
+
+    // Handle file uploads
+    const files = req.files as
+      | { [fieldname: string]: Express.Multer.File[] }
+      | undefined;
+
+    // 🟡 Replace or add new media
+    if (files?.media && files.media.length > 0) {
+      // If replaceMedia=true, remove old media first
+      if (replaceMedia === "true" || replaceMedia === true) {
+        for (const old of existing.media) {
+          try {
+            await deleteFromCloudinary(old.publicId);
+          } catch (err) {
+            console.warn("Failed to delete old media:", old.publicId);
+          }
+        }
+        await prisma.media.deleteMany({ where: { listingId: id } });
+      }
+
+      // Upload new media
+      const newMedia = [];
+      for (const f of files.media) {
+        const uploaded = await uploadToCloudinary(f.buffer, "listings/media");
+        newMedia.push({
+          url: uploaded.secure_url,
+          publicId: uploaded.public_id,
+          mimeType: f.mimetype,
+          size: f.size,
+          listingId: id,
+        });
+      }
+      if (newMedia.length > 0) {
+        await prisma.media.createMany({ data: newMedia });
+      }
+    }
+
+    // 🟢 Update listing record
     const updated = await prisma.listing.update({
       where: { id },
-      data: req.body,
+      data: dataToUpdate,
+      include: { media: true, category: true },
     });
 
     return successResponse(res, "Listing updated successfully", updated);
@@ -136,6 +217,7 @@ export const updateListing = async (req: AuthRequest, res: Response) => {
     return errorResponse(res, "Listing update failed");
   }
 };
+
 
 /* ==========================================================
    🔴 DELETE LISTING & CLOUDINARY MEDIA
@@ -603,5 +685,45 @@ export const getUserOrders = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error("❌ getUserOrders error:", error);
     return errorResponse(res, "Failed to fetch user orders");
+  }
+};
+export const getListingById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return errorResponse(res, "Listing ID is required", "ID_REQUIRED", 400);
+    }
+
+    const listing = await prisma.listing.findUnique({
+      where: { id },
+      include: {
+        media: true,
+        category: true,
+        seller: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+            vendorApplication: {
+              include: { location: true },
+            },
+          },
+        },
+        _count: {
+          select: { transactions: true },
+        },
+      },
+    });
+
+    if (!listing) {
+      return errorResponse(res, "Listing not found", "LISTING_NOT_FOUND", 404);
+    }
+
+    return successResponse(res, "Listing fetched successfully", listing);
+  } catch (err) {
+    console.error("❌ getListingById error:", err);
+    return errorResponse(res, "Failed to fetch listing", "SERVER_ERROR", 500);
   }
 };

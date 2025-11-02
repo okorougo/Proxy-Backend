@@ -32,5 +32,23 @@ export const generateSignedDownloadUrl = (publicId: string) => {
   });
   return url;
 };
+export const deleteFromCloudinary = async (publicId: string) => {
+  if (!publicId) throw new Error("Missing publicId for Cloudinary deletion");
+  try {
+    const result = await cloudinary.uploader.destroy(publicId, {
+      invalidate: true, // optional: ensures cached versions are also removed
+      resource_type: "auto", // auto-detect (image, video, etc.)
+    });
+
+    if (result.result !== "ok" && result.result !== "not found") {
+      console.warn("⚠️ Cloudinary delete warning:", result);
+    }
+
+    return result;
+  } catch (error: any) {
+    console.error("❌ Cloudinary deletion error:", error.message || error);
+    throw new Error("Failed to delete from Cloudinary");
+  }
+};
 
 export default cloudinary;
