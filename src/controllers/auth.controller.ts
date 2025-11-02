@@ -429,5 +429,66 @@ export const resendResetOtp = async (req: Request, res: Response) => {
     return errorResponse(res, "Internal server error", "SERVER_ERROR", 500);
   }
 };
+export const updateUser = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id; // assuming user is attached to req by auth middleware
+    const { name, email, phone } = req.body;
+
+    if (!userId) {
+      return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
+    }
+
+    if (!name && !email && !phone) {
+      return errorResponse(res, "No update fields provided", "NO_FIELDS", 400);
+    }
+
+    // ✅ Check if email exists for another user
+    if (email) {
+      const existingEmail = await prisma.user.findFirst({
+        where: {
+          email,
+          NOT: { id: userId },
+        },
+      });
+      if (existingEmail) {
+        return errorResponse(res, "Email already exists", "EMAIL_EXISTS", 409);
+      }
+    }
+
+    // ✅ Check if phone exists for another user
+    if (phone) {
+      const existingPhone = await prisma.user.findFirst({
+        where: {
+          phone,
+          NOT: { id: userId },
+        },
+      });
+      if (existingPhone) {
+        return errorResponse(res, "Phone number already exists", "PHONE_EXISTS", 409);
+      }
+    }
+
+    // ✅ Perform update
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...(name && { name }),
+        ...(email && { email }),
+        ...(phone && { phone }),
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+      },
+    });
+
+    return successResponse(res, "Profile updated successfully", updatedUser);
+  } catch (err) {
+    console.error("❌ updateUser error:", err);
+    return errorResponse(res, "Failed to update profile", "UPDATE_ERROR", 500);
+  }
+};
 
 
