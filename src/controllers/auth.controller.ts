@@ -67,7 +67,7 @@ export const login = async (req: Request, res: Response) => {
 
     return successResponse(res, "Login successful", {
       token,
-      user: { id: user.id, email: user.email, name: user.name },
+      user: { id: user.id, email: user.email, name: user.name, phone: user.phone },
     });
   } catch (err) {
     console.error(err);
@@ -429,4 +429,5 @@ export const resendResetOtp = async (req: Request, res: Response) => {
     return errorResponse(res, "Internal server error", "SERVER_ERROR", 500);
   }
 };
+
 
