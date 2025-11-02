@@ -483,7 +483,6 @@ export const getUserOrders = async (req: AuthRequest, res: Response) => {
     const userId = req.user?.id;
     if (!userId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
 
-    // ✅ Fetch all orders for the logged-in user
     const orders = await prisma.order.findMany({
       where: { userId },
       include: {
@@ -492,9 +491,7 @@ export const getUserOrders = async (req: AuthRequest, res: Response) => {
           include: {
             location: true,
             user: {
-              include: {
-                kycDocument: true,
-              },
+              include: { kycDocument: true },
             },
           },
         },
@@ -515,16 +512,20 @@ export const getUserOrders = async (req: AuthRequest, res: Response) => {
       return successResponse(res, "No orders found", []);
     }
 
-    // ✅ Format response neatly
     const formatted = orders.map((order) => {
       let digitalFiles: any[] = [];
 
-      // ✅ For digital deliveries, use saved URLs directly
-      if (
-        order.isDigital &&
-        order.delivery?.isDigital &&
-        order.delivery.digitalFiles
-      ) {
+      if (order.isDigital) {
+        // ✅ Get files directly from listing.media for digital listings
+        digitalFiles = order.listings.flatMap((item) =>
+          item.listing.media.map((file) => ({
+            id: file.id,
+            name: file.publicId || file.url.split("/").pop(),
+            url: file.url,
+          }))
+        );
+      } else if (order.delivery?.isDigital && order.delivery.digitalFiles) {
+        // ✅ Fallback for legacy digital deliveries with stored JSON files
         try {
           const parsed =
             typeof order.delivery.digitalFiles === "string"
@@ -534,7 +535,7 @@ export const getUserOrders = async (req: AuthRequest, res: Response) => {
             digitalFiles = parsed.map((f: any) => ({
               id: f.id,
               name: f.name,
-              url: f.url, // direct file URL
+              url: f.url,
             }));
           }
         } catch (err) {
@@ -562,16 +563,16 @@ export const getUserOrders = async (req: AuthRequest, res: Response) => {
         delivery: order.delivery
           ? {
               id: order.delivery.id,
-              status: order.status,
+              status: order.delivery.status,
               fareAmount: order.delivery.fareAmount,
               isDigital: order.delivery.isDigital,
               digitalFiles,
               pickupLat: order.delivery.pickupLat,
               pickupLng: order.delivery.pickupLng,
               dropoffLat: order.delivery.dropoffLat,
-              dropoffLng:order.delivery.dropoffLng,
+              dropoffLng: order.delivery.dropoffLng,
               pickupAddress: order.delivery.pickupAddress,
-              dropoffAddress: order.delivery.dropoffAddress
+              dropoffAddress: order.delivery.dropoffAddress,
             }
           : null,
         listings: order.listings.map((item) => ({
@@ -580,7 +581,9 @@ export const getUserOrders = async (req: AuthRequest, res: Response) => {
           price: item.unitPrice,
           quantity: item.quantity,
           image: item.listing.media?.[0]?.url || null,
+          category: item.listing.category?.name || "Uncategorized",
         })),
+        digitalFiles, // ✅ Include digital files directly for digital listings
         createdAt: order.createdAt,
       };
     });

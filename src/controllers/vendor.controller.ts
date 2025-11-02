@@ -5,7 +5,7 @@ import { errorResponse, successResponse } from "../utils/response";
 import { AuthRequest } from "../middleware/auth";
 import geohash from "ngeohash";
 import { generateSignedDownloadUrl } from "../lib/cloudinary";
-import axios from "axios"
+import axios from "axios";
 
 function generateGeohash(
   latitude: number,
@@ -184,17 +184,16 @@ export const getVendorDashboardStats = async (
 ) => {
   try {
     const userId = req.user?.id;
-    if (!userId)
-      return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
+    if (!userId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
     const vendor = await prisma.vendorApplication.findUnique({
-      where:{userId: userId}
-    })
+      where: { userId: userId },
+    });
 
-    if(!vendor){
-      return errorResponse(res, "Unauthorized", "User not found", 401)
+    if (!vendor) {
+      return errorResponse(res, "Unauthorized", "User not found", 401);
     }
 
-    const vendorId = vendor.id
+    const vendorId = vendor.id;
 
     // 1️⃣ Running Orders (active deliveries)
     const runningOrders = await prisma.transaction.count({
@@ -384,12 +383,7 @@ export const createMultiVendorOrder = async (
   try {
     const { reference } = req.query;
     const userId = req.user?.id;
-    const {
-      items,
-      dropoffAddress,
-      dropoffLat,
-      dropoffLng,
-    } = req.body;
+    const { items, dropoffAddress, dropoffLat, dropoffLng } = req.body;
     if (!reference) return errorResponse(res, "Missing payment reference");
 
     // 1️⃣ Verify payment from Paystack
@@ -426,9 +420,8 @@ export const createMultiVendorOrder = async (
           include: {
             vendorApplication: {
               include: {
-                user: true
+                user: true,
               },
-
             },
           },
         },
@@ -445,10 +438,9 @@ export const createMultiVendorOrder = async (
     const grouped: Record<string, { listing: any; quantity: number }[]> = {};
     for (const it of items as CartItem[]) {
       const listing = listingMap.get(it.id);
-      if (!listing)
-        return errorResponse(res, `Listing ${it.id} not found`);
+      if (!listing) return errorResponse(res, `Listing ${it.id} not found`);
 
-      const vendorId = listing.seller?.vendorApplication?.id as string ;
+      const vendorId = listing.seller?.vendorApplication?.id as string;
 
       if (!grouped[vendorId]) grouped[vendorId] = [];
       grouped[vendorId].push({ listing, quantity: Number(it.quantity || 1) });
@@ -485,7 +477,7 @@ export const createMultiVendorOrder = async (
               listings: { create: orderItemsCreate },
             },
             include: {
-              listings: { include: { listing: true } },
+              listings: { include: { listing: { include: { media: true } } } },
               vendor: true,
               user: true,
             },
@@ -502,7 +494,7 @@ export const createMultiVendorOrder = async (
               amountCents: Math.round(totalAmount * 100),
               status: "PENDING", // payment pending by default
               method: "PAYSTACK", // or from req.body
-              amountPaid:amountPaid,
+              amountPaid: amountPaid,
               paystackRef,
             },
           });
@@ -512,16 +504,46 @@ export const createMultiVendorOrder = async (
 
       // optionally auto create delivery for physical items (you might rather create delivery after payment success)
       let delivery = null;
-      if (
-        !order.isDigital &&
-        dropoffLat &&
-        dropoffLng &&
-        dropoffAddress
-      ) {
-        // try to find vendor location
-        const vendorLocation = await prisma.location.findFirst({
-          where: { /* vendorId field name */ vendorId },
+      if (order.isDigital) {
+        const digitalFiles = vendorItems.flatMap((i) =>
+          i.listing.media.map((file: any) => ({
+            id: file.id,
+            name: file.publicId,
+            url: file.url, // direct accessible file URL
+          }))
+        );
+
+        delivery = await prisma.delivery.create({
+          data: {
+            orderId: order.id,
+            transactionId: transaction.id,
+            pickupAddress: "Digital Delivery",
+            pickupLat: 0,
+            pickupLng: 0,
+            dropoffAddress: "Digital File",
+            dropoffLat: 0,
+            dropoffLng: 0,
+            distanceKm: 0,
+            fareAmount: 0,
+            status: "DELIVERED",
+            isDigital: true,
+            digitalFiles: JSON.stringify(digitalFiles),
+          },
         });
+
+        // mark order as delivered since digital
+        await prisma.order.update({
+          where: { id: order.id },
+          data: { status: "DELIVERED" },
+        });
+      }
+
+      // ✅ PHYSICAL ORDERS — create delivery record
+      if (!order.isDigital && dropoffLat && dropoffLng && dropoffAddress) {
+        const vendorLocation = await prisma.location.findFirst({
+          where: { vendorId },
+        });
+
         if (vendorLocation) {
           const distanceKm = haversineDistance(
             vendorLocation.lat,
@@ -539,6 +561,7 @@ export const createMultiVendorOrder = async (
           delivery = await prisma.delivery.create({
             data: {
               orderId: order.id,
+              transactionId: transaction.id,
               pickupAddress: vendorLocation.Address ?? "Vendor address",
               pickupLat: vendorLocation.lat,
               pickupLng: vendorLocation.lng,
@@ -549,11 +572,10 @@ export const createMultiVendorOrder = async (
               fareAmount,
               status: "PENDING",
               isDigital: false,
-              transactionId: transaction.id,
             },
           });
 
-          // update order total to include delivery
+          // Update order total
           await prisma.order.update({
             where: { id: order.id },
             data: { totalAmount: { increment: fareAmount } },
