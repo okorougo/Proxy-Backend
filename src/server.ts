@@ -35,6 +35,7 @@ const io = new Server(server, {
   cors: {
     origin: ["*", "http://localhost:5173"], // change to your frontend URL later
     credentials: true, 
+    methods:["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"]
   },
 });
 // const onlineUsers = new Map<string, string>();
