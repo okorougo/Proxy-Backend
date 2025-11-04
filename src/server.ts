@@ -33,7 +33,7 @@ app.use(passport.initialize());
 
 const io = new Server(server, {
   cors: {
-    origin: "*", // change to your frontend URL later
+    origin: ["*", "http://localhost:5173"], // change to your frontend URL later
   },
 });
 // const onlineUsers = new Map<string, string>();
