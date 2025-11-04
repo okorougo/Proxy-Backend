@@ -178,117 +178,151 @@ export const addeVendorLocation = async (req: Request, res: Response) => {
   }
 };
 
-export const getVendorDashboardStats = async (
-  req: AuthRequest,
-  res: Response
-) => {
+export const getVendorDashboardStats = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     if (!userId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
-    const vendor = await prisma.vendorApplication.findUnique({
-      where: { userId: userId },
-    });
 
-    if (!vendor) {
-      return errorResponse(res, "Unauthorized", "User not found", 401);
-    }
+    // ✅ Find vendor for logged-in user
+    const vendor = await prisma.vendorApplication.findUnique({ where: { userId } });
+    if (!vendor) return errorResponse(res, "Vendor not found", "NO_VENDOR", 404);
 
     const vendorId = vendor.id;
 
-    // 1️⃣ Running Orders (active deliveries)
-    const runningOrders = await prisma.transaction.count({
+    // 1️⃣ Running Orders (active, not completed or cancelled)
+    const runningOrders = await prisma.order.count({
       where: {
-        sellerId: vendorId,
-        status: "PENDING",
+        vendorId,
+        NOT: { status: { in: ["COMPLETED", "CANCELLED", "REJECTED"] } },
       },
     });
 
-    // 2️⃣ Order Requests (awaiting confirmation or not yet processed)
-    const orderRequests = await prisma.transaction.count({
-      where: {
-        sellerId: vendorId,
-        status: "PENDING",
-      },
+    // 2️⃣ Order Requests (pending confirmation)
+    const orderRequests = await prisma.order.count({
+      where: { vendorId, status: "PENDING" },
     });
 
-    // 3️⃣ Revenue Made (sum of all COMPLETED transactions)
-    const revenue = await prisma.transaction.aggregate({
+    // 3️⃣ Total Revenue (sum of COMPLETED transactions)
+    const revenueAgg = await prisma.transaction.aggregate({
+      where: { sellerId: vendorId, status: "COMPLETED" },
+      _sum: { amountCents: true },
+    });
+    const totalRevenue = (revenueAgg._sum.amountCents ?? 0) / 100;
+
+    // 4️⃣ Daily Stats
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    const endOfToday = new Date();
+    endOfToday.setHours(23, 59, 59, 999);
+
+    const todayRevenueAgg = await prisma.transaction.aggregate({
       where: {
         sellerId: vendorId,
         status: "COMPLETED",
+        createdAt: { gte: startOfToday, lte: endOfToday },
       },
       _sum: { amountCents: true },
     });
+    const todayRevenue = (todayRevenueAgg._sum.amountCents ?? 0) / 100;
 
-    const totalRevenue = (revenue._sum.amountCents ?? 0) / 100;
+    const todayNewOrders = await prisma.order.count({
+      where: { vendorId, createdAt: { gte: startOfToday, lte: endOfToday } },
+    });
 
-    // 4️⃣ Monthly Revenue (past 6 months)
+    // 5️⃣ Monthly Revenue (last 6 months)
     const now = new Date();
-    const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(now.getDay() - 5);
+    const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
 
-    const monthlyStats = await prisma.transaction.findMany({
+    const transactions = await prisma.transaction.findMany({
       where: {
         sellerId: vendorId,
         status: "COMPLETED",
         createdAt: { gte: sixMonthsAgo },
       },
-      select: {
-        amountCents: true,
-        createdAt: true,
-      },
+      select: { amountCents: true, createdAt: true },
+      orderBy: { createdAt: "asc" },
     });
 
-    // Group by month
     const monthlyTotals: Record<string, number> = {};
-    for (const t of monthlyStats) {
-      const month = t.createdAt.toLocaleString("default", { month: "short" });
-      monthlyTotals[month] =
-        (monthlyTotals[month] ?? 0) + (t.amountCents ?? 0) / 100;
+
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const label = d.toLocaleString("default", { month: "short" });
+      monthlyTotals[label] = 0;
     }
 
-    // 5️⃣ Popular Listings (Top 5 listings sold most by this vendor)
-    const popularListings = await prisma.listing.findMany({
-      where: { sellerId: vendorId },
-      select: {
-        id: true,
-        title: true,
-        price: true,
-        media: {
-          take: 1,
-          select: { url: true },
+    transactions.forEach((t) => {
+      const label = t.createdAt.toLocaleString("default", { month: "short" });
+      monthlyTotals[label] += (t.amountCents ?? 0) / 100;
+    });
+
+    const labels = Object.keys(monthlyTotals);
+    const values = Object.values(monthlyTotals);
+
+    // 6️⃣ Popular Listings (Top 5 best-sellers)
+    const soldItems = await prisma.orderItem.findMany({
+      where: {
+        order: {
+          vendorId,
+          transaction: { status: "COMPLETED" },
         },
-        transactions: {
-          where: { status: "COMPLETED" },
-          select: { id: true },
+      },
+      select: {
+        listingId: true,
+        quantity: true,
+        listing: {
+          select: {
+            id: true,
+            title: true,
+            price: true,
+            media: { take: 1, select: { url: true } },
+          },
         },
       },
     });
 
-    const rankedListings = popularListings
-      .map((l) => ({
-        id: l.id,
-        title: l.title,
-        price: l.price,
-        totalSold: l.transactions.length,
-        media: l.media[0]?.url ?? null,
-      }))
-      .filter((l) => l.totalSold > 0)
+    const listingMap = new Map<
+      string,
+      { id: string; title: string; price: number; image: string | null; totalSold: number }
+    >();
+
+    for (const item of soldItems) {
+      const id = item.listing.id;
+      const existing = listingMap.get(id);
+      const qty = item.quantity ?? 0;
+      if (existing) {
+        existing.totalSold += qty;
+      } else {
+        listingMap.set(id, {
+          id,
+          title: item.listing.title,
+          price: item.listing.price,
+          image: item.listing.media?.[0]?.url ?? null,
+          totalSold: qty,
+        });
+      }
+    }
+
+    const popularListings = Array.from(listingMap.values())
       .sort((a, b) => b.totalSold - a.totalSold)
       .slice(0, 5);
 
+    // ✅ Final Response
     return successResponse(res, "Vendor dashboard stats", {
       runningOrders,
       orderRequests,
       totalRevenue,
-      monthlyRevenue: monthlyTotals,
-      popularListings: rankedListings,
+      todayRevenue,
+      todayNewOrders,
+      monthlyRevenue: { labels, values },
+      popularListings,
     });
   } catch (err) {
     console.error("getVendorDashboardStats error:", err);
     return errorResponse(res, "Failed to fetch vendor dashboard stats");
   }
 };
+
 
 export const getVendorById = async (req: Request, res: Response) => {
   try {
@@ -313,67 +347,122 @@ export const getVendorById = async (req: Request, res: Response) => {
 
 export const getVendorOrders = async (req: AuthRequest, res: Response) => {
   try {
-    const vendorId = req.user?.id;
-    if (!vendorId) {
+    const vendorUserId = req.user?.id; // the logged-in vendor user
+    if (!vendorUserId)
       return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
-    }
 
-    // ✅ Optional filters and pagination from query
-    const { status, page = "1", limit = "10" } = req.query;
+    // ✅ find the vendor application associated with this user
+    const vendor = await prisma.vendorApplication.findFirst({
+      where: { userId: vendorUserId },
+    });
 
-    const pageNum = parseInt(page as string, 10);
-    const pageSize = parseInt(limit as string, 10);
+    if (!vendor)
+      return errorResponse(res, "Vendor profile not found", "NOT_FOUND", 404);
 
-    const whereClause: any = {
-      sellerId: vendorId,
-    };
-
-    // If a filter status is passed (e.g. ?status=COMPLETED)
-    if (status) {
-      whereClause.status = status;
-    }
-
-    // ✅ Count total
-    const totalOrders = await prisma.transaction.count({ where: whereClause });
-
-    // ✅ Fetch paginated orders
-    const orders = await prisma.transaction.findMany({
-      where: whereClause,
+    // ✅ fetch all orders belonging to this vendor
+    const orders = await prisma.order.findMany({
+      where: { vendorId: vendor.id },
       include: {
-        buyer: {
-          select: { id: true, name: true, email: true },
-        },
-        listing: {
+        user: {
           select: {
             id: true,
-            title: true,
-            price: true,
-            media: true,
-            transactions: true,
+            name: true,
+            email: true,
+            phone: true,
           },
         },
-        Delivery: true,
+        listings: {
+          include: {
+            listing: {
+              include: {
+                media: true,
+                category: true,
+              },
+            },
+          },
+        },
+        transaction: true,
+        delivery: true,
       },
-      orderBy: {
-        createdAt: "desc",
-      },
-      skip: (pageNum - 1) * pageSize,
-      take: pageSize,
+      orderBy: { createdAt: "desc" },
     });
 
-    const totalPages = Math.ceil(totalOrders / pageSize);
+    if (!orders || orders.length === 0)
+      return successResponse(res, "No orders found", []);
 
-    return successResponse(res, "Vendor orders fetched successfully", {
-      totalOrders,
-      totalPages,
-      currentPage: pageNum,
-      orders,
+    // ✅ format the result for clean frontend consumption
+    const formatted = orders.map((order) => {
+      let digitalFiles: any[] = [];
+
+      // For digital orders, use stored digitalFiles directly
+      if (
+        order.isDigital &&
+        order.delivery?.isDigital &&
+        order.delivery.digitalFiles
+      ) {
+        try {
+          const parsed =
+            typeof order.delivery.digitalFiles === "string"
+              ? JSON.parse(order.delivery.digitalFiles)
+              : order.delivery.digitalFiles;
+
+          if (Array.isArray(parsed)) {
+            digitalFiles = parsed.map((f: any) => ({
+              id: f.id,
+              name: f.name,
+              url: f.url,
+            }));
+          }
+        } catch (err) {
+          console.error("Error parsing digitalFiles JSON:", err);
+        }
+      }
+
+      return {
+        id: order.id,
+        buyer: order.user,
+        totalAmount: order.totalAmount,
+        status: order.status,
+        isDigital: order.isDigital,
+        transaction: {
+          id: order.transaction?.id,
+          amountPaid: order.transaction?.amountPaid,
+          status: order.transaction?.status,
+          reference: order.transaction?.paystackRef,
+        },
+        delivery: order.delivery
+          ? {
+              id: order.delivery.id,
+              status: order.delivery.status,
+              fareAmount: order.delivery.fareAmount,
+              isDigital: order.delivery.isDigital,
+              digitalFiles,
+              pickupAddress: order.delivery.pickupAddress,
+              dropoffAddress: order.delivery.dropoffAddress,
+              pickupLat: order.delivery.pickupLat,
+              pickupLng: order.delivery.pickupLng,
+              dropoffLat: order.delivery.dropoffLat,
+              dropoffLng: order.delivery.dropoffLng,
+            }
+          : null,
+        listings: order.listings.map((item) => ({
+          id: item.id,
+          title: item.listing.title,
+          price: item.unitPrice,
+          quantity: item.quantity,
+          image: item.listing.media?.[0]?.url || null,
+        })),
+        createdAt: order.createdAt,
+      };
     });
+
+    return successResponse(res, "Vendor orders fetched successfully", formatted);
   } catch (error) {
-    console.error("getVendorOrders error:", error);
+    console.error("❌ getVendorOrders error:", error);
     return errorResponse(res, "Failed to fetch vendor orders");
   }
 };
+
 type CartItem = { id: string; quantity: number };
 
 export const createMultiVendorOrder = async (
