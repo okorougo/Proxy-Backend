@@ -225,7 +225,7 @@ export const getVendorDashboardStats = async (
     // 4️⃣ Monthly Revenue (past 6 months)
     const now = new Date();
     const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(now.getMonth() - 5);
+    sixMonthsAgo.setMonth(now.getDay() - 5);
 
     const monthlyStats = await prisma.transaction.findMany({
       where: {
@@ -492,7 +492,7 @@ export const createMultiVendorOrder = async (
               buyerId: userId,
               sellerId: vendorId,
               amountCents: Math.round(totalAmount * 100),
-              status: "PENDING", // payment pending by default
+              status: "COMPLETED", // payment pending by default
               method: "PAYSTACK", // or from req.body
               amountPaid: amountPaid,
               paystackRef,
