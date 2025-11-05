@@ -31,7 +31,7 @@ const server = http.createServer(app);
 
 app.use(passport.initialize());
 
-const io = new Server(server, {
+export const io = new Server(server, {
   cors: {
     origin: ["*", "http://localhost:5173"], // change to your frontend URL later
     credentials: true, 

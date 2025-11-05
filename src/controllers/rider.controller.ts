@@ -3,6 +3,7 @@ import prisma from "../lib/prisma";
 import { AuthRequest } from "../middleware/auth";
 import { uploadToCloudinary } from "../lib/cloudinary";
 import { errorResponse, successResponse } from "../utils/response";
+import {io} from "../server"
 
 /** 🧍 Rider Registration */
 export const registerRider = async (req: AuthRequest, res: Response) => {
@@ -240,3 +241,51 @@ function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
+
+export const acceptDelivery = async (req: Request, res: Response) => {
+  try {
+    const riderId = req.user?.id; // from auth middleware
+    const { deliveryId } = req.params;
+
+    const delivery = await prisma.delivery.findUnique({
+      where: { id: deliveryId },
+      include: { order: true },
+    });
+
+    if (!delivery) return errorResponse(res, "Delivery not found", "NOT_FOUND", 404);
+
+    if (delivery.status !== "IN_TRANSIT") {
+      return errorResponse(res, "This delivery has already been taken");
+    }
+
+    // assign the first rider atomically
+    const updated = await prisma.delivery.update({
+      where: { id: deliveryId },
+      data: {
+        status: "ACCEPTED",
+        riderId,
+        startedAt: new Date(),
+      },
+    });
+
+    // broadcast to vendor + user
+    io.to(delivery.order.userId).emit("rider_assigned", {
+      deliveryId,
+      rider: {
+        id: riderId,
+      },
+    });
+
+    io.to(delivery.order.vendorId).emit("rider_assigned", {
+      deliveryId,
+      rider: {
+        id: riderId,
+      },
+    });
+
+    return successResponse(res, "Rider assigned successfully", updated);
+  } catch (error) {
+    console.error("acceptDelivery error:", error);
+    return errorResponse(res, "Failed to accept delivery");
+  }
+};

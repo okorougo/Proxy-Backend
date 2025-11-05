@@ -6,6 +6,7 @@ import { AuthRequest } from "../middleware/auth";
 import geohash from "ngeohash";
 import { generateSignedDownloadUrl } from "../lib/cloudinary";
 import axios from "axios";
+import {io} from "../server"
 
 function generateGeohash(
   latitude: number,
@@ -679,5 +680,70 @@ export const createMultiVendorOrder = async (
   } catch (err) {
     console.error("createMultiVendorOrder error:", err);
     return errorResponse(res, "Failed to create orders");
+  }
+};
+export const pushOrderToRiders = async (req: Request, res: Response) => {
+  try {
+    const { deliveryId } = req.params;
+    const delivery = await prisma.delivery.findUnique({
+      where: { id: deliveryId },
+      include: {
+        order: {
+          include: {
+            vendor: { include: { user: true } },
+          },
+        },
+      },
+    });
+
+    if (!delivery) return errorResponse(res, "Delivery not found", "NOT_FOUND", 404);
+    if (delivery.status !== "PENDING")
+      return errorResponse(res, "Cannot push a non-pending delivery");
+
+    // mark as searching
+    await prisma.delivery.update({
+      where: { id: deliveryId },
+      data: { status: "ACCEPTED" },
+    });
+
+    // Fetch nearby riders (within 10km)
+    const riders = await prisma.rider.findMany({
+      where: {
+        isOnline: true,
+        currentLat: { not: null },
+        currentLng: { not: null },
+      },
+    });
+
+    const nearbyRiders = riders.filter((r) => {
+      const R = 6371; // km
+      const dLat = ((r.currentLat as number - delivery.pickupLat) * Math.PI) / 180;
+      const dLon = ((r.currentLng as number - delivery.pickupLng) * Math.PI) / 180;
+      const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(delivery.pickupLat * (Math.PI / 180)) *
+          Math.cos(r.currentLat as number * (Math.PI / 180)) *
+          Math.sin(dLon / 2) ** 2;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c <= 10; // within 10km
+    });
+
+    // Broadcast to nearby riders
+    nearbyRiders.forEach((r) => {
+      io.to(r.id).emit("new_delivery_offer", {
+        deliveryId: delivery.id,
+        pickupAddress: delivery.pickupAddress,
+        dropoffAddress: delivery.dropoffAddress,
+        fareAmount: delivery.fareAmount,
+        vendorName: delivery.order.vendor.user.name,
+      });
+    });
+
+    return successResponse(res, "Order pushed to nearby riders", {
+      ridersFound: nearbyRiders.length,
+    });
+  } catch (error) {
+    console.error("pushOrderToRiders error:", error);
+    return errorResponse(res, "Failed to push order to riders");
   }
 };
