@@ -366,10 +366,11 @@ model Delivery {
 
 model Rider {
   id          String        @id @default(uuid())
+  fullName    String
+  dateOfBirth String
   userId      String        @unique
   user        User          @relation(fields: [userId], references: [id])
   phone       String
-  address     String?
   vehicleType String
   status        RiderStatus @default(PENDING)// PENDING, APPROVED, REJECTED
   isOnline    Boolean       @default(false)
