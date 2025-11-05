@@ -22,6 +22,7 @@ import rateLimit from 'express-rate-limit';
 import "./lib/passport";
 import { uploadToCloudinary } from "./lib/cloudinary";
 import passport from "passport";
+import cors from "cors"
 
 
 
@@ -31,13 +32,13 @@ const server = http.createServer(app);
 
 app.use(passport.initialize());
 
-export const io = new Server(server, {
-  cors: {
+export const io = new Server(server);
+
+app.use(cors( {
     origin: ["*", "http://localhost:5173"], // change to your frontend URL later
     credentials: true, 
     methods:["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"]
-  },
-});
+  },))
 // const onlineUsers = new Map<string, string>();
 
 app.use(express.json());
