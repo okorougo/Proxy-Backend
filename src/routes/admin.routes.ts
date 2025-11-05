@@ -12,7 +12,7 @@ router.get("/dashboard", authMiddleware, adminOnly, getDashboardStats);
 router.get("/rider-stats", getRiderDashboardStats);
 
 // 📋 All Riders
-router.get("/", getAllRiders);
+router.get("/riders", getAllRiders);
 
 
 
@@ -26,7 +26,7 @@ router.post("/kyc/status", authMiddleware, adminOnly, updateKycStatus);
 // Reports
 router.get("/reports", authMiddleware, modOrAdmin, listReports);
 router.post("/reports/resolve", authMiddleware, adminOnly, resolveReport);
-router.get("/", authMiddleware, adminOnly, listUsers);
+router.get("/users", authMiddleware, adminOnly, listUsers);
 router.post("/ban", authMiddleware, adminOnly, banUser);
 router.post("/unban", authMiddleware, adminOnly, unbanUser);
 router.post("/role", authMiddleware, adminOnly, updateUserRole);
