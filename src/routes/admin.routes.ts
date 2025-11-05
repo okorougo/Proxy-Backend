@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getDashboardStats, listKycRequests, updateKycStatus, listReports, resolveReport, listUsers, banUser, unbanUser, updateUserRole,listAllListings, approveListing, rejectListing, removeListing, createCategory, getCategories, updateCategory, deleteCategory, adminLogin, getRiderMonthlyStats, getSingleRider, getRiderDashboardStats, getAllRiders} from "../controllers/admin.controller";
+import { getDashboardStats, listKycRequests, updateKycStatus, listReports, resolveReport, listUsers, banUser, unbanUser, updateUserRole,listAllListings, approveListing, rejectListing, removeListing, createCategory, getCategories, updateCategory, deleteCategory, adminLogin, getRiderMonthlyStats, getSingleRider, getRiderDashboardStats, getAllRiders, getSingleUser} from "../controllers/admin.controller";
 import multer from "multer";
 import { authMiddleware } from "../middleware/auth";
 import { adminOnly, modOrAdmin } from "../middleware/admin";
@@ -14,7 +14,8 @@ router.get("/rider-stats", getRiderDashboardStats);
 // 📋 All Riders
 router.get("/riders", getAllRiders);
 
-
+router.get("/single-rider/:id", getSingleRider)
+router.get("/single-user/:id", getSingleUser)
 
 // 📈 Monthly Stats
 router.get("/rider-analytics/monthly", getRiderMonthlyStats);

@@ -442,7 +442,7 @@ export const getSingleRider = async (req: AuthRequest, res: Response) => {
     const rider = await prisma.rider.findUnique({
       where: { id },
       include: {
-        user: { select: { name: true, email: true, phone: true } },
+        user: { select: { name: true, email: true, phone: true, } },
         vehicle: true,
         kyc: true,
         deliveries: {
@@ -455,6 +455,27 @@ export const getSingleRider = async (req: AuthRequest, res: Response) => {
     if (!rider) return errorResponse(res, "Rider not found", "RIDER_NOT_FOUND", 404);
 
     return successResponse(res, "Rider details retrieved", rider);
+  } catch (err) {
+    console.error("getSingleRider error:", err);
+    return errorResponse(res, "Failed to get rider details");
+  }
+};
+export const getSingleUser = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const user = await prisma.user.findUnique({
+      where: { id },
+      include: {
+        kycDocument: true,
+        Session: true,
+        order: true,
+        
+      },
+    });
+
+    if (!user) return errorResponse(res, "User not found", "RIDER_NOT_FOUND", 404);
+
+    return successResponse(res, "Rider details retrieved", user);
   } catch (err) {
     console.error("getSingleRider error:", err);
     return errorResponse(res, "Failed to get rider details");
