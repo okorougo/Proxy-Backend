@@ -254,7 +254,7 @@ export const acceptDelivery = async (req: Request, res: Response) => {
 
     if (!delivery) return errorResponse(res, "Delivery not found", "NOT_FOUND", 404);
 
-    if (delivery.status !== "IN_TRANSIT") {
+    if (delivery.status !== "SEARCH_OF_RIDER") {
       return errorResponse(res, "This delivery has already been taken");
     }
 

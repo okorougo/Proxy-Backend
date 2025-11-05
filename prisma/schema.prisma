@@ -417,6 +417,7 @@ enum DeliveryStatus {
   IN_TRANSIT // en route
   DELIVERED // delivered successfully
   CANCELLED
+  SEARCH_OF_RIDER
 }
 enum RiderStatus {
   PENDING

@@ -697,13 +697,14 @@ export const pushOrderToRiders = async (req: Request, res: Response) => {
     });
 
     if (!delivery) return errorResponse(res, "Delivery not found", "NOT_FOUND", 404);
+    
     if (delivery.status !== "PENDING")
       return errorResponse(res, "Cannot push a non-pending delivery");
 
     // mark as searching
     await prisma.delivery.update({
       where: { id: deliveryId },
-      data: { status: "ACCEPTED" },
+      data: { status: "SEARCH_OF_RIDER" },
     });
 
     // Fetch nearby riders (within 10km)
