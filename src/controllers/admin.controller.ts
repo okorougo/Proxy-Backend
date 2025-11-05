@@ -144,7 +144,7 @@ export const listUsers = async (req: AuthRequest, res: Response) => {
 // Ban user
 export const banUser = async (req: AuthRequest, res: Response) => {
   try {
-    const { userId } = req.body;
+    const { userId } = req.params;
     const updated = await prisma.user.update({
       where: { id: userId },
       data: { isBanned: true },
@@ -161,7 +161,7 @@ export const banUser = async (req: AuthRequest, res: Response) => {
 // Unban user
 export const unbanUser = async (req: AuthRequest, res: Response) => {
   try {
-    const { userId } = req.body;
+        const { userId } = req.params;
     const updated = await prisma.user.update({
       where: { id: userId },
       data: { isBanned: false },
@@ -352,6 +352,7 @@ export const deleteCategory = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: "Failed to delete category" });
   }
 };
+
 export const getRiderDashboardStats = async (req: AuthRequest, res: Response) => {
   try {
     const [pending, approved, rejected, totalDeliveries] = await Promise.all([

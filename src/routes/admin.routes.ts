@@ -27,8 +27,8 @@ router.post("/kyc/status", authMiddleware, adminOnly, updateKycStatus);
 router.get("/reports", authMiddleware, modOrAdmin, listReports);
 router.post("/reports/resolve", authMiddleware, adminOnly, resolveReport);
 router.get("/users", authMiddleware, adminOnly, listUsers);
-router.post("/ban", authMiddleware, adminOnly, banUser);
-router.post("/unban", authMiddleware, adminOnly, unbanUser);
+router.post("/ban/:userId", authMiddleware, adminOnly, banUser);
+router.post("/unban/:userId", authMiddleware, adminOnly, unbanUser);
 router.post("/role", authMiddleware, adminOnly, updateUserRole);
 router.get("/", authMiddleware, modOrAdmin, listAllListings);
 

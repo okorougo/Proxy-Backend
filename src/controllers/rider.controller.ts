@@ -8,7 +8,7 @@ import {io} from "../server"
 /** 🧍 Rider Registration */
 export const registerRider = async (req: AuthRequest, res: Response) => {
   try {
-    const { phone, address, vehicleType } = req.body;
+    const { phone, fullName, dateOfBirth, vehicleType } = req.body;
     const userId = req.user?.id;
 
     if (!phone || !vehicleType)
@@ -24,11 +24,12 @@ export const registerRider = async (req: AuthRequest, res: Response) => {
 
     const rider = await prisma.rider.upsert({
       where: { userId },
-      update: { phone, address, vehicleType },
+      update: {fullName, vehicleType,dateOfBirth },
       create: {
         userId: user?.id as string,
-        phone,
-        address,
+        phone: user?.phone as string,
+        fullName,
+        dateOfBirth,
         vehicleType,
         status: "PENDING",
       },
