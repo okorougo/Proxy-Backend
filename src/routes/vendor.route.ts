@@ -11,6 +11,7 @@ import {
   getVendorDashboardStats,
   getVendorById,
   getVendorOrders,
+  pushOrderToRiders,
 } from "../controllers/vendor.controller";
 
 const router = Router();
@@ -24,4 +25,5 @@ router.post("/add-location",addeVendorLocation );
 router.get("/orders", authMiddleware, getVendorOrders);
 router.get("/dashboard", authMiddleware, getVendorDashboardStats);
 router.get("/get-vendor/:id", authMiddleware, getVendorById);
+router.get("/push-order-to-rider/:deliveryId", authMiddleware, pushOrderToRiders);
 export default router;

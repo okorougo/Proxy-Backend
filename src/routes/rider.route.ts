@@ -52,6 +52,7 @@ router.get("/me", authMiddleware, getMyRiderProfile);
 // 🔒 Admin: Approve/Reject Rider
 router.patch("/status/:id", updateRiderStatus);
 router.post("/update-location", updateRiderLocation);
+router.post("/accept-delivery/:deliveryId", authMiddleware, updateRiderLocation);
 
 // 🔌 Toggle online/offline
 router.post("/toggle-online", toggleRiderOnline);
