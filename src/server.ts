@@ -9,6 +9,7 @@ import paymentRoutes from "./routes/payment.routes";
 import messageRoutes from "./routes/message.route";
 import sessionRoutes from "./routes/session.routes";
 import vendor from "./routes/vendor.route";
+import rider from "./routes/rider.route"
 import http from "http";
 import { Server } from "socket.io";
 import prisma from "./lib/prisma"
@@ -53,6 +54,7 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/sessions", sessionRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/vendor", vendor);
+app.use("/api/rider", rider);
 // Cookie parser
 app.use(cookieParser());
 
