@@ -47,7 +47,16 @@ export const uploadRiderVehicle = async (req: AuthRequest, res: Response) => {
   try {
     const { brand, model, plateNumber } = req.body;
     const userId = req.user?.id;
-    const rider = await prisma.rider.findUnique({ where: { userId } });
+        const user = await prisma.user.findUnique({
+      where:{id: userId},
+      include:{
+        rider: true
+      }
+    })
+
+    if(!user) return errorResponse(res, "User not found")
+
+    const rider = await prisma.rider.findUnique({ where: { id: user.rider?.id } });
 
     if (!rider) return errorResponse(res, "Rider not found");
 
@@ -80,7 +89,16 @@ export const uploadRiderKyc = async (req: AuthRequest, res: Response) => {
   try {
     const { ninNumber, idType } = req.body;
     const userId = req.user?.id;
-    const rider = await prisma.rider.findUnique({ where: { userId } });
+    const user = await prisma.user.findUnique({
+      where:{id: userId},
+      include:{
+        rider: true
+      }
+    })
+
+    if(!user) return errorResponse(res, "User not found")
+
+    const rider = await prisma.rider.findUnique({ where: { id: user.rider?.id } });
 
     if (!rider) return errorResponse(res, "Rider not found");
 
