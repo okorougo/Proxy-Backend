@@ -337,6 +337,7 @@ export const getVendorById = async (req: Request, res: Response) => {
           },
         },
         location: true,
+        order:true
       },
     });
     return successResponse(res, "Vendor fetched successfully", vendor);
