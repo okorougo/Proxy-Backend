@@ -132,7 +132,7 @@ export const resolveReport = async (req: AuthRequest, res: Response) => {
 export const listUsers = async (req: AuthRequest, res: Response) => {
   try {
     const users = await prisma.user.findMany({
-      select: { id: true, email: true, name: true, role: true, isBanned: true, createdAt: true, vendorApplication: true, kycDocument:true, Session:true, order:true },
+      select: { id: true, email: true, name: true, role: true, isBanned: true, createdAt: true, vendorApplication: true, kycDocument:true, Session:true, order:true, rider:true,  },
       orderBy: { createdAt: "desc" },
     });
     return successResponse(res, "Users retrieved", users);
