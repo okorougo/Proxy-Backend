@@ -192,7 +192,7 @@ export const updateUserRole = async (req: AuthRequest, res: Response) => {
 export const listAllListings = async (req: AuthRequest, res: Response) => {
   try {
     const listings = await prisma.listing.findMany({
-      include: { seller: { select: { id: true, email: true, name: true } } },
+      include: { media: true, seller: { select: { id: true, email: true, name: true, kycDocument:true, vendorApplication:true } } },
       orderBy: { createdAt: "desc" },
     });
     return successResponse(res, "Listings retrieved", listings);
@@ -220,10 +220,10 @@ export const approveListing = async (req: AuthRequest, res: Response) => {
 // Reject listing
 export const rejectListing = async (req: AuthRequest, res: Response) => {
   try {
-    const { listingId } = req.body;
+    const { listingId, rejectionNote } = req.body;
     const updated = await prisma.listing.update({
       where: { id: listingId },
-      data: { status: "REJECTED" },
+      data: { status: "REJECTED",rejectionNote },
     });
     return successResponse(res, "Listing rejected", updated);
   } catch (err:any) {

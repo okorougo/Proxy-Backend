@@ -130,6 +130,7 @@ model Listing {
   extraDetails Json?
   category     Category      @relation(fields: [categoryId], references: [id])
   OrderItem    OrderItem[]
+  rejectionNote String?
 }
 
 model DigitalFile {
@@ -382,6 +383,7 @@ model Rider {
   deliveries  Delivery[]
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
+  rejectionNote String?
 }
 
 model RiderKyc {
