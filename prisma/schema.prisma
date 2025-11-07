@@ -398,6 +398,7 @@ model RiderKyc {
   roadWorthinessUrl String?
   status            String   @default("PENDING") // PENDING, APPROVED, REJECTED
   createdAt         DateTime @default(now())
+  rejectionNote String?
 }
 
 model RiderVehicle {
