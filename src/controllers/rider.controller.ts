@@ -133,9 +133,17 @@ export const uploadRiderKyc = async (req: AuthRequest, res: Response) => {
 export const getMyRiderProfile = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
+    const user = await prisma.user.findUnique({
+      where:{id:userId},
+      include:{
+        rider:true
+      }
+    })
+    if (!user) return errorResponse(res, "User profile not found");
+
     const rider = await prisma.rider.findUnique({
       where: { userId },
-      include: { vehicle: true, kyc: true },
+      include: { vehicle: true, kyc: true, },
     });
 
     if (!rider) return errorResponse(res, "Rider profile not found");
