@@ -394,16 +394,23 @@ export const getRiderDashboardStats = async (req: AuthRequest, res: Response) =>
 /** 📋 Paginated Riders List */
 export const getAllRiders = async (req: AuthRequest, res: Response) => {
   try {
+    // Accept optional status and search params. By default (no status provided)
+    // fetch riders of any status.
     const { status, search, page = "1", limit = "10" } = req.query;
     const skip = (Number(page) - 1) * Number(limit);
 
     const where: any = {};
+    // status remains optional; if provided we filter by it, otherwise all statuses
     if (status) where.status = status;
+
+    // Search across rider.fullName, linked user name/email, and rider phone
     if (search) {
+      const q = String(search);
       where.OR = [
-        { user: { name: { contains: String(search), mode: "insensitive" } } },
-        { user: { email: { contains: String(search), mode: "insensitive" } } },
-        { phone: { contains: String(search) } },
+        { fullName: { contains: q, mode: "insensitive" } },
+        { user: { name: { contains: q, mode: "insensitive" } } },
+        { user: { email: { contains: q, mode: "insensitive" } } },
+        { phone: { contains: q, mode: "insensitive" } },
       ];
     }
 
@@ -411,7 +418,8 @@ export const getAllRiders = async (req: AuthRequest, res: Response) => {
       prisma.rider.findMany({
         where,
         include: {
-          user: { select: { name: true, email: true } },
+          user: { select: { name: true, email: true, rider: true } },
+          deliveries:true,
           vehicle: true,
           kyc: true,
           _count: { select: { deliveries: true } },
