@@ -286,6 +286,7 @@ export const vendorLogin = async (req: Request, res: Response) => {
         id: user.id,
         email: user.email,
         name: user.name,
+        phone:user.phone,
         vendorApplicationId: user.vendorApplication.id,
         vendorStatus: user.vendorApplication.status,
       },
