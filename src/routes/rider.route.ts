@@ -9,8 +9,13 @@ import {
   updateRiderStatus,
   updateRiderLocation,
   toggleRiderOnline,
-  getNearbyRiders
+  getNearbyRiders,
+  approveRiderKyc,
+  rejectRiderKyc,
+  approveRiderAccount,
+  rejectRiderAccount
 } from "../controllers/rider.controller";
+import { adminOnly } from "../middleware/admin";
 
 const router = express.Router();
 
@@ -53,6 +58,11 @@ router.get("/me", authMiddleware, getMyRiderProfile);
 router.patch("/status/:id", updateRiderStatus);
 router.post("/update-location", updateRiderLocation);
 router.post("/accept-delivery/:deliveryId", authMiddleware, updateRiderLocation);
+router.post("/kyc/approve/:userId", authMiddleware, adminOnly, approveRiderKyc);
+router.post("/kyc/reject/:userId", authMiddleware, adminOnly , rejectRiderKyc);
+
+router.post("/approve/:userId", authMiddleware,adminOnly, approveRiderAccount);
+router.post("/reject/:userId", authMiddleware, adminOnly, rejectRiderAccount);
 
 // 🔌 Toggle online/offline
 router.post("/toggle-online", toggleRiderOnline);

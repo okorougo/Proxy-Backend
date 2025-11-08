@@ -4,6 +4,7 @@ import { AuthRequest } from "../middleware/auth";
 import { uploadToCloudinary } from "../lib/cloudinary";
 import { errorResponse, successResponse } from "../utils/response";
 import {io} from "../server"
+import { sendExpo, sendFcm } from "../lib/notifications";
 
 /** 🧍 Rider Registration */
 export const registerRider = async (req: AuthRequest, res: Response) => {
@@ -314,5 +315,137 @@ export const acceptDelivery = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("acceptDelivery error:", error);
     return errorResponse(res, "Failed to accept delivery");
+  }
+};
+export const approveRiderKyc = async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId } = req.params;
+    if (!userId) return errorResponse(res, "userId is required");
+
+    const kyc = await prisma.kycVerification.findUnique({ where: { userId } });
+    if (!kyc) return errorResponse(res, "KYC record not found", "NOT_FOUND", 404);
+
+    // update KYC status
+    const updated = await prisma.kycVerification.update({
+      where: { userId },
+      data: { status: "APPROVED", updatedAt: new Date() },
+    });
+
+    // set user.isKycVerified true
+    await prisma.user.update({
+      where: { id: userId },
+      data: { isKycVerified: true },
+    });
+
+    // notify via socket + push
+    // socket: send to sessions of that user
+    const sessions = await prisma.session.findMany({ where: { userId, deviceToken: { not: null } } });
+    for (const s of sessions) {
+      if (s.devicePlatform === "expo") await sendExpo(s.deviceToken!, "KYC Approved", "Your KYC has been approved", { type: "kyc", status: "APPROVED" });
+      else await sendFcm(s.deviceToken!, "KYC Approved", "Your KYC has been approved", { type: "kyc", status: "APPROVED" });
+    }
+
+    return successResponse(res, "KYC approved", updated);
+  } catch (err) {
+    console.error("approveRiderKyc error:", err);
+    return errorResponse(res, "Failed to approve KYC");
+  }
+};
+
+export const rejectRiderKyc = async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const { reason } = req.body;
+    if (!userId) return errorResponse(res, "userId is required");
+
+    const kyc = await prisma.kycVerification.findUnique({ where: { userId } });
+    if (!kyc) return errorResponse(res, "KYC record not found", "NOT_FOUND", 404);
+
+    const updated = await prisma.kycVerification.update({
+      where: { userId },
+      data: { status: "REJECTED", rejectionNote: reason ?? "Rejected by admin", updatedAt: new Date() },
+    });
+
+    // set user.isKycVerified false
+    await prisma.user.update({
+      where: { id: userId },
+      data: { isKycVerified: false },
+    });
+
+    // notify sessions
+    const sessions = await prisma.session.findMany({ where: { userId, deviceToken: { not: null } } });
+    for (const s of sessions) {
+      if (s.devicePlatform === "expo") await sendExpo(s.deviceToken!, "KYC Rejected", reason ?? "KYC was rejected", { type: "kyc", status: "REJECTED" });
+      else await sendFcm(s.deviceToken!, "KYC Rejected", reason ?? "KYC was rejected", { type: "kyc", status: "REJECTED" });
+    }
+
+    return successResponse(res, "KYC rejected", updated);
+  } catch (err) {
+    console.error("rejectRiderKyc error:", err);
+    return errorResponse(res, "Failed to reject KYC");
+  }
+};
+
+export const approveRiderAccount = async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId } = req.params;
+    if (!userId) return errorResponse(res, "userId required");
+
+    // ensure KYC is approved (optional rule)
+    const kyc = await prisma.kycVerification.findUnique({ where: { userId } });
+    if (kyc && kyc.status !== "APPROVED") {
+      // You may only want to allow created rider if KYC approved; adjust per your policy
+      return errorResponse(res, "KYC must be approved before approving rider account");
+    }
+
+    // upsert Rider profile
+    const rider = await prisma.rider.update({
+      where: { userId },
+      data:{
+        status: "APPROVED",
+        updatedAt: new Date()
+      }
+    });
+
+    // set the user's role to RIDER
+
+    // notify rider via socket/push
+    const sessions = await prisma.session.findMany({ where: { userId, deviceToken: { not: null } } });
+    for (const s of sessions) {
+      if (s.devicePlatform === "expo") await sendExpo(s.deviceToken!, "Rider Approved", "Your rider account has been approved", { type: "rider", status: "APPROVED" });
+      else await sendFcm(s.deviceToken!, "Rider Approved", "Your rider account has been approved", { type: "rider", status: "APPROVED" });
+    }
+
+    return successResponse(res, "Rider approved", rider);
+  } catch (err) {
+    console.error("approveRiderAccount error:", err);
+    return errorResponse(res, "Failed to approve rider account");
+  }
+};
+
+
+export const rejectRiderAccount = async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const { reason } = req.body;
+    if (!userId) return errorResponse(res, "userId required");
+
+    // set Rider.isApproved = false (if exists), else create with false
+    const rider = await prisma.rider.update({
+      where: { userId },
+      data: { status: "REJECTED", updatedAt: new Date(), rejectionNote: reason || "" },
+    });
+
+
+    const sessions = await prisma.session.findMany({ where: { userId, deviceToken: { not: null } } });
+    for (const s of sessions) {
+      if (s.devicePlatform === "expo") await sendExpo(s.deviceToken!, "Rider Rejected", reason ?? "Your rider application was rejected", { type: "rider", status: "REJECTED" });
+      else await sendFcm(s.deviceToken!, "Rider Rejected", reason ?? "Your rider application was rejected", { type: "rider", status: "REJECTED" });
+    }
+
+    return successResponse(res, "Rider rejected", rider);
+  } catch (err) {
+    console.error("rejectRiderAccount error:", err);
+    return errorResponse(res, "Failed to reject rider account");
   }
 };
