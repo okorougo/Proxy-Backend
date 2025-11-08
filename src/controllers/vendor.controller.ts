@@ -6,7 +6,7 @@ import { AuthRequest } from "../middleware/auth";
 import geohash from "ngeohash";
 import { generateSignedDownloadUrl } from "../lib/cloudinary";
 import axios from "axios";
-import {io} from "../server"
+import { io } from "../server";
 
 function generateGeohash(
   latitude: number,
@@ -161,8 +161,17 @@ export const addeVendorLocation = async (req: Request, res: Response) => {
     const longitude = Number(lng);
     const geohash = generateGeohash(latitude, longitude);
 
-    const location = await prisma.location.create({
-      data: {
+    const location = await prisma.location.upsert({
+      where: { vendorId: userId },
+      update: {
+        Address: address,
+        lat: latitude,
+        lng: longitude,
+        city,
+        country,
+        geohash,
+      },
+      create: {
         Address: address,
         lat: latitude,
         lng: longitude,
@@ -179,14 +188,20 @@ export const addeVendorLocation = async (req: Request, res: Response) => {
   }
 };
 
-export const getVendorDashboardStats = async (req: AuthRequest, res: Response) => {
+export const getVendorDashboardStats = async (
+  req: AuthRequest,
+  res: Response
+) => {
   try {
     const userId = req.user?.id;
     if (!userId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
 
     // ✅ Find vendor for logged-in user
-    const vendor = await prisma.vendorApplication.findUnique({ where: { userId } });
-    if (!vendor) return errorResponse(res, "Vendor not found", "NO_VENDOR", 404);
+    const vendor = await prisma.vendorApplication.findUnique({
+      where: { userId },
+    });
+    if (!vendor)
+      return errorResponse(res, "Vendor not found", "NO_VENDOR", 404);
 
     const vendorId = vendor.id;
 
@@ -284,7 +299,13 @@ export const getVendorDashboardStats = async (req: AuthRequest, res: Response) =
 
     const listingMap = new Map<
       string,
-      { id: string; title: string; price: number; image: string | null; totalSold: number }
+      {
+        id: string;
+        title: string;
+        price: number;
+        image: string | null;
+        totalSold: number;
+      }
     >();
 
     for (const item of soldItems) {
@@ -324,7 +345,6 @@ export const getVendorDashboardStats = async (req: AuthRequest, res: Response) =
   }
 };
 
-
 export const getVendorById = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
@@ -337,7 +357,7 @@ export const getVendorById = async (req: Request, res: Response) => {
           },
         },
         location: true,
-        order:true
+        order: true,
       },
     });
     return successResponse(res, "Vendor fetched successfully", vendor);
@@ -458,7 +478,11 @@ export const getVendorOrders = async (req: AuthRequest, res: Response) => {
       };
     });
 
-    return successResponse(res, "Vendor orders fetched successfully", formatted);
+    return successResponse(
+      res,
+      "Vendor orders fetched successfully",
+      formatted
+    );
   } catch (error) {
     console.error("❌ getVendorOrders error:", error);
     return errorResponse(res, "Failed to fetch vendor orders");
@@ -697,8 +721,9 @@ export const pushOrderToRiders = async (req: Request, res: Response) => {
       },
     });
 
-    if (!delivery) return errorResponse(res, "Delivery not found", "NOT_FOUND", 404);
-    
+    if (!delivery)
+      return errorResponse(res, "Delivery not found", "NOT_FOUND", 404);
+
     if (delivery.status !== "PENDING")
       return errorResponse(res, "Cannot push a non-pending delivery");
 
@@ -719,12 +744,14 @@ export const pushOrderToRiders = async (req: Request, res: Response) => {
 
     const nearbyRiders = riders.filter((r) => {
       const R = 6371; // km
-      const dLat = ((r.currentLat as number - delivery.pickupLat) * Math.PI) / 180;
-      const dLon = ((r.currentLng as number - delivery.pickupLng) * Math.PI) / 180;
+      const dLat =
+        (((r.currentLat as number) - delivery.pickupLat) * Math.PI) / 180;
+      const dLon =
+        (((r.currentLng as number) - delivery.pickupLng) * Math.PI) / 180;
       const a =
         Math.sin(dLat / 2) ** 2 +
         Math.cos(delivery.pickupLat * (Math.PI / 180)) *
-          Math.cos(r.currentLat as number * (Math.PI / 180)) *
+          Math.cos((r.currentLat as number) * (Math.PI / 180)) *
           Math.sin(dLon / 2) ** 2;
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       return R * c <= 10; // within 10km
@@ -750,3 +777,69 @@ export const pushOrderToRiders = async (req: Request, res: Response) => {
   }
 };
 
+export const updateVendor = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id; // assuming user is attached to req by auth middleware
+    const { name, email, phone } = req.body;
+
+    if (!userId) {
+      return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
+    }
+
+    if (!name && !email && !phone) {
+      return errorResponse(res, "No update fields provided", "NO_FIELDS", 400);
+    }
+
+    // ✅ Check if email exists for another user
+    if (email) {
+      const existingEmail = await prisma.user.findFirst({
+        where: {
+          email,
+          NOT: { id: userId },
+        },
+      });
+      if (existingEmail) {
+        return errorResponse(res, "Email already exists", "EMAIL_EXISTS", 409);
+      }
+    }
+
+    // ✅ Check if phone exists for another user
+    if (phone) {
+      const existingPhone = await prisma.user.findFirst({
+        where: {
+          phone,
+          NOT: { id: userId },
+        },
+      });
+      if (existingPhone) {
+        return errorResponse(
+          res,
+          "Phone number already exists",
+          "PHONE_EXISTS",
+          409
+        );
+      }
+    }
+
+    // ✅ Perform update
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...(name && { name }),
+        ...(email && { email }),
+        ...(phone && { phone }),
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+      },
+    });
+
+    return successResponse(res, "Profile updated successfully", updatedUser);
+  } catch (err) {
+    console.error("❌ updateUser error:", err);
+    return errorResponse(res, "Failed to update profile", "UPDATE_ERROR", 500);
+  }
+};

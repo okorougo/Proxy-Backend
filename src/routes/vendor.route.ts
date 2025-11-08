@@ -12,6 +12,7 @@ import {
   getVendorById,
   getVendorOrders,
   pushOrderToRiders,
+  updateVendor,
 } from "../controllers/vendor.controller";
 
 const router = Router();
@@ -26,4 +27,5 @@ router.get("/orders", authMiddleware, getVendorOrders);
 router.get("/dashboard", authMiddleware, getVendorDashboardStats);
 router.get("/get-vendor/:id", authMiddleware, getVendorById);
 router.post("/push-order-to-rider/:deliveryId", authMiddleware, pushOrderToRiders);
+router.put("/update", authMiddleware, updateVendor);
 export default router;
