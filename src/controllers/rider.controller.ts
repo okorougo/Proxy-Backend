@@ -322,18 +322,24 @@ export const approveRiderKyc = async (req: AuthRequest, res: Response) => {
     const { userId } = req.params;
     if (!userId) return errorResponse(res, "userId is required");
 
-    const kyc = await prisma.kycVerification.findUnique({ where: { userId } });
+    const kyc = await prisma.riderKyc.findUnique({ where: { riderId:userId }, include:{
+      rider:{
+        include:{
+          user:true
+        }
+      }
+    } });
     if (!kyc) return errorResponse(res, "KYC record not found", "NOT_FOUND", 404);
 
     // update KYC status
-    const updated = await prisma.kycVerification.update({
-      where: { userId },
-      data: { status: "APPROVED", updatedAt: new Date() },
+    const updated = await prisma.riderKyc.update({
+      where: { riderId:userId },
+      data: { status: "APPROVED" },
     });
 
     // set user.isKycVerified true
     await prisma.user.update({
-      where: { id: userId },
+      where: { id: kyc.rider.userId },
       data: { isKycVerified: true },
     });
 
@@ -358,17 +364,23 @@ export const rejectRiderKyc = async (req: AuthRequest, res: Response) => {
     const { reason } = req.body;
     if (!userId) return errorResponse(res, "userId is required");
 
-    const kyc = await prisma.kycVerification.findUnique({ where: { userId } });
+        const kyc = await prisma.riderKyc.findUnique({ where: { riderId:userId }, include:{
+      rider:{
+        include:{
+          user:true
+        }
+      }
+    } });
     if (!kyc) return errorResponse(res, "KYC record not found", "NOT_FOUND", 404);
 
-    const updated = await prisma.kycVerification.update({
-      where: { userId },
-      data: { status: "REJECTED", rejectionNote: reason ?? "Rejected by admin", updatedAt: new Date() },
+    const updated = await prisma.riderKyc.update({
+      where: { riderId:userId },
+      data: { status: "REJECTED", rejectionNote: reason ?? "Rejected by admin" },
     });
 
     // set user.isKycVerified false
     await prisma.user.update({
-      where: { id: userId },
+      where: { id: kyc.rider.userId },
       data: { isKycVerified: false },
     });
 
@@ -392,7 +404,13 @@ export const approveRiderAccount = async (req: AuthRequest, res: Response) => {
     if (!userId) return errorResponse(res, "userId required");
 
     // ensure KYC is approved (optional rule)
-    const kyc = await prisma.kycVerification.findUnique({ where: { userId } });
+        const kyc = await prisma.riderKyc.findUnique({ where: { riderId:userId }, include:{
+      rider:{
+        include:{
+          user:true
+        }
+      }
+    } });
     if (kyc && kyc.status !== "APPROVED") {
       // You may only want to allow created rider if KYC approved; adjust per your policy
       return errorResponse(res, "KYC must be approved before approving rider account");
@@ -400,7 +418,7 @@ export const approveRiderAccount = async (req: AuthRequest, res: Response) => {
 
     // upsert Rider profile
     const rider = await prisma.rider.update({
-      where: { userId },
+      where: { id: kyc?.riderId },
       data:{
         status: "APPROVED",
         updatedAt: new Date()
