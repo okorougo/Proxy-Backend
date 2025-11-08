@@ -17,7 +17,10 @@ router.post(
   ]),
   createListing
 );
-router.put("/update/:id", authMiddleware, updateListing);
+router.put("/update/:id",   upload.fields([
+    { name: "media", maxCount: 10 },       // images/videos from frontend
+    { name: "digitalFiles", maxCount: 5 }, // pdfs/zip for digital listings
+  ]), authMiddleware, updateListing);
 router.delete("/delete/:id", authMiddleware, deleteListing);
 router.get("/vendor", authMiddleware, getAllListingsByVendor);
 router.get("/popular", getPopularListings);
