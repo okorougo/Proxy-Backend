@@ -284,7 +284,16 @@ export const acceptDelivery = async (req: Request, res: Response) => {
 
     const delivery = await prisma.delivery.findUnique({
       where: { id: deliveryId },
-      include: { order: true },
+      include: { order: {
+        include:{
+          user: true, 
+          vendor: {
+            include:{
+              user:true
+            }
+          }
+        }
+      }, rider:true },
     });
 
     if (!delivery) return errorResponse(res, "Delivery not found", "NOT_FOUND", 404);
@@ -317,6 +326,11 @@ export const acceptDelivery = async (req: Request, res: Response) => {
         id: riderId,
       },
     });
+
+      const sessions = await prisma.session.findMany({ where: { userId: delivery.order.userId, deviceToken: { not: null } } });
+    for (const s of sessions) {
+      if (s.devicePlatform === "expo") await sendExpo(s.deviceToken!, "Delivery Update", `Your delivery is now Accepted and it will be out for Transit`, { type: "delivery_status", status: "Accepted" });
+    }
 
     return successResponse(res, "Rider assigned successfully", updated);
   } catch (error) {
@@ -472,5 +486,64 @@ export const rejectRiderAccount = async (req: AuthRequest, res: Response) => {
   } catch (err) {
     console.error("rejectRiderAccount error:", err);
     return errorResponse(res, "Failed to reject rider account");
+  }
+};
+export const updateDeliveryStatus = async (req: AuthRequest, res: Response) => {
+  try {
+    const riderId = req.user?.id;
+    const { deliveryId, status } = req.body;
+
+    if (!["PICKED_UP", "IN_TRANSIT", "DELIVERED", "CANCELLED"].includes(status)) {
+      return errorResponse(res, "Invalid status");
+    }
+
+    const delivery = await prisma.delivery.findUnique({
+      where: { id: deliveryId },
+      include: { order: {
+        include:{
+          user:true,
+          vendor:{
+            include:{
+              user: true
+            }
+          }
+        }
+      } },
+    });
+
+    if (!delivery) return errorResponse(res, "Delivery not found");
+    if (delivery.riderId !== riderId) return errorResponse(res, "Unauthorized");
+
+    const updated = await prisma.delivery.update({
+      where: { id: deliveryId },
+      data: { status },
+    });
+
+    // 📡 Notify vendor + user via socket
+    io.to(delivery.order.userId).emit("delivery_status_update", {
+      deliveryId,
+      status,
+    });
+    io.to(delivery.order.vendorId).emit("delivery_status_update", {
+      deliveryId,
+      status,
+    });
+
+    // 📨 Optionally send push notification
+
+    const sessions = await prisma.session.findMany({ where: { userId: delivery.order.userId, deviceToken: { not: null } } });
+    for (const s of sessions) {
+      if (s.devicePlatform === "expo") await sendExpo(s.deviceToken!, "Delivery Update", `Your delivery is now: ${status}`, { type: "delivery_status", status });
+    }
+    const vendorSessions = await prisma.session.findMany({ where: { userId: delivery.order.vendor.user.id, deviceToken: { not: null } } });
+    for (const s of vendorSessions) {
+      if (s.devicePlatform === "expo") await sendExpo(s.deviceToken!, `Delivery Update for order # ${(delivery.order.id).slice(0, 6) }`, `This order is now: ${status}`, { type: "delivery_status", status });
+    }
+    // sendFcm() or sendExpo() here...
+
+    return successResponse(res, "Delivery status updated", updated);
+  } catch (err) {
+    console.error("updateDeliveryStatus error:", err);
+    return errorResponse(res, "Failed to update delivery status");
   }
 };

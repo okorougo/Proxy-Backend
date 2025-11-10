@@ -24,6 +24,7 @@ import "./lib/passport";
 import { uploadToCloudinary } from "./lib/cloudinary";
 import passport from "passport";
 import cors from "cors"
+import { haversineDistance } from './utils/distanceCalcu';
 
 
 
@@ -348,15 +349,56 @@ io.on("connection", (socket) => {
         currentLat: parseFloat(lat),
         currentLng: parseFloat(lng),
         isOnline: true,
+        lastSeenAt: new Date(),
       },
     });
 
-    // Broadcast location update to vendors/admins
-    socket.broadcast.emit("rider_location_update", {
+       socket.broadcast.emit("rider_location_update", {
       riderId,
       lat: parseFloat(lat),
       lng: parseFloat(lng),
     });
+
+    const pendingDeliveries = await prisma.delivery.findMany({
+      where: { status: "SEARCH_OF_RIDER" },
+      include: {
+        order: {
+          include: {
+            vendor: {
+              include: { user: true },
+            },
+          },
+        },
+      },
+    });
+
+    const nearbyDeliveries = pendingDeliveries.filter((delivery) => {
+      if (!delivery.pickupLat || !delivery.pickupLng) return false;
+      const distance = haversineDistance(
+        delivery.pickupLat,
+        delivery.pickupLng,
+        rider.currentLat ?? 0,
+        rider.currentLng ?? 0
+      );
+      return distance <= 10; // within 10 km radius
+    });
+
+    // 📨 3️⃣ Send “new_delivery_offer” event to this rider only
+    if (nearbyDeliveries.length > 0) {
+      io.to(socket.id).emit(
+        "new_delivery_offer",
+        nearbyDeliveries.map((d) => ({
+          deliveryId: d.id,
+          pickupAddress: d.pickupAddress,
+          dropoffAddress: d.dropoffAddress,
+          fareAmount: d.fareAmount,
+          vendorName: d.order.vendor.user.name,
+        }))
+      );
+    }
+
+    // Broadcast location update to vendors/admins
+ 
   } catch (error) {
     console.error("rider_update_location error:", error);
   }
