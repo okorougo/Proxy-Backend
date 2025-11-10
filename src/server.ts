@@ -36,7 +36,7 @@ app.use(passport.initialize());
 export const io = new Server(server);
 
 app.use(cors( {
-    origin: ["*", "http://localhost:5173"], // change to your frontend URL later
+    origin: ["*", "http://localhost:5173, https://proxy-admin-pink.vercel.app/"], // change to your frontend URL later
     credentials: true, 
     methods:["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"]
   },))
