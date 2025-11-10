@@ -317,16 +317,6 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("rider_update_location", async (data) => {
-    const { riderId, lat, lng } = data;
-    await prisma.rider.update({
-      where: { id: riderId },
-      data: { currentLat: lat, currentLng: lng, isOnline: true },
-    });
-
-    // broadcast to all vendors/admins
-    socket.broadcast.emit("rider_location_update", { riderId, lat, lng });
-  });
 
   socket.on("rider_toggle_online", async (data) => {
     const { riderId, isOnline } = data;
@@ -337,6 +327,41 @@ io.on("connection", (socket) => {
     });
     socket.broadcast.emit("rider_status_change", data);
   });
+
+  socket.on("rider_update_location", async (data) => {
+  try {
+    const { riderId, lat, lng } = data;
+    if (!riderId || !lat || !lng) {
+      console.warn("🚫 Invalid rider_update_location payload:", data);
+      return;
+    }
+
+    const rider = await prisma.rider.findUnique({ where: { id: riderId } });
+    if (!rider) {
+      console.warn(`🚫 No rider found for userId=${riderId}`);
+      return;
+    }
+
+    await prisma.rider.update({
+      where: { id: riderId },
+      data: {
+        currentLat: parseFloat(lat),
+        currentLng: parseFloat(lng),
+        isOnline: true,
+      },
+    });
+
+    // Broadcast location update to vendors/admins
+    socket.broadcast.emit("rider_location_update", {
+      riderId,
+      lat: parseFloat(lat),
+      lng: parseFloat(lng),
+    });
+  } catch (error) {
+    console.error("rider_update_location error:", error);
+  }
+});
+
 
   // ✅ Rider accepts delivery offer
 
