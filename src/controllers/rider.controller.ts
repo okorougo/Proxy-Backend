@@ -250,7 +250,7 @@ export const getNearbyRiders = async (req: AuthRequest, res: Response) => {
       );
       return dist <= Number(radiusKm);
     });
-
+    
     return successResponse(res, "Nearby riders", nearby);
   } catch (err) {
     console.error("getNearbyRiders error:", err);
@@ -277,6 +277,7 @@ export const acceptDelivery = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id; // from auth middleware
     const { deliveryId } = req.params;
+
 
     const rider = await prisma.rider.findUnique({ where: { userId } });
     if (!rider) return errorResponse(res, "Rider profile not found");
@@ -311,6 +312,13 @@ export const acceptDelivery = async (req: Request, res: Response) => {
         startedAt: new Date(),
       },
     });
+
+    const order = await prisma.order.update({
+      where: {id: updated.orderId},
+      data:{
+        status: ""
+      }
+    })
 
     // broadcast to vendor + user
     io.to(delivery.order.userId).emit("rider_assigned", {
@@ -545,5 +553,167 @@ export const updateDeliveryStatus = async (req: AuthRequest, res: Response) => {
   } catch (err) {
     console.error("updateDeliveryStatus error:", err);
     return errorResponse(res, "Failed to update delivery status");
+  }
+};
+export const markArrivalAtPickup = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const { deliveryId } = req.params;
+
+    const rider = await prisma.rider.findUnique({ where: { userId } });
+    if (!rider) return errorResponse(res, "Rider not found");
+
+    const delivery = await prisma.delivery.update({
+      where: { id: deliveryId, riderId: rider.id },
+      data: { status: "PICKED_UP", startedAt: new Date() },
+      include:{order: true}
+    });
+
+    io.to(delivery.order.userId).emit("delivery_update", {
+      deliveryId,
+      status: "",
+      message: "Rider has arrived at pickup location",
+    });
+
+    return successResponse(res, "Marked as arrived", delivery);
+  } catch (err) {
+    console.error("markArrivalAtPickup error:", err);
+    return errorResponse(res, "Failed to update delivery");
+  }
+};
+export const startDelivery = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const { deliveryId } = req.params;
+
+    const rider = await prisma.rider.findUnique({ where: { userId } });
+    if (!rider) return errorResponse(res, "Rider not found");
+
+    const delivery = await prisma.delivery.update({
+      where: { id: deliveryId, riderId: rider.id },
+      data: { status: "IN_TRANSIT", startedAt: new Date(),
+       },
+       include:{
+        order:true
+       }
+    });
+
+    io.to(delivery.order.userId).emit("delivery_update", {
+      deliveryId,
+      status: "IN_TRANSIT",
+      message: "Delivery is now in transit",
+    });
+        io.to(delivery.order.userId).emit("delivery_in_transit", { deliveryId });
+    io.to(delivery.order.vendorId).emit("delivery_in_transit", { deliveryId });
+
+    return successResponse(res, "Delivery started", delivery);
+  } catch (err) {
+    console.error("startDelivery error:", err);
+    return errorResponse(res, "Failed to start delivery");
+  }
+};
+export const completeDelivery = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const { deliveryId } = req.params;
+
+    const rider = await prisma.rider.findUnique({ where: { userId } });
+    if (!rider) return errorResponse(res, "Rider not found");
+
+    const delivery = await prisma.delivery.findUnique({
+      where: { id: deliveryId },
+      include: { order: true },
+    });
+    if (!delivery) return errorResponse(res, "Delivery not found");
+    if (delivery.status !== "IN_TRANSIT")
+      return errorResponse(res, "Cannot complete this delivery");
+
+    const updated = await prisma.delivery.update({
+      where: { id: deliveryId },
+      data: { status: "DELIVERED", completedAt: new Date() },
+      include: { order: true },
+    });
+
+    // Notify user and vendor
+    io.to(updated.order.userId).emit("delivery_completed", { deliveryId });
+    io.to(updated.order.vendorId).emit("delivery_completed", { deliveryId });
+
+       const sessions = await prisma.session.findMany({ where: { userId, deviceToken: { not: null } } });
+    for (const s of sessions) {
+      if (s.devicePlatform === "expo") await sendExpo(s.deviceToken!, "Order Delivered", ` your order #${(updated.orderId).toString().slice(0,6)} has been delivered to you`, { type: "Order", status: "DELIVERED" });
+    }
+
+
+
+    return successResponse(res, "Delivery completed successfully", updated);
+  } catch (error) {
+    console.error("completeDelivery error:", error);
+    return errorResponse(res, "Failed to complete delivery");
+  }
+};
+
+export const getActiveDeliveries = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const rider = await prisma.rider.findUnique({ where: { userId } });
+    if (!rider) return errorResponse(res, "Rider not found", "NOT_FOUND", 404);
+
+    const deliveries = await prisma.delivery.findMany({
+      where: {
+        riderId: rider.id,
+        status: { in: ["ACCEPTED", "IN_TRANSIT"] },
+      },
+      include: { 
+        rider:{
+          include:{
+            kyc:true,
+            vehicle:true,
+            user:true
+          }
+        },
+        order: {
+          include: {
+            vendor: { include: { user: true } },
+            user: true,
+
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return successResponse(res, "Active deliveries fetched", deliveries);
+  } catch (error) {
+    console.error("getActiveDeliveries error:", error);
+    return errorResponse(res, "Failed to fetch active deliveries");
+  }
+};
+export const getRiderDeliveryHistory = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+
+    const rider = await prisma.rider.findUnique({ where: { userId } });
+    if (!rider) return errorResponse(res, "Rider not found", "NOT_FOUND", 404);
+
+    const deliveries = await prisma.delivery.findMany({
+      where: {
+        riderId: rider.id,
+        status: { in: ["DELIVERED", "CANCELLED"] },
+      },
+      include: {
+        order: {
+          include: {
+            vendor: { include: { user: true } },
+            user: true,
+          },
+        },
+      },
+      orderBy: { completedAt: "desc" },
+    });
+
+    return successResponse(res, "Delivery history fetched successfully", deliveries);
+  } catch (error) {
+    console.error("getRiderDeliveryHistory error:", error);
+    return errorResponse(res, "Failed to fetch rider delivery history");
   }
 };

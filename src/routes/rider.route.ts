@@ -14,7 +14,11 @@ import {
   rejectRiderKyc,
   approveRiderAccount,
   rejectRiderAccount,
-  acceptDelivery
+  acceptDelivery,
+  getRiderDeliveryHistory,
+  getActiveDeliveries,
+  completeDelivery,
+  startDelivery
 } from "../controllers/rider.controller";
 import { adminOnly } from "../middleware/admin";
 
@@ -70,5 +74,9 @@ router.post("/toggle-online", toggleRiderOnline);
 
 // 🗺️ Get nearby riders
 router.get("/nearby", getNearbyRiders);
+router.get("/rider/history", authMiddleware, getRiderDeliveryHistory);
+router.get("/rider/active-deliveries", authMiddleware, getActiveDeliveries);
+router.post("/rider/start-pickup/:deliveryId", authMiddleware, startDelivery);
+router.post("/rider/complete-delivery/:deliveryId", authMiddleware, completeDelivery);
 
 export default router;

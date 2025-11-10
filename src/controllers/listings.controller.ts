@@ -596,7 +596,16 @@ export const getUserOrders = async (req: AuthRequest, res: Response) => {
           },
         },
         transaction: true,
-        delivery: true,
+        delivery: {
+          include:{
+            rider:{
+              include:{
+                kyc:true,
+                vehicle:true
+              }
+            }
+          }
+        },
       },
       orderBy: { createdAt: "desc" },
     });
