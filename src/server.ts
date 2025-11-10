@@ -329,9 +329,10 @@ io.on("connection", (socket) => {
   });
 
   socket.on("rider_toggle_online", async (data) => {
+    const { riderId, isOnline } = data;
     await prisma.rider.update({
-      where: { id: data.riderId },
-      data: { isOnline: data.isOnline },
+      where: { id: riderId },
+      data: { isOnline: isOnline },
     });
     socket.broadcast.emit("rider_status_change", data);
   });
