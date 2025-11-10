@@ -319,6 +319,7 @@ io.on("connection", (socket) => {
 
   socket.on("rider_update_location", async (data) => {
     const { riderId, lat, lng } = data;
+    console.log(`Rider ${riderId} location update: ${lat}, ${lng}`);
     await prisma.rider.update({
       where: { id: riderId },
       data: { currentLat: lat, currentLng: lng, isOnline: true },
