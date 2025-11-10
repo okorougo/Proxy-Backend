@@ -7,6 +7,7 @@ import geohash from "ngeohash";
 import { generateSignedDownloadUrl } from "../lib/cloudinary";
 import axios from "axios";
 import { io } from "../server";
+import { sendExpo, sendFcm } from "../lib/notifications";
 
 function generateGeohash(
   latitude: number,
@@ -707,9 +708,10 @@ export const createMultiVendorOrder = async (
     return errorResponse(res, "Failed to create orders");
   }
 };
-export const pushOrderToRiders = async (req: Request, res: Response) => {
+export const pushOrderToRiders = async (req: AuthRequest, res: Response) => {
   try {
     const { deliveryId } = req.params;
+
     const delivery = await prisma.delivery.findUnique({
       where: { id: deliveryId },
       include: {
@@ -727,46 +729,81 @@ export const pushOrderToRiders = async (req: Request, res: Response) => {
     if (delivery.status !== "PENDING")
       return errorResponse(res, "Cannot push a non-pending delivery");
 
-    // mark as searching
+    // 🔄 Mark delivery as searching
     await prisma.delivery.update({
       where: { id: deliveryId },
       data: { status: "SEARCH_OF_RIDER" },
     });
 
-    // Fetch nearby riders (within 10km)
-    const riders = await prisma.rider.findMany({
+    // 🚴 Find all active riders (online + have coords)
+    const allRiders = await prisma.rider.findMany({
       where: {
         isOnline: true,
         currentLat: { not: null },
         currentLng: { not: null },
       },
+      include: {
+        user: {
+          include:{
+            Session: true
+          }
+        },
+      },
     });
 
-    const nearbyRiders = riders.filter((r) => {
-      const R = 6371; // km
-      const dLat =
-        (((r.currentLat as number) - delivery.pickupLat) * Math.PI) / 180;
-      const dLon =
-        (((r.currentLng as number) - delivery.pickupLng) * Math.PI) / 180;
+    // 🧮 Filter by 10 km radius
+    const nearbyRiders = allRiders.filter((r) => {
+      const R = 6371;
+      const dLat = ((r.currentLat! - delivery.pickupLat) * Math.PI) / 180;
+      const dLon = ((r.currentLng! - delivery.pickupLng) * Math.PI) / 180;
       const a =
         Math.sin(dLat / 2) ** 2 +
         Math.cos(delivery.pickupLat * (Math.PI / 180)) *
-          Math.cos((r.currentLat as number) * (Math.PI / 180)) *
+          Math.cos(r.currentLat! * (Math.PI / 180)) *
           Math.sin(dLon / 2) ** 2;
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      return R * c <= 10; // within 10km
+      return R * c <= 10;
     });
 
-    // Broadcast to nearby riders
-    nearbyRiders.forEach((r) => {
-      io.to(r.id).emit("new_delivery_offer", {
-        deliveryId: delivery.id,
-        pickupAddress: delivery.pickupAddress,
-        dropoffAddress: delivery.dropoffAddress,
-        fareAmount: delivery.fareAmount,
-        vendorName: delivery.order.vendor.user.name,
+    const io = req.app.get("io"); // ✅ use io from app context
+
+    // 📡 Broadcast to all rider sessions
+    for (const rider of nearbyRiders) {
+      // Find all active sessions for that rider’s user
+      const sessions = await prisma.session.findMany({
+        where: {
+          userId: rider.userId,
+          isOnline: true,
+          socketId: { not: null },
+        },
       });
-    });
+
+      // emit socket event
+      for (const s of sessions) {
+        io.to(s.socketId!).emit("new_delivery_offer", {
+          deliveryId: delivery.id,
+          pickupAddress: delivery.pickupAddress,
+          dropoffAddress: delivery.dropoffAddress,
+          fareAmount: delivery.fareAmount,
+          vendorName: delivery.order.vendor.user.name,
+        });
+      }
+
+      // 🔔 also send push if offline
+      if (sessions.length === 0 && rider.user.Session[0].deviceToken) {
+        const message = `New delivery request from ${delivery.order.vendor.user.name}`;
+        if (rider.user.Session[0].devicePlatform === "expo")
+          await sendExpo(rider.user.Session[0].deviceToken as string, "New Delivery Offer", message, {
+            type: "delivery_offer",
+            deliveryId: delivery.id,
+          });
+        else
+          await sendFcm(rider.user.Session[0].deviceToken as string, "New Delivery Offer", message, {
+            type: "delivery_offer",
+            deliveryId: delivery.id,
+          });
+      }
+    }
 
     return successResponse(res, "Order pushed to nearby riders", {
       ridersFound: nearbyRiders.length,
@@ -776,6 +813,7 @@ export const pushOrderToRiders = async (req: Request, res: Response) => {
     return errorResponse(res, "Failed to push order to riders");
   }
 };
+
 
 export const updateVendor = async (req: Request, res: Response) => {
   try {

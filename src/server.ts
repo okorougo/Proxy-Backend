@@ -320,7 +320,7 @@ io.on("connection", (socket) => {
   socket.on("rider_update_location", async (data) => {
     const { riderId, lat, lng } = data;
     await prisma.rider.update({
-      where: { userId: riderId },
+      where: { id: riderId },
       data: { currentLat: lat, currentLng: lng, isOnline: true },
     });
 
@@ -335,6 +335,46 @@ io.on("connection", (socket) => {
     });
     socket.broadcast.emit("rider_status_change", data);
   });
+
+  // ✅ Rider accepts delivery offer
+
+
+
+// // ✅ Rider updates delivery status (picked up, in transit, delivered)
+// socket.on("update_delivery_status", async ({ deliveryId, status }) => {
+//   try {
+//     const validStatuses = ["PICKED_UP", "IN_TRANSIT", "DELIVERED"];
+//     if (!validStatuses.includes(status)) {
+//       return socket.emit("error", { message: "Invalid status" });
+//     }
+
+//     await prisma.delivery.update({
+//       where: { id: deliveryId },
+//       data: { status },
+//     });
+
+//     // Notify user + vendor + admin dashboard
+//     io.emit("delivery_status_update", { deliveryId, status });
+//   } catch (err) {
+//     console.error("update_delivery_status error:", err);
+//   }
+// });
+
+
+// // ✅ Rider shares real-time location during delivery
+// socket.on("delivery_location_update", async ({ deliveryId, lat, lng }) => {
+//   try {
+//     await prisma.delivery.update({
+//       where: { id: deliveryId },
+//       data: { currentLat: lat, currentLng: lng },
+//     });
+
+//     // Notify user for tracking
+//     io.emit("delivery_location_update", { deliveryId, lat, lng });
+//   } catch (err) {
+//     console.error("delivery_location_update error:", err);
+//   }
+// });
 
   // disconnect cleanup
   socket.on("disconnect", async () => {

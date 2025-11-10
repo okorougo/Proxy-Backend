@@ -13,7 +13,8 @@ import {
   approveRiderKyc,
   rejectRiderKyc,
   approveRiderAccount,
-  rejectRiderAccount
+  rejectRiderAccount,
+  acceptDelivery
 } from "../controllers/rider.controller";
 import { adminOnly } from "../middleware/admin";
 
@@ -57,7 +58,7 @@ router.get("/me", authMiddleware, getMyRiderProfile);
 // 🔒 Admin: Approve/Reject Rider
 router.patch("/status/:id", updateRiderStatus);
 router.post("/update-location", updateRiderLocation);
-router.post("/accept-delivery/:deliveryId", authMiddleware, updateRiderLocation);
+router.post("/accept-delivery/:deliveryId", authMiddleware, acceptDelivery);
 router.post("/kyc/approve/:userId", authMiddleware, adminOnly, approveRiderKyc);
 router.post("/kyc/reject/:userId", authMiddleware, adminOnly , rejectRiderKyc);
 

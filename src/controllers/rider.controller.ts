@@ -177,10 +177,13 @@ export const updateRiderStatus = async (req: Request, res: Response) => {
 };
 export const updateRiderLocation = async (req: AuthRequest, res: Response) => {
   try {
-    const riderId = req.user?.id;
+    const userId = req.user?.id;
     const { lat, lng } = req.body;
 
     if (!lat || !lng) return errorResponse(res, "Latitude and longitude required");
+    const rider = await prisma.rider.findUnique({ where: { userId } });
+    if (!rider) return errorResponse(res, "Rider profile not found");
+    const riderId = rider.id;
 
     await prisma.rider.update({
       where: { userId: riderId },
@@ -272,8 +275,12 @@ function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 
 export const acceptDelivery = async (req: Request, res: Response) => {
   try {
-    const riderId = req.user?.id; // from auth middleware
+    const userId = req.user?.id; // from auth middleware
     const { deliveryId } = req.params;
+
+    const rider = await prisma.rider.findUnique({ where: { userId } });
+    if (!rider) return errorResponse(res, "Rider profile not found");
+    const riderId = rider.id;
 
     const delivery = await prisma.delivery.findUnique({
       where: { id: deliveryId },
