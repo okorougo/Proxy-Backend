@@ -717,3 +717,39 @@ export const getRiderDeliveryHistory = async (req: Request, res: Response) => {
     return errorResponse(res, "Failed to fetch rider delivery history");
   }
 };
+export const getSingleRiderDelivery = async(req:Request, res:Response) =>{
+  try {
+    const {deliveryId}= req.params;
+    if(!deliveryId) return errorResponse(res, "Delivery id not found");
+    
+    const delivery = await prisma.delivery.findUnique({
+      where:{id:deliveryId},
+      include:{
+        order:{
+          include:{
+            user: true,
+            vendor:{
+              include:{
+                user:{
+                  include:{
+                    kycDocument:true,
+                    vendorApplication: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+    
+    if (!delivery) return errorResponse(res, "Delivery not found")
+
+    return successResponse(res, "Delivery fetched succesfully")
+ 
+    
+  } catch (error) {
+        return errorResponse(res, "Failed to fetch delivery");
+  }
+
+}

@@ -18,7 +18,8 @@ import {
   getRiderDeliveryHistory,
   getActiveDeliveries,
   completeDelivery,
-  startDelivery
+  startDelivery,
+  getSingleRiderDelivery
 } from "../controllers/rider.controller";
 import { adminOnly } from "../middleware/admin";
 
@@ -78,5 +79,6 @@ router.get("/history", authMiddleware, getRiderDeliveryHistory);
 router.get("/active-deliveries", authMiddleware, getActiveDeliveries);
 router.post("/start-pickup/:deliveryId", authMiddleware, startDelivery);
 router.post("/complete-delivery/:deliveryId", authMiddleware, completeDelivery);
+router.get("/delivery/:deliveryId", authMiddleware, getSingleRiderDelivery);
 
 export default router;
