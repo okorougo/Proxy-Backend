@@ -571,9 +571,19 @@ export const markArrivalAtPickup = async (req: AuthRequest, res: Response) => {
 
     io.to(delivery.order.userId).emit("delivery_update", {
       deliveryId,
-      status: "",
+      status: "Picked Up",
       message: "Rider has arrived at pickup location",
     });
+
+    const sessions = await prisma.session.findMany({
+      where: { userId: delivery.order.userId , deviceToken: { not: null } }
+    })
+     for (const s of sessions) {
+      if (s.devicePlatform === "expo") {
+        await sendExpo(s.deviceToken!, "Delivery Update", `Your delivery has been picked up and is on the way`, { type: "delivery_status", status: "PICKED_UP" });
+      }
+    }
+
 
     return successResponse(res, "Marked as arrived", delivery);
   } catch (err) {
