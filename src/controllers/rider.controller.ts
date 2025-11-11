@@ -661,7 +661,7 @@ export const getActiveDeliveries = async (req: Request, res: Response) => {
     const deliveries = await prisma.delivery.findMany({
       where: {
         riderId: rider.id,
-        status: { in: ["ACCEPTED", "IN_TRANSIT"] },
+        status: { in: ["ACCEPTED", "IN_TRANSIT", "PICKED_UP"] },
       },
       include: { 
         rider:{
