@@ -675,6 +675,7 @@ export const getUserOrders = async (req: AuthRequest, res: Response) => {
               dropoffLng: order.delivery.dropoffLng,
               pickupAddress: order.delivery.pickupAddress,
               dropoffAddress: order.delivery.dropoffAddress,
+              rider: order.delivery.rider
             }
           : null,
         listings: order.listings.map((item) => ({

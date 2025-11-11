@@ -661,7 +661,6 @@ export const completeDelivery = async (req: Request, res: Response) => {
     return errorResponse(res, "Failed to complete delivery");
   }
 };
-
 export const getActiveDeliveries = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
