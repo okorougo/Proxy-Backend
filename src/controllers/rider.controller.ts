@@ -754,7 +754,7 @@ export const getSingleRiderDelivery = async(req:Request, res:Response) =>{
     
     if (!delivery) return errorResponse(res, "Delivery not found")
 
-    return successResponse(res, "Delivery fetched succesfully")
+    return successResponse(res, "Delivery fetched succesfully", delivery)
  
     
   } catch (error) {
