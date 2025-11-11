@@ -19,7 +19,8 @@ import {
   getActiveDeliveries,
   completeDelivery,
   startDelivery,
-  getSingleRiderDelivery
+  getSingleRiderDelivery,
+  markArrivalAtPickup
 } from "../controllers/rider.controller";
 import { adminOnly } from "../middleware/admin";
 
@@ -77,6 +78,7 @@ router.post("/toggle-online", toggleRiderOnline);
 router.get("/nearby", getNearbyRiders);
 router.get("/history", authMiddleware, getRiderDeliveryHistory);
 router.get("/active-deliveries", authMiddleware, getActiveDeliveries);
+router.post("/pickup/:deliveryId", authMiddleware, markArrivalAtPickup);
 router.post("/start-pickup/:deliveryId", authMiddleware, startDelivery);
 router.post("/complete-delivery/:deliveryId", authMiddleware, completeDelivery);
 router.get("/delivery/:deliveryId", authMiddleware, getSingleRiderDelivery);
