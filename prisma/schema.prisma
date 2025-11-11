@@ -23,35 +23,35 @@ enum VendorStatus {
 }
 
 model User {
-  id                 String             @id @default(uuid())
-  email              String             @unique
-  password           String?
-  phone              String?            @unique
-  name               String?
-  role               String             @default("USER")
-  createdAt          DateTime           @default(now())
-  isEmailVerified    Boolean            @default(false)
-  listings           Listing[]
-  media              Media[]
-  reportsMade        Report[]           @relation("Reporter")
-  reportsReviewed    Report[]           @relation("ReviewedBy")
-  buyerTransactions  Transaction[]      @relation("buyerTransactions")
-  auditLogs          AuditLog[]         @relation("Actor")
-  messagesSent       Message[]          @relation("sentMessages")
-  messagesRecv       Message[]          @relation("recvMessages")
-  isKycVerified      Boolean            @default(false)
-  kycDocument        KycVerification?
-  kycDocumentId      String?
-  givenReviews       Review[]           @relation("givenReviews")
-  receivedReviews    Review[]           @relation("receivedReviews")
-  Session            Session[]
-  isBanned           Boolean            @default(false)
-  otpCode            String? // temporary OTP code
-  otpExpiresAt       DateTime?
-  vendorApplication  VendorApplication?
-  order              Order[]
-  riderId            String?
-  rider              Rider?
+  id                String             @id @default(uuid())
+  email             String             @unique
+  password          String?
+  phone             String?            @unique
+  name              String?
+  role              String             @default("USER")
+  createdAt         DateTime           @default(now())
+  isEmailVerified   Boolean            @default(false)
+  listings          Listing[]
+  media             Media[]
+  reportsMade       Report[]           @relation("Reporter")
+  reportsReviewed   Report[]           @relation("ReviewedBy")
+  buyerTransactions Transaction[]      @relation("buyerTransactions")
+  auditLogs         AuditLog[]         @relation("Actor")
+  messagesSent      Message[]          @relation("sentMessages")
+  messagesRecv      Message[]          @relation("recvMessages")
+  isKycVerified     Boolean            @default(false)
+  kycDocument       KycVerification?
+  kycDocumentId     String?
+  givenReviews      Review[]           @relation("givenReviews")
+  receivedReviews   Review[]           @relation("receivedReviews")
+  Session           Session[]
+  isBanned          Boolean            @default(false)
+  otpCode           String? // temporary OTP code
+  otpExpiresAt      DateTime?
+  vendorApplication VendorApplication?
+  order             Order[]
+  riderId           String?
+  rider             Rider?
 
   // Social auth
   provider   String? // "google" | "apple"
@@ -80,10 +80,10 @@ model VendorApplication {
   rejectionNote String?
   location      Location?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  order     Order[]
-  sellerTransactions Transaction[]      @relation("sellerTransactions")
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  order              Order[]
+  sellerTransactions Transaction[] @relation("sellerTransactions")
 }
 
 model KycVerification {
@@ -108,28 +108,28 @@ enum KycStatus {
 }
 
 model Listing {
-  id           String        @id @default(uuid())
-  title        String
-  description  String
-  priceCents   Int
-  price        Float
-  currency     String        @default("NGN")
-  isDigital    Boolean       @default(false)
-  condition    String? // e.g. "new", "used", "refurbished"
-  stock        Int? // only for physical products
-  seller       User          @relation(fields: [sellerId], references: [id])
-  sellerId     String
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  media        Media[]
-  digitalFiles DigitalFile[] // 🔥 new relation
-  transactions Transaction[]
-  Message      Message[]
-  status       ListingStatus @default(PENDING)
-  categoryId   String
-  extraDetails Json?
-  category     Category      @relation(fields: [categoryId], references: [id])
-  OrderItem    OrderItem[]
+  id            String        @id @default(uuid())
+  title         String
+  description   String
+  priceCents    Int
+  price         Float
+  currency      String        @default("NGN")
+  isDigital     Boolean       @default(false)
+  condition     String? // e.g. "new", "used", "refurbished"
+  stock         Int? // only for physical products
+  seller        User          @relation(fields: [sellerId], references: [id])
+  sellerId      String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  media         Media[]
+  digitalFiles  DigitalFile[] // 🔥 new relation
+  transactions  Transaction[]
+  Message       Message[]
+  status        ListingStatus @default(PENDING)
+  categoryId    String
+  extraDetails  Json?
+  category      Category      @relation(fields: [categoryId], references: [id])
+  OrderItem     OrderItem[]
   rejectionNote String?
 }
 
@@ -259,24 +259,24 @@ model AuditLog {
 }
 
 model Transaction {
-  id          String        @id @default(uuid())
+  id          String            @id @default(uuid())
   listingId   String? // keep for single-listing cases
-  listing     Listing?      @relation(fields: [listingId], references: [id])
-  orderId     String        @unique
-  buyer       User          @relation("buyerTransactions", fields: [buyerId], references: [id])
+  listing     Listing?          @relation(fields: [listingId], references: [id])
+  orderId     String            @unique
+  buyer       User              @relation("buyerTransactions", fields: [buyerId], references: [id])
   buyerId     String
-  seller      VendorApplication          @relation("sellerTransactions", fields: [sellerId], references: [id])
+  seller      VendorApplication @relation("sellerTransactions", fields: [sellerId], references: [id])
   sellerId    String
   amountCents Int
-  currency    String        @default("NGN")
+  currency    String            @default("NGN")
   method      PaymentMethod
-  status      PaymentStatus @default(PENDING)
+  status      PaymentStatus     @default(PENDING)
   receiptUrl  String? // Optional proof (image uploaded to Cloudinary)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
   review      Review[]
   Delivery    Delivery[]
-  order       Order         @relation(fields: [orderId], references: [id])
+  order       Order             @relation(fields: [orderId], references: [id])
   orderItems  OrderItem[]
   amountPaid  Float?
   paystackRef String?
@@ -358,6 +358,10 @@ model Delivery {
   isDigital    Boolean        @default(false)
   digitalFiles Json? // JSON array of signed download URLs
 
+  riderArrivedAt DateTime?
+  riderLat       Float?
+  riderLng       Float?
+
   startedAt   DateTime?
   completedAt DateTime?
   createdAt   DateTime  @default(now())
@@ -366,23 +370,23 @@ model Delivery {
 }
 
 model Rider {
-  id          String        @id @default(uuid())
-  fullName    String
-  dateOfBirth String
-  userId      String        @unique
-  user        User          @relation(fields: [userId], references: [id])
-  phone       String
-  vehicleType String
-  status        RiderStatus @default(PENDING)// PENDING, APPROVED, REJECTED
-  isOnline    Boolean       @default(false)
-  currentLat  Float?
-  currentLng  Float?
-  lastSeenAt  DateTime      @default(now())
-  kyc         RiderKyc?
-  vehicle     RiderVehicle?
-  deliveries  Delivery[]
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  id            String        @id @default(uuid())
+  fullName      String
+  dateOfBirth   String
+  userId        String        @unique
+  user          User          @relation(fields: [userId], references: [id])
+  phone         String
+  vehicleType   String
+  status        RiderStatus   @default(PENDING) // PENDING, APPROVED, REJECTED
+  isOnline      Boolean       @default(false)
+  currentLat    Float?
+  currentLng    Float?
+  lastSeenAt    DateTime      @default(now())
+  kyc           RiderKyc?
+  vehicle       RiderVehicle?
+  deliveries    Delivery[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
   rejectionNote String?
 }
 
@@ -398,7 +402,7 @@ model RiderKyc {
   roadWorthinessUrl String?
   status            String   @default("PENDING") // PENDING, APPROVED, REJECTED
   createdAt         DateTime @default(now())
-  rejectionNote String?
+  rejectionNote     String?
 }
 
 model RiderVehicle {
@@ -423,6 +427,7 @@ enum DeliveryStatus {
   CANCELLED
   SEARCH_OF_RIDER
 }
+
 enum RiderStatus {
   PENDING
   APPROVED

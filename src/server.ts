@@ -431,19 +431,33 @@ io.on("connection", (socket) => {
 
 
 // // ✅ Rider shares real-time location during delivery
-// socket.on("delivery_location_update", async ({ deliveryId, lat, lng }) => {
-//   try {
-//     await prisma.delivery.update({
-//       where: { id: deliveryId },
-//       data: { currentLat: lat, currentLng: lng },
-//     });
+socket.on("delivery_location_update", async ({ deliveryId, lat, lng }) => {
+  try {
+    const delivery = await prisma.delivery.findUnique({
+      where: { id: deliveryId },
+      include: {
+        order: true,
+      },
+    });
+    if (!delivery) {
+      return socket.emit("error", { message: "Invalid deliveryId" });
+    }
 
-//     // Notify user for tracking
-//     io.emit("delivery_location_update", { deliveryId, lat, lng });
-//   } catch (err) {
-//     console.error("delivery_location_update error:", err);
-//   }
-// });
+    // Update delivery record with latest location
+    await prisma.delivery.update({
+      where: { id: deliveryId },
+      data: {
+        riderLat: lat,
+        riderLng: lng,
+      },
+    });
+
+    // Notify user for tracking
+    io.emit("delivery_location_update", { deliveryId, lat, lng });
+  } catch (err) {
+    console.error("delivery_location_update error:", err);
+  }
+});
 
   // disconnect cleanup
   socket.on("disconnect", async () => {
