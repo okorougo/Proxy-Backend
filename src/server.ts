@@ -25,6 +25,8 @@ import { uploadToCloudinary } from "./lib/cloudinary";
 import passport from "passport";
 import cors from "cors"
 import { haversineDistance } from './utils/distanceCalcu';
+import axios from 'axios';
+import cron from "node-cron";
 
 
 
@@ -35,12 +37,30 @@ const server = http.createServer(app);
 app.use(passport.initialize());
 
 export const io = new Server(server);
+const allowedOrigins = [
+  "http://localhost:5173", // local dev
+  "https://proxy-admin-pink.vercel.app", // production
+  "https://proxy-admin-pink.vercel.app/", // production
+  "https://www.proxy-admin-pink.vercel.app" // replace with your actual frontend domain
+];
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true);
 
-app.use(cors( {
-    origin: ["http://localhost:5173, https://proxy-admin-pink.vercel.app"], // change to your frontend URL later
-    credentials: true, 
-    methods:["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"]
-  },))
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.warn("❌ CORS blocked for origin:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"],
+  })
+);
+
 
   app.options("*", cors());
 // const onlineUsers = new Map<string, string>();
@@ -473,7 +493,15 @@ socket.on("delivery_location_update", async ({ deliveryId, lat, lng }) => {
   });
 });
 
-
+cron.schedule("*/10 * * * *", async () => {
+  try {
+    const response = await axios.get(
+      "https://proxy-backend-6of2.onrender.com/api/listings/popular"
+    );
+  } catch (error: any) {
+    console.error("Error hitting the server:", error.message);
+  }
+});
 
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
