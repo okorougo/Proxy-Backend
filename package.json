@@ -4,11 +4,11 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn src/server.ts",
-    "build": "npx prisma generate && tsc",
+    "build": "tsc",
     "start": "node dist/server.js",
     "seed:category": "ts-node prisma/seed.ts",
     "seed:admin": "ts-node prisma/adminSeed.ts",
-    "postinstall": "npx prisma generate"
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.0.0",
