@@ -667,7 +667,7 @@ export const createMultiVendorOrder = async (
             Number(dropoffLat),
             Number(dropoffLng)
           );
-          const BASE_FARE = 400,
+          const BASE_FARE = 600,
             RATE_PER_KM = 120,
             SERVICE_FEE = 100;
           const fareAmount = Math.round(
