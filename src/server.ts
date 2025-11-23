@@ -498,6 +498,7 @@ cron.schedule("*/10 * * * *", async () => {
     const response = await axios.get(
       "https://proxy-backend-6of2.onrender.com/api/listings/popular"
     );
+    console.log("Fetched sucessfully")
   } catch (error: any) {
     console.error("Error hitting the server:", error.message);
   }
