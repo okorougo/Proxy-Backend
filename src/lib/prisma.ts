@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { prismaConfig } from '../../prisma.config'; // adjust path if needed
+const { adapter } = require('../../prisma.config'); // adjust path
 
-const prisma = new PrismaClient(prismaConfig);
-
+const prisma = new PrismaClient({ adapter });
 export default prisma;
