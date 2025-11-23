@@ -547,8 +547,10 @@ export const createMultiVendorOrder = async (
 
     if (listings.length === 0) return errorResponse(res, "Listings not found");
 
-    // Map listingId -> listing
-    const listingMap = new Map(listings.map((l) => [l.id, l]));
+    // Map listingId -> listing (typed so .get() returns a proper listing type instead of unknown)
+    const listingMap = new Map<string, (typeof listings)[number]>(
+      listings.map((l) => [l.id, l])
+    );
 
     // Group items by seller (use listing.sellerId — do NOT trust client-provided vendorId)
     const grouped: Record<string, { listing: any; quantity: number }[]> = {};
