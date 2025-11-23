@@ -9,5 +9,5 @@
     "skipLibCheck": true,
     "typeRoots": ["./src/types", "./node_modules/@types"]
   },
-  "include": ["src/types/**/*.d.ts", "src/**/*"]
+  "include": ["src/types/**/*.d.ts", "src/**/*", "prisma.config.js"]
 }
