@@ -91,43 +91,40 @@ export const stripePayment = () => async (req: Request, res: Response) => {
 
   console.log("Stripe Key:", process.env.STRIPE_SECRET_KEY?.slice(0,5));
   try {
-    const { amount, currency = "usd" } = req.body;
+    const { amount, currency = "usd", receipt_email  } = req.body;
 
     if (!amount || typeof amount !== "number" || amount <= 0) {
       return res.status(400).json({ error: "Invalid amount" });
     }
 
     // 1️⃣ Create or reuse a customer
-    const customer = await stripe.customers.create();
+    // const customer = await stripe.customers.create();
 
-    // 2️⃣ Create customer session (required for PaymentSheet on mobile)
-    const customerSession = await stripe.customerSessions.create({
-      customer: customer.id,
-      components: {
-        mobile_payment_element: {
-          enabled: true,
-          features: {
-            payment_method_save: "enabled",
-            payment_method_remove: "enabled",
-            payment_method_redisplay: "enabled",
-          },
-        },
-      },
-    });
+    // // 2️⃣ Create customer session (required for PaymentSheet on mobile)
+    // const customerSession = await stripe.customerSessions.create({
+    //   customer: customer.id,
+    //   components: {
+    //     mobile_payment_element: {
+    //       enabled: true,
+    //       features: {
+    //         payment_method_save: "enabled",
+    //         payment_method_remove: "enabled",
+    //         payment_method_redisplay: "enabled",
+    //       },
+    //     },
+    //   },
+    // });
 
     // 3️⃣ Create Payment Intent
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency,
-      customer: customer.id,
+      receipt_email,
       automatic_payment_methods: { enabled: true },
     });
 
     return res.json({
-      paymentIntentClientSecret: paymentIntent.client_secret,
-      customerSessionClientSecret: customerSession.client_secret,
-      customerId: customer.id,
-      publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
+      clientSecret: paymentIntent.client_secret,
     });
    
   } catch (err: any) {
