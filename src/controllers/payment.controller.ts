@@ -84,9 +84,10 @@ export const completeTransaction = async (req: AuthRequest, res: Response) => {
     return errorResponse(res, "Failed to complete transaction");
   }
 };
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-11-17.clover",
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: null,
 });
+
 export const stripePayment = () => async (req: Request, res: Response) => {
 
   console.log("Stripe Key:", process.env.STRIPE_SECRET_KEY?.slice(0,5));
@@ -114,10 +115,10 @@ export const stripePayment = () => async (req: Request, res: Response) => {
     //     },
     //   },
     // });
-
+        console.log("Creating PaymentIntent for amount:", amount);
     // 3️⃣ Create Payment Intent
     const paymentIntent = await stripe.paymentIntents.create({
-      amount,
+      amount: Math.round(amount * 100),
       currency,
       receipt_email,
       automatic_payment_methods: { enabled: true },
