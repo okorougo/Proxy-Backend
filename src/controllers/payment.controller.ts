@@ -88,6 +88,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: null,
 });
 export const stripePayment = () => async (req: Request, res: Response) => {
+
+  console.log("Stripe Key:", process.env.STRIPE_SECRET_KEY?.slice(0,5));
   try {
     const { amount, currency = "usd" } = req.body;
 
