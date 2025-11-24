@@ -123,6 +123,26 @@ export type Review = Prisma.ReviewModel
  */
 export type Delivery = Prisma.DeliveryModel
 /**
+ * Model VendorWallet
+ * 
+ */
+export type VendorWallet = Prisma.VendorWalletModel
+/**
+ * Model WithdrawalRequest
+ * 
+ */
+export type WithdrawalRequest = Prisma.WithdrawalRequestModel
+/**
+ * Model WalletTransaction
+ * 
+ */
+export type WalletTransaction = Prisma.WalletTransactionModel
+/**
+ * Model VendorBank
+ * 
+ */
+export type VendorBank = Prisma.VendorBankModel
+/**
  * Model Rider
  * 
  */

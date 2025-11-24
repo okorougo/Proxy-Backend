@@ -68,6 +68,10 @@ export const ModelName = {
   Session: 'Session',
   Review: 'Review',
   Delivery: 'Delivery',
+  VendorWallet: 'VendorWallet',
+  WithdrawalRequest: 'WithdrawalRequest',
+  WalletTransaction: 'WalletTransaction',
+  VendorBank: 'VendorBank',
   Rider: 'Rider',
   RiderKyc: 'RiderKyc',
   RiderVehicle: 'RiderVehicle'
@@ -370,6 +374,61 @@ export const DeliveryScalarFieldEnum = {
 } as const
 
 export type DeliveryScalarFieldEnum = (typeof DeliveryScalarFieldEnum)[keyof typeof DeliveryScalarFieldEnum]
+
+
+export const VendorWalletScalarFieldEnum = {
+  id: 'id',
+  vendorId: 'vendorId',
+  balance: 'balance',
+  totalEarned: 'totalEarned',
+  withdrawn: 'withdrawn',
+  currency: 'currency',
+  updatedAt: 'updatedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type VendorWalletScalarFieldEnum = (typeof VendorWalletScalarFieldEnum)[keyof typeof VendorWalletScalarFieldEnum]
+
+
+export const WithdrawalRequestScalarFieldEnum = {
+  id: 'id',
+  vendorId: 'vendorId',
+  amount: 'amount',
+  bankName: 'bankName',
+  accountName: 'accountName',
+  accountNumber: 'accountNumber',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  vendorWalletId: 'vendorWalletId'
+} as const
+
+export type WithdrawalRequestScalarFieldEnum = (typeof WithdrawalRequestScalarFieldEnum)[keyof typeof WithdrawalRequestScalarFieldEnum]
+
+
+export const WalletTransactionScalarFieldEnum = {
+  id: 'id',
+  vendorId: 'vendorId',
+  amount: 'amount',
+  type: 'type',
+  remark: 'remark',
+  createdAt: 'createdAt'
+} as const
+
+export type WalletTransactionScalarFieldEnum = (typeof WalletTransactionScalarFieldEnum)[keyof typeof WalletTransactionScalarFieldEnum]
+
+
+export const VendorBankScalarFieldEnum = {
+  id: 'id',
+  vendorId: 'vendorId',
+  bankName: 'bankName',
+  bankCode: 'bankCode',
+  accountName: 'accountName',
+  accountNumber: 'accountNumber',
+  createdAt: 'createdAt'
+} as const
+
+export type VendorBankScalarFieldEnum = (typeof VendorBankScalarFieldEnum)[keyof typeof VendorBankScalarFieldEnum]
 
 
 export const RiderScalarFieldEnum = {

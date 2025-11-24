@@ -2,7 +2,7 @@
 // Define your data models here
 
 generator client {
-  provider = "prisma-client" 
+  provider = "prisma-client"
   output   = "../src/generated/client"
 }
 
@@ -80,10 +80,14 @@ model VendorApplication {
   rejectionNote String?
   location      Location?
 
-  createdAt          DateTime      @default(now())
-  updatedAt          DateTime      @updatedAt
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
   order              Order[]
-  sellerTransactions Transaction[] @relation("sellerTransactions")
+  sellerTransactions Transaction[]       @relation("sellerTransactions")
+  wallet             VendorWallet?
+  withdrawalRequests WithdrawalRequest[]
+  walletTransactions WalletTransaction[]
+  vendorBank         VendorBank?
 }
 
 model KycVerification {
@@ -367,6 +371,67 @@ model Delivery {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   order       Order     @relation(fields: [orderId], references: [id])
+}
+
+model VendorWallet {
+  id          String   @id @default(uuid())
+  vendorId    String   @unique
+  balance     Float    @default(0) // available for withdrawal
+  totalEarned Float    @default(0)
+  withdrawn   Float    @default(0)
+  currency    String   @default("NGN")
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+
+  vendor      VendorApplication   @relation(fields: [vendorId], references: [id])
+  withdrawals WithdrawalRequest[]
+}
+
+model WithdrawalRequest {
+  id            String           @id @default(uuid())
+  vendorId      String
+  amount        Float
+  bankName      String
+  accountName   String
+  accountNumber String
+  status        WithdrawalStatus @default(PENDING)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  vendor         VendorApplication @relation(fields: [vendorId], references: [id])
+  vendorWallet   VendorWallet?     @relation(fields: [vendorWalletId], references: [id])
+  vendorWalletId String?
+}
+
+enum WithdrawalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  FAILED
+  COMPLETED
+}
+
+model WalletTransaction {
+  id        String   @id @default(uuid())
+  vendorId  String
+  amount    Float
+  type      String // "CREDIT" or "DEBIT"
+  remark    String?
+  createdAt DateTime @default(now())
+
+  vendor VendorApplication @relation(fields: [vendorId], references: [id])
+}
+
+model VendorBank {
+  id            String   @id @default(uuid())
+  vendorId      String   @unique
+  bankName      String
+  bankCode      String
+  accountName   String
+  accountNumber String
+  createdAt     DateTime @default(now())
+
+  vendor VendorApplication @relation(fields: [vendorId], references: [id])
 }
 
 model Rider {

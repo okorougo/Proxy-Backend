@@ -15,6 +15,9 @@ router.post("/verify-otp", verifyOtp);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
 router.post("/resend-reset-otp", resendResetOtp);
+router.get("/me", authMiddleware, async (req, res) => {
+  return res.json({ user: req.user });
+});
 
 // Google
 router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));

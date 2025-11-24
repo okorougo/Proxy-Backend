@@ -86,6 +86,14 @@ export const approveVendor = async (req: Request, res: Response) => {
       data: { role: "VENDOR" },
     });
 
+    await prisma.vendorWallet.create({
+      data: {
+        vendorId: app.id,
+        balance: 0,
+        totalEarned: 0,
+      },
+    });
+
     // Notify user
     const html = `
       <div style="font-family:sans-serif">
@@ -499,7 +507,14 @@ export const createMultiVendorOrder = async (
   try {
     const { reference } = req.query;
     const userId = req.user?.id;
-    const { items, dropoffAddress, dropoffLat, dropoffLng, paymentType,amountPaidByCustomer } = req.body;
+    const {
+      items,
+      dropoffAddress,
+      dropoffLat,
+      dropoffLng,
+      paymentType,
+      amountPaidByCustomer,
+    } = req.body;
     if (!reference) return errorResponse(res, "Missing payment reference");
 
     // 1️⃣ Verify payment based on payment type
@@ -511,7 +526,9 @@ export const createMultiVendorOrder = async (
       const response = await axios.get(
         `https://api.paystack.co/transaction/verify/${reference}`,
         {
-          headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}` },
+          headers: {
+            Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+          },
         }
       );
 
@@ -760,9 +777,9 @@ export const pushOrderToRiders = async (req: AuthRequest, res: Response) => {
       },
       include: {
         user: {
-          include:{
-            Session: true
-          }
+          include: {
+            Session: true,
+          },
         },
       },
     });
@@ -809,15 +826,25 @@ export const pushOrderToRiders = async (req: AuthRequest, res: Response) => {
       if (sessions.length === 0 && rider.user.Session[0].deviceToken) {
         const message = `New delivery request from ${delivery.order.vendor.user.name}`;
         if (rider.user.Session[0].devicePlatform === "expo")
-          await sendExpo(rider.user.Session[0].deviceToken as string, "New Delivery Offer", message, {
-            type: "delivery_offer",
-            deliveryId: delivery.id,
-          });
+          await sendExpo(
+            rider.user.Session[0].deviceToken as string,
+            "New Delivery Offer",
+            message,
+            {
+              type: "delivery_offer",
+              deliveryId: delivery.id,
+            }
+          );
         else
-          await sendFcm(rider.user.Session[0].deviceToken as string, "New Delivery Offer", message, {
-            type: "delivery_offer",
-            deliveryId: delivery.id,
-          });
+          await sendFcm(
+            rider.user.Session[0].deviceToken as string,
+            "New Delivery Offer",
+            message,
+            {
+              type: "delivery_offer",
+              deliveryId: delivery.id,
+            }
+          );
       }
     }
 
@@ -829,7 +856,6 @@ export const pushOrderToRiders = async (req: AuthRequest, res: Response) => {
     return errorResponse(res, "Failed to push order to riders");
   }
 };
-
 
 export const updateVendor = async (req: Request, res: Response) => {
   try {
