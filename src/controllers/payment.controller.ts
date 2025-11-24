@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { Response ,Request} from "express";
 import prisma from "../lib/prisma";
 import cloudinary from "../lib/cloudinary";
 import { AuthRequest } from "../middleware/auth";
@@ -87,7 +87,7 @@ export const completeTransaction = async (req: AuthRequest, res: Response) => {
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: null,
 });
-export const stripePayment = () => async (req: AuthRequest, res: Response) => {
+export const stripePayment = () => async (req: Request, res: Response) => {
   try {
     const { amount, currency = "usd" } = req.body;
 
