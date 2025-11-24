@@ -84,11 +84,9 @@ export const completeTransaction = async (req: AuthRequest, res: Response) => {
     return errorResponse(res, "Failed to complete transaction");
   }
 };
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: null,
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-export const stripePayment = () => async (req: Request, res: Response) => {
+export const stripePayment =  async (req: Request, res: Response) => {
 
   console.log("Stripe Key:", process.env.STRIPE_SECRET_KEY?.slice(0,5));
   try {
@@ -99,7 +97,12 @@ export const stripePayment = () => async (req: Request, res: Response) => {
     }
 
     // 1️⃣ Create or reuse a customer
-    // const customer = await stripe.customers.create();
+    const customer = await stripe.customers.create();
+
+      const ephemeralKey = await stripe.ephemeralKeys.create(
+    { customer: customer.id },
+    { apiVersion: '2024-09-30.acacia' }
+  );
 
     // // 2️⃣ Create customer session (required for PaymentSheet on mobile)
     // const customerSession = await stripe.customerSessions.create({
@@ -121,11 +124,14 @@ export const stripePayment = () => async (req: Request, res: Response) => {
       amount: Math.round(amount * 100),
       currency,
       receipt_email,
+      customer: customer.id,
       automatic_payment_methods: { enabled: true },
     });
 
     return res.json({
       clientSecret: paymentIntent.client_secret,
+      ephemeralKey: ephemeralKey.secret,
+    customer: customer.id,
     });
    
   } catch (err: any) {
