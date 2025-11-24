@@ -84,8 +84,8 @@ export const completeTransaction = async (req: AuthRequest, res: Response) => {
     return errorResponse(res, "Failed to complete transaction");
   }
 };
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: null,
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2025-11-17.clover",
 });
 export const stripePayment = () => async (req: Request, res: Response) => {
 
