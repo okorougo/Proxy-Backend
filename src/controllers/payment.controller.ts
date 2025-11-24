@@ -96,7 +96,7 @@ export const stripePayment = () => async (req: AuthRequest, res: Response) => {
   }
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: "2025-11-17.clover",
+    apiVersion: null,
   });
   const { amount, currency } = req.body;
   try {
