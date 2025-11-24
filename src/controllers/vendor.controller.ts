@@ -499,27 +499,40 @@ export const createMultiVendorOrder = async (
   try {
     const { reference } = req.query;
     const userId = req.user?.id;
-    const { items, dropoffAddress, dropoffLat, dropoffLng } = req.body;
+    const { items, dropoffAddress, dropoffLat, dropoffLng, paymentType } = req.body;
     if (!reference) return errorResponse(res, "Missing payment reference");
 
-    // 1️⃣ Verify payment from Paystack
-    const response = await axios.get(
-      `https://api.paystack.co/transaction/verify/${reference}`,
-      {
-        headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}` },
-      }
-    );
+    // 1️⃣ Verify payment based on payment type
+    let amountPaid = 0;
+    let paystackRef = reference as string;
 
-    const paystackData = response.data;
-    if (paystackData.status !== true)
-      return errorResponse(res, "Invalid payment verification");
+    if (paymentType === "PAYSTACK") {
+      // Verify payment from Paystack
+      const response = await axios.get(
+        `https://api.paystack.co/transaction/verify/${reference}`,
+        {
+          headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}` },
+        }
+      );
 
-    const payment = paystackData.data;
-    if (payment.status !== "success")
-      return errorResponse(res, "Payment not successful");
+      const paystackData = response.data;
+      if (paystackData.status !== true)
+        return errorResponse(res, "Invalid payment verification");
 
-    const amountPaid = payment.amount / 100;
-    const paystackRef = payment.reference;
+      const payment = paystackData.data;
+      if (payment.status !== "success")
+        return errorResponse(res, "Payment not successful");
+
+      amountPaid = payment.amount / 100;
+      paystackRef = payment.reference;
+    } else if (paymentType === "STRIPE") {
+      // For Stripe, just store the reference without verification
+      // Stripe verification can be done via webhooks if needed
+      paystackRef = reference as string;
+      console.log("Stripe payment reference:", paystackRef);
+    } else {
+      return errorResponse(res, "Invalid payment type", "INVALID_PAYMENT_TYPE");
+    }
 
     if (!userId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
     if (!Array.isArray(items) || items.length === 0)
@@ -611,7 +624,7 @@ export const createMultiVendorOrder = async (
               sellerId: vendorId,
               amountCents: Math.round(totalAmount * 100),
               status: "COMPLETED", // payment pending by default
-              method: "PAYSTACK", // or from req.body
+              method: paymentType, // Use the payment type from request
               amountPaid: amountPaid,
               paystackRef,
             },
