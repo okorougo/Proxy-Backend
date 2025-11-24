@@ -499,7 +499,7 @@ export const createMultiVendorOrder = async (
   try {
     const { reference } = req.query;
     const userId = req.user?.id;
-    const { items, dropoffAddress, dropoffLat, dropoffLng, paymentType } = req.body;
+    const { items, dropoffAddress, dropoffLat, dropoffLng, paymentType,amountPaidByCustomer } = req.body;
     if (!reference) return errorResponse(res, "Missing payment reference");
 
     // 1️⃣ Verify payment based on payment type
@@ -529,6 +529,7 @@ export const createMultiVendorOrder = async (
       // For Stripe, just store the reference without verification
       // Stripe verification can be done via webhooks if needed
       paystackRef = reference as string;
+      amountPaid = Number(amountPaidByCustomer) || 0;
       console.log("Stripe payment reference:", paystackRef);
     } else {
       return errorResponse(res, "Invalid payment type", "INVALID_PAYMENT_TYPE");
