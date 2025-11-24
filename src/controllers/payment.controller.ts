@@ -84,41 +84,50 @@ export const completeTransaction = async (req: AuthRequest, res: Response) => {
     return errorResponse(res, "Failed to complete transaction");
   }
 };
-
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: null,
+});
 export const stripePayment = () => async (req: AuthRequest, res: Response) => {
-  if (!process.env.STRIPE_SECRET_KEY) {
-    errorResponse(
-      res,
-      "STRIPE_SECRET_KEY is not configured in environment variables"
-    );
-
-    process.exit(1);
-  }
-
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: null,
-  });
-  const { amount, currency } = req.body;
   try {
+    const { amount, currency = "usd" } = req.body;
+
     if (!amount || typeof amount !== "number" || amount <= 0) {
-      return res
-        .status(400)
-        .json({
-          error:
-            "Invalid amount. Amount must be an integer in the smallest currency unit (e.g., kobo for NGN).",
-        });
+      return res.status(400).json({ error: "Invalid amount" });
     }
 
-    // Optionally: create a Customer first, or attach metadata to PaymentIntent.
-    // Example metadata: { orderId: 'abc123', userId: 'user_1' }
+    // 1️⃣ Create or reuse a customer
+    const customer = await stripe.customers.create();
+
+    // 2️⃣ Create customer session (required for PaymentSheet on mobile)
+    const customerSession = await stripe.customerSessions.create({
+      customer: customer.id,
+      components: {
+        mobile_payment_element: {
+          enabled: true,
+          features: {
+            payment_method_save: "enabled",
+            payment_method_remove: "enabled",
+            payment_method_redisplay: "enabled",
+          },
+        },
+      },
+    });
+
+    // 3️⃣ Create Payment Intent
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency,
-      // You can optionally set payment_method_types, e.g. ['card']
-      payment_method_types: ["card"],
+      customer: customer.id,
+      automatic_payment_methods: { enabled: true },
     });
 
-    return res.json({ clientSecret: paymentIntent.client_secret });
+    return res.json({
+      paymentIntentClientSecret: paymentIntent.client_secret,
+      customerSessionClientSecret: customerSession.client_secret,
+      customerId: customer.id,
+      publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
+    });
+   
   } catch (err: any) {
     console.error("create-payment-intent error", err);
     return res
