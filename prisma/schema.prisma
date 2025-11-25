@@ -66,10 +66,20 @@ model Category {
   iconLib     String?
   iconName    String?
   listings    Listing[]
+  subCategories SubCategory[] 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
-
+model SubCategory {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  category    Category  @relation(fields: [categoryId], references: [id])
+  categoryId  String
+  listings    Listing[]  // optional: listings can belong to a sub-category
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
 model VendorApplication {
   id     String @id @default(uuid())
   user   User   @relation(fields: [userId], references: [id])
@@ -131,6 +141,8 @@ model Listing {
   Message       Message[]
   status        ListingStatus @default(PENDING)
   categoryId    String
+  subCategoryId String?
+  subCategory   SubCategory?  @relation(fields: [subCategoryId], references: [id])
   extraDetails  Json?
   category      Category      @relation(fields: [categoryId], references: [id])
   OrderItem     OrderItem[]
@@ -344,6 +356,8 @@ model Delivery {
   transaction   Transaction @relation(fields: [transactionId], references: [id])
   transactionId String
 
+  OTP       String @unique
+
   rider   Rider?  @relation(fields: [riderId], references: [id])
   riderId String?
   orderId String  @unique
@@ -383,8 +397,9 @@ model VendorWallet {
   updatedAt   DateTime @updatedAt
   createdAt   DateTime @default(now())
 
-  vendor      VendorApplication   @relation(fields: [vendorId], references: [id])
-  withdrawals WithdrawalRequest[]
+  vendor            VendorApplication   @relation(fields: [vendorId], references: [id])
+  withdrawals       WithdrawalRequest[]
+  walletTransaction WalletTransaction[]
 }
 
 model WithdrawalRequest {
@@ -419,7 +434,9 @@ model WalletTransaction {
   remark    String?
   createdAt DateTime @default(now())
 
-  vendor VendorApplication @relation(fields: [vendorId], references: [id])
+  vendor         VendorApplication @relation(fields: [vendorId], references: [id])
+  vendorWallet   VendorWallet?     @relation(fields: [vendorWalletId], references: [id])
+  vendorWalletId String?
 }
 
 model VendorBank {

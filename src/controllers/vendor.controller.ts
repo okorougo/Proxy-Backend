@@ -41,6 +41,16 @@ function haversineDistance(
   return R * c; // distance in km
 }
 
+/**
+ * Generate a 4-digit OTP as a string (leading zeros allowed)
+ */
+function generateOtp(): string {
+  return Math.floor(10000 * Math.random())
+    .toString()
+    .padStart(4, "0")
+    .slice(-4);
+}
+
 // User applies to become vendor
 export const applyVendor = async (req: Request, res: Response) => {
   try {
@@ -662,10 +672,14 @@ export const createMultiVendorOrder = async (
           }))
         );
 
+        // generate OTP for digital delivery (if any downstream logic needs it)
+        const otp = generateOtp();
+
         delivery = await prisma.delivery.create({
           data: {
             orderId: order.id,
             transactionId: transaction.id,
+            OTP: otp,
             pickupAddress: "Digital Delivery",
             pickupLat: 0,
             pickupLng: 0,
@@ -677,7 +691,7 @@ export const createMultiVendorOrder = async (
             status: "DELIVERED",
             isDigital: true,
             digitalFiles: JSON.stringify(digitalFiles),
-          },
+          } as any,
         });
 
         // mark order as delivered since digital
@@ -693,7 +707,7 @@ export const createMultiVendorOrder = async (
           where: { vendorId },
         });
 
-        if (vendorLocation) {
+          if (vendorLocation) {
           const distanceKm = haversineDistance(
             vendorLocation.lat,
             vendorLocation.lng,
@@ -706,11 +720,15 @@ export const createMultiVendorOrder = async (
           const fareAmount = Math.round(
             BASE_FARE + distanceKm * RATE_PER_KM + SERVICE_FEE
           );
+          
+          // generate OTP for the physical delivery
+          const otp = generateOtp();
 
           delivery = await prisma.delivery.create({
             data: {
               orderId: order.id,
               transactionId: transaction.id,
+              OTP: otp,
               pickupAddress: vendorLocation.Address ?? "Vendor address",
               pickupLat: vendorLocation.lat,
               pickupLng: vendorLocation.lng,
@@ -721,7 +739,7 @@ export const createMultiVendorOrder = async (
               fareAmount,
               status: "PENDING",
               isDigital: false,
-            },
+            } as any,
           });
 
           // Update order total

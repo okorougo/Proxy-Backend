@@ -3,7 +3,7 @@ import prisma from "../lib/prisma";
 import { AuthRequest } from "../middleware/auth";
 import { uploadToCloudinary } from "../lib/cloudinary";
 import { errorResponse, successResponse } from "../utils/response";
-import {io} from "../server"
+import { io } from "../server";
 import { sendExpo, sendFcm } from "../lib/notifications";
 
 /** 🧍 Rider Registration */
@@ -16,16 +16,16 @@ export const registerRider = async (req: AuthRequest, res: Response) => {
       return errorResponse(res, "Phone and vehicle type are required");
 
     const user = await prisma.user.findUnique({
-        where:{id: userId}
-    })
+      where: { id: userId },
+    });
 
-    if(!user){
-        errorResponse(res, "User not found")
+    if (!user) {
+      errorResponse(res, "User not found");
     }
 
     const rider = await prisma.rider.upsert({
       where: { userId },
-      update: {fullName, vehicleType,dateOfBirth },
+      update: { fullName, vehicleType, dateOfBirth },
       create: {
         userId: user?.id as string,
         phone: user?.phone as string,
@@ -48,34 +48,59 @@ export const uploadRiderVehicle = async (req: AuthRequest, res: Response) => {
   try {
     const { brand, model, plateNumber } = req.body;
     const userId = req.user?.id;
-        const user = await prisma.user.findUnique({
-      where:{id: userId},
-      include:{
-        rider: true
-      }
-    })
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        rider: true,
+      },
+    });
 
-    if(!user) return errorResponse(res, "User not found")
+    if (!user) return errorResponse(res, "User not found");
 
-    const rider = await prisma.rider.findUnique({ where: { id: user.rider?.id } });
+    const rider = await prisma.rider.findUnique({
+      where: { id: user.rider?.id },
+    });
 
     if (!rider) return errorResponse(res, "Rider not found");
 
-    const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
+    const files = req.files as
+      | { [fieldname: string]: Express.Multer.File[] }
+      | undefined;
 
     const uploadFile = async (f: Express.Multer.File, folder: string) => {
       const uploaded = await uploadToCloudinary(f.buffer, folder);
       return uploaded.secure_url;
     };
 
-    const frontViewUrl = files?.frontView ? await uploadFile(files.frontView[0], "riders/vehicles/front") : undefined;
-    const backViewUrl = files?.backView ? await uploadFile(files.backView[0], "riders/vehicles/back") : undefined;
-    const documentUrl = files?.document ? await uploadFile(files.document[0], "riders/vehicles/docs") : undefined;
+    const frontViewUrl = files?.frontView
+      ? await uploadFile(files.frontView[0], "riders/vehicles/front")
+      : undefined;
+    const backViewUrl = files?.backView
+      ? await uploadFile(files.backView[0], "riders/vehicles/back")
+      : undefined;
+    const documentUrl = files?.document
+      ? await uploadFile(files.document[0], "riders/vehicles/docs")
+      : undefined;
 
     const vehicle = await prisma.riderVehicle.upsert({
       where: { riderId: rider.id },
-      update: { brand, model, plateNumber, frontViewUrl, backViewUrl, documentUrl },
-      create: { riderId: rider.id, brand, model, plateNumber, frontViewUrl, backViewUrl, documentUrl },
+      update: {
+        brand,
+        model,
+        plateNumber,
+        frontViewUrl,
+        backViewUrl,
+        documentUrl,
+      },
+      create: {
+        riderId: rider.id,
+        brand,
+        model,
+        plateNumber,
+        frontViewUrl,
+        backViewUrl,
+        documentUrl,
+      },
     });
 
     return successResponse(res, "Vehicle details uploaded", vehicle);
@@ -91,36 +116,61 @@ export const uploadRiderKyc = async (req: AuthRequest, res: Response) => {
     const { ninNumber, idType } = req.body;
     const userId = req.user?.id;
     const user = await prisma.user.findUnique({
-      where:{id: userId},
-      include:{
-        rider: true
-      }
-    })
+      where: { id: userId },
+      include: {
+        rider: true,
+      },
+    });
 
-    if(!user) return errorResponse(res, "User not found")
+    if (!user) return errorResponse(res, "User not found");
 
-    const rider = await prisma.rider.findUnique({ where: { id: user.rider?.id } });
+    const rider = await prisma.rider.findUnique({
+      where: { id: user.rider?.id },
+    });
 
     if (!rider) return errorResponse(res, "Rider not found");
 
-    const files = req.files as { [key: string]: Express.Multer.File[] } | undefined;
+    const files = req.files as
+      | { [key: string]: Express.Multer.File[] }
+      | undefined;
 
     const uploadFile = async (f: Express.Multer.File, folder: string) => {
       const uploaded = await uploadToCloudinary(f.buffer, folder);
       return uploaded.secure_url;
     };
 
-    const selfieUrl = files?.selfie ? await uploadFile(files.selfie[0], "riders/kyc/selfies") : undefined;
-    const idCardUrl = files?.idCard ? await uploadFile(files.idCard[0], "riders/kyc/idcards") : undefined;
-    const licenseUrl = files?.license ? await uploadFile(files.license[0], "riders/kyc/license") : undefined;
+    const selfieUrl = files?.selfie
+      ? await uploadFile(files.selfie[0], "riders/kyc/selfies")
+      : undefined;
+    const idCardUrl = files?.idCard
+      ? await uploadFile(files.idCard[0], "riders/kyc/idcards")
+      : undefined;
+    const licenseUrl = files?.license
+      ? await uploadFile(files.license[0], "riders/kyc/license")
+      : undefined;
     const roadWorthinessUrl = files?.roadWorthiness
       ? await uploadFile(files.roadWorthiness[0], "riders/kyc/roadworthiness")
       : undefined;
 
     const kyc = await prisma.riderKyc.upsert({
       where: { riderId: rider.id },
-      update: { ninNumber, idType, selfieUrl, idCardUrl, licenseUrl, roadWorthinessUrl },
-      create: { riderId: rider.id, ninNumber, idType, selfieUrl, idCardUrl, licenseUrl, roadWorthinessUrl },
+      update: {
+        ninNumber,
+        idType,
+        selfieUrl,
+        idCardUrl,
+        licenseUrl,
+        roadWorthinessUrl,
+      },
+      create: {
+        riderId: rider.id,
+        ninNumber,
+        idType,
+        selfieUrl,
+        idCardUrl,
+        licenseUrl,
+        roadWorthinessUrl,
+      },
     });
 
     return successResponse(res, "KYC uploaded successfully", kyc);
@@ -135,16 +185,16 @@ export const getMyRiderProfile = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     const user = await prisma.user.findUnique({
-      where:{id:userId},
-      include:{
-        rider:true
-      }
-    })
+      where: { id: userId },
+      include: {
+        rider: true,
+      },
+    });
     if (!user) return errorResponse(res, "User profile not found");
 
     const rider = await prisma.rider.findUnique({
       where: { userId },
-      include: { vehicle: true, kyc: true, },
+      include: { vehicle: true, kyc: true },
     });
 
     if (!rider) return errorResponse(res, "Rider profile not found");
@@ -180,7 +230,8 @@ export const updateRiderLocation = async (req: AuthRequest, res: Response) => {
     const userId = req.user?.id;
     const { lat, lng } = req.body;
 
-    if (!lat || !lng) return errorResponse(res, "Latitude and longitude required");
+    if (!lat || !lng)
+      return errorResponse(res, "Latitude and longitude required");
     const rider = await prisma.rider.findUnique({ where: { userId } });
     if (!rider) return errorResponse(res, "Rider profile not found");
     const riderId = rider.id;
@@ -237,7 +288,12 @@ export const getNearbyRiders = async (req: AuthRequest, res: Response) => {
 
     const allRiders = await prisma.rider.findMany({
       where: { isOnline: true },
-      select: { id: true, currentLat: true, currentLng: true, user: { select: { name: true } } },
+      select: {
+        id: true,
+        currentLat: true,
+        currentLng: true,
+        user: { select: { name: true } },
+      },
     });
 
     const nearby = allRiders.filter((r) => {
@@ -250,7 +306,7 @@ export const getNearbyRiders = async (req: AuthRequest, res: Response) => {
       );
       return dist <= Number(radiusKm);
     });
-    
+
     return successResponse(res, "Nearby riders", nearby);
   } catch (err) {
     console.error("getNearbyRiders error:", err);
@@ -259,7 +315,12 @@ export const getNearbyRiders = async (req: AuthRequest, res: Response) => {
 };
 
 // 🧮 Haversine utility
-function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
+function haversineDistance(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+) {
   const R = 6371;
   const dLat = (lat2 - lat1) * (Math.PI / 180);
   const dLon = (lon2 - lon1) * (Math.PI / 180);
@@ -278,26 +339,29 @@ export const acceptDelivery = async (req: Request, res: Response) => {
     const userId = req.user?.id; // from auth middleware
     const { deliveryId } = req.params;
 
-
     const rider = await prisma.rider.findUnique({ where: { userId } });
     if (!rider) return errorResponse(res, "Rider profile not found");
     const riderId = rider.id;
 
     const delivery = await prisma.delivery.findUnique({
       where: { id: deliveryId },
-      include: { order: {
-        include:{
-          user: true, 
-          vendor: {
-            include:{
-              user:true
-            }
-          }
-        }
-      }, rider:true },
+      include: {
+        order: {
+          include: {
+            user: true,
+            vendor: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        },
+        rider: true,
+      },
     });
 
-    if (!delivery) return errorResponse(res, "Delivery not found", "NOT_FOUND", 404);
+    if (!delivery)
+      return errorResponse(res, "Delivery not found", "NOT_FOUND", 404);
 
     if (delivery.status !== "SEARCH_OF_RIDER") {
       return errorResponse(res, "This delivery has already been taken");
@@ -314,11 +378,11 @@ export const acceptDelivery = async (req: Request, res: Response) => {
     });
 
     const order = await prisma.order.update({
-      where: {id: updated.orderId},
-      data:{
-        status: ""
-      }
-    })
+      where: { id: updated.orderId },
+      data: {
+        status: "",
+      },
+    });
 
     // broadcast to vendor + user
     io.to(delivery.order.userId).emit("rider_assigned", {
@@ -335,9 +399,17 @@ export const acceptDelivery = async (req: Request, res: Response) => {
       },
     });
 
-      const sessions = await prisma.session.findMany({ where: { userId: delivery.order.userId, deviceToken: { not: null } } });
+    const sessions = await prisma.session.findMany({
+      where: { userId: delivery.order.userId, deviceToken: { not: null } },
+    });
     for (const s of sessions) {
-      if (s.devicePlatform === "expo") await sendExpo(s.deviceToken!, "Delivery Update", `Your delivery is now Accepted and it will be out for Transit`, { type: "delivery_status", status: "Accepted" });
+      if (s.devicePlatform === "expo")
+        await sendExpo(
+          s.deviceToken!,
+          "Delivery Update",
+          `Your delivery is now Accepted and it will be out for Transit`,
+          { type: "delivery_status", status: "Accepted" }
+        );
     }
 
     return successResponse(res, "Rider assigned successfully", updated);
@@ -351,18 +423,22 @@ export const approveRiderKyc = async (req: AuthRequest, res: Response) => {
     const { userId } = req.params;
     if (!userId) return errorResponse(res, "userId is required");
 
-    const kyc = await prisma.riderKyc.findUnique({ where: { riderId:userId }, include:{
-      rider:{
-        include:{
-          user:true
-        }
-      }
-    } });
-    if (!kyc) return errorResponse(res, "KYC record not found", "NOT_FOUND", 404);
+    const kyc = await prisma.riderKyc.findUnique({
+      where: { riderId: userId },
+      include: {
+        rider: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+    if (!kyc)
+      return errorResponse(res, "KYC record not found", "NOT_FOUND", 404);
 
     // update KYC status
     const updated = await prisma.riderKyc.update({
-      where: { riderId:userId },
+      where: { riderId: userId },
       data: { status: "APPROVED" },
     });
 
@@ -374,10 +450,24 @@ export const approveRiderKyc = async (req: AuthRequest, res: Response) => {
 
     // notify via socket + push
     // socket: send to sessions of that user
-    const sessions = await prisma.session.findMany({ where: { userId, deviceToken: { not: null } } });
+    const sessions = await prisma.session.findMany({
+      where: { userId, deviceToken: { not: null } },
+    });
     for (const s of sessions) {
-      if (s.devicePlatform === "expo") await sendExpo(s.deviceToken!, "KYC Approved", "Your KYC has been approved", { type: "kyc", status: "APPROVED" });
-      else await sendFcm(s.deviceToken!, "KYC Approved", "Your KYC has been approved", { type: "kyc", status: "APPROVED" });
+      if (s.devicePlatform === "expo")
+        await sendExpo(
+          s.deviceToken!,
+          "KYC Approved",
+          "Your KYC has been approved",
+          { type: "kyc", status: "APPROVED" }
+        );
+      else
+        await sendFcm(
+          s.deviceToken!,
+          "KYC Approved",
+          "Your KYC has been approved",
+          { type: "kyc", status: "APPROVED" }
+        );
     }
 
     return successResponse(res, "KYC approved", updated);
@@ -393,18 +483,25 @@ export const rejectRiderKyc = async (req: AuthRequest, res: Response) => {
     const { reason } = req.body;
     if (!userId) return errorResponse(res, "userId is required");
 
-        const kyc = await prisma.riderKyc.findUnique({ where: { riderId:userId }, include:{
-      rider:{
-        include:{
-          user:true
-        }
-      }
-    } });
-    if (!kyc) return errorResponse(res, "KYC record not found", "NOT_FOUND", 404);
+    const kyc = await prisma.riderKyc.findUnique({
+      where: { riderId: userId },
+      include: {
+        rider: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+    if (!kyc)
+      return errorResponse(res, "KYC record not found", "NOT_FOUND", 404);
 
     const updated = await prisma.riderKyc.update({
-      where: { riderId:userId },
-      data: { status: "REJECTED", rejectionNote: reason ?? "Rejected by admin" },
+      where: { riderId: userId },
+      data: {
+        status: "REJECTED",
+        rejectionNote: reason ?? "Rejected by admin",
+      },
     });
 
     // set user.isKycVerified false
@@ -414,10 +511,24 @@ export const rejectRiderKyc = async (req: AuthRequest, res: Response) => {
     });
 
     // notify sessions
-    const sessions = await prisma.session.findMany({ where: { userId, deviceToken: { not: null } } });
+    const sessions = await prisma.session.findMany({
+      where: { userId, deviceToken: { not: null } },
+    });
     for (const s of sessions) {
-      if (s.devicePlatform === "expo") await sendExpo(s.deviceToken!, "KYC Rejected", reason ?? "KYC was rejected", { type: "kyc", status: "REJECTED" });
-      else await sendFcm(s.deviceToken!, "KYC Rejected", reason ?? "KYC was rejected", { type: "kyc", status: "REJECTED" });
+      if (s.devicePlatform === "expo")
+        await sendExpo(
+          s.deviceToken!,
+          "KYC Rejected",
+          reason ?? "KYC was rejected",
+          { type: "kyc", status: "REJECTED" }
+        );
+      else
+        await sendFcm(
+          s.deviceToken!,
+          "KYC Rejected",
+          reason ?? "KYC was rejected",
+          { type: "kyc", status: "REJECTED" }
+        );
     }
 
     return successResponse(res, "KYC rejected", updated);
@@ -433,34 +544,54 @@ export const approveRiderAccount = async (req: AuthRequest, res: Response) => {
     if (!userId) return errorResponse(res, "userId required");
 
     // ensure KYC is approved (optional rule)
-        const kyc = await prisma.riderKyc.findUnique({ where: { riderId:userId }, include:{
-      rider:{
-        include:{
-          user:true
-        }
-      }
-    } });
+    const kyc = await prisma.riderKyc.findUnique({
+      where: { riderId: userId },
+      include: {
+        rider: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
     if (kyc && kyc.status !== "APPROVED") {
       // You may only want to allow created rider if KYC approved; adjust per your policy
-      return errorResponse(res, "KYC must be approved before approving rider account");
+      return errorResponse(
+        res,
+        "KYC must be approved before approving rider account"
+      );
     }
 
     // upsert Rider profile
     const rider = await prisma.rider.update({
       where: { id: kyc?.riderId },
-      data:{
+      data: {
         status: "APPROVED",
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
 
     // set the user's role to RIDER
 
     // notify rider via socket/push
-    const sessions = await prisma.session.findMany({ where: { userId, deviceToken: { not: null } } });
+    const sessions = await prisma.session.findMany({
+      where: { userId, deviceToken: { not: null } },
+    });
     for (const s of sessions) {
-      if (s.devicePlatform === "expo") await sendExpo(s.deviceToken!, "Rider Approved", "Your rider account has been approved", { type: "rider", status: "APPROVED" });
-      else await sendFcm(s.deviceToken!, "Rider Approved", "Your rider account has been approved", { type: "rider", status: "APPROVED" });
+      if (s.devicePlatform === "expo")
+        await sendExpo(
+          s.deviceToken!,
+          "Rider Approved",
+          "Your rider account has been approved",
+          { type: "rider", status: "APPROVED" }
+        );
+      else
+        await sendFcm(
+          s.deviceToken!,
+          "Rider Approved",
+          "Your rider account has been approved",
+          { type: "rider", status: "APPROVED" }
+        );
     }
 
     return successResponse(res, "Rider approved", rider);
@@ -469,7 +600,6 @@ export const approveRiderAccount = async (req: AuthRequest, res: Response) => {
     return errorResponse(res, "Failed to approve rider account");
   }
 };
-
 
 export const rejectRiderAccount = async (req: AuthRequest, res: Response) => {
   try {
@@ -480,14 +610,31 @@ export const rejectRiderAccount = async (req: AuthRequest, res: Response) => {
     // set Rider.isApproved = false (if exists), else create with false
     const rider = await prisma.rider.update({
       where: { userId },
-      data: { status: "REJECTED", updatedAt: new Date(), rejectionNote: reason || "" },
+      data: {
+        status: "REJECTED",
+        updatedAt: new Date(),
+        rejectionNote: reason || "",
+      },
     });
 
-
-    const sessions = await prisma.session.findMany({ where: { userId, deviceToken: { not: null } } });
+    const sessions = await prisma.session.findMany({
+      where: { userId, deviceToken: { not: null } },
+    });
     for (const s of sessions) {
-      if (s.devicePlatform === "expo") await sendExpo(s.deviceToken!, "Rider Rejected", reason ?? "Your rider application was rejected", { type: "rider", status: "REJECTED" });
-      else await sendFcm(s.deviceToken!, "Rider Rejected", reason ?? "Your rider application was rejected", { type: "rider", status: "REJECTED" });
+      if (s.devicePlatform === "expo")
+        await sendExpo(
+          s.deviceToken!,
+          "Rider Rejected",
+          reason ?? "Your rider application was rejected",
+          { type: "rider", status: "REJECTED" }
+        );
+      else
+        await sendFcm(
+          s.deviceToken!,
+          "Rider Rejected",
+          reason ?? "Your rider application was rejected",
+          { type: "rider", status: "REJECTED" }
+        );
     }
 
     return successResponse(res, "Rider rejected", rider);
@@ -501,22 +648,26 @@ export const updateDeliveryStatus = async (req: AuthRequest, res: Response) => {
     const riderId = req.user?.id;
     const { deliveryId, status } = req.body;
 
-    if (!["PICKED_UP", "IN_TRANSIT", "DELIVERED", "CANCELLED"].includes(status)) {
+    if (
+      !["PICKED_UP", "IN_TRANSIT", "DELIVERED", "CANCELLED"].includes(status)
+    ) {
       return errorResponse(res, "Invalid status");
     }
 
     const delivery = await prisma.delivery.findUnique({
       where: { id: deliveryId },
-      include: { order: {
-        include:{
-          user:true,
-          vendor:{
-            include:{
-              user: true
-            }
-          }
-        }
-      } },
+      include: {
+        order: {
+          include: {
+            user: true,
+            vendor: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!delivery) return errorResponse(res, "Delivery not found");
@@ -539,13 +690,32 @@ export const updateDeliveryStatus = async (req: AuthRequest, res: Response) => {
 
     // 📨 Optionally send push notification
 
-    const sessions = await prisma.session.findMany({ where: { userId: delivery.order.userId, deviceToken: { not: null } } });
+    const sessions = await prisma.session.findMany({
+      where: { userId: delivery.order.userId, deviceToken: { not: null } },
+    });
     for (const s of sessions) {
-      if (s.devicePlatform === "expo") await sendExpo(s.deviceToken!, "Delivery Update", `Your delivery is now: ${status}`, { type: "delivery_status", status });
+      if (s.devicePlatform === "expo")
+        await sendExpo(
+          s.deviceToken!,
+          "Delivery Update",
+          `Your delivery is now: ${status}`,
+          { type: "delivery_status", status }
+        );
     }
-    const vendorSessions = await prisma.session.findMany({ where: { userId: delivery.order.vendor.user.id, deviceToken: { not: null } } });
+    const vendorSessions = await prisma.session.findMany({
+      where: {
+        userId: delivery.order.vendor.user.id,
+        deviceToken: { not: null },
+      },
+    });
     for (const s of vendorSessions) {
-      if (s.devicePlatform === "expo") await sendExpo(s.deviceToken!, `Delivery Update for order # ${(delivery.order.id).slice(0, 6) }`, `This order is now: ${status}`, { type: "delivery_status", status });
+      if (s.devicePlatform === "expo")
+        await sendExpo(
+          s.deviceToken!,
+          `Delivery Update for order # ${delivery.order.id.slice(0, 6)}`,
+          `This order is now: ${status}`,
+          { type: "delivery_status", status }
+        );
     }
     // sendFcm() or sendExpo() here...
 
@@ -566,7 +736,7 @@ export const markArrivalAtPickup = async (req: AuthRequest, res: Response) => {
     const delivery = await prisma.delivery.update({
       where: { id: deliveryId, riderId: rider.id },
       data: { status: "PICKED_UP", startedAt: new Date() },
-      include:{order: true}
+      include: { order: true },
     });
 
     io.to(delivery.order.userId).emit("delivery_update", {
@@ -576,14 +746,18 @@ export const markArrivalAtPickup = async (req: AuthRequest, res: Response) => {
     });
 
     const sessions = await prisma.session.findMany({
-      where: { userId: delivery.order.userId , deviceToken: { not: null } }
-    })
-     for (const s of sessions) {
+      where: { userId: delivery.order.userId, deviceToken: { not: null } },
+    });
+    for (const s of sessions) {
       if (s.devicePlatform === "expo") {
-        await sendExpo(s.deviceToken!, "Delivery Update", `Your delivery has been picked up and is on the way`, { type: "delivery_status", status: "PICKED_UP" });
+        await sendExpo(
+          s.deviceToken!,
+          "Delivery Update",
+          `Your delivery has been picked up and is on the way`,
+          { type: "delivery_status", status: "PICKED_UP" }
+        );
       }
     }
-
 
     return successResponse(res, "Marked as arrived", delivery);
   } catch (err) {
@@ -601,11 +775,10 @@ export const startDelivery = async (req: AuthRequest, res: Response) => {
 
     const delivery = await prisma.delivery.update({
       where: { id: deliveryId, riderId: rider.id },
-      data: { status: "IN_TRANSIT", startedAt: new Date(),
-       },
-       include:{
-        order:true
-       }
+      data: { status: "IN_TRANSIT", startedAt: new Date() },
+      include: {
+        order: true,
+      },
     });
 
     io.to(delivery.order.userId).emit("delivery_update", {
@@ -613,7 +786,7 @@ export const startDelivery = async (req: AuthRequest, res: Response) => {
       status: "IN_TRANSIT",
       message: "Delivery is now in transit",
     });
-        io.to(delivery.order.userId).emit("delivery_in_transit", { deliveryId });
+    io.to(delivery.order.userId).emit("delivery_in_transit", { deliveryId });
     io.to(delivery.order.vendorId).emit("delivery_in_transit", { deliveryId });
 
     return successResponse(res, "Delivery started", delivery);
@@ -641,19 +814,46 @@ export const completeDelivery = async (req: Request, res: Response) => {
     const updated = await prisma.delivery.update({
       where: { id: deliveryId },
       data: { status: "DELIVERED", completedAt: new Date() },
-      include: { order: true },
+      include: { order: {
+        include:{
+          transaction:true
+        }
+      } },
+    });
+    await prisma.vendorWallet.update({
+      where: { vendorId: updated.order.vendorId },
+      data: {
+        balance: { increment: updated.order.transaction?.amountPaid || 0 },
+        totalEarned: { increment: updated.order.transaction?.amountPaid || 0 },
+        walletTransaction: {
+          create: {
+            amount: updated.order.transaction?.amountPaid || 0,
+            type: "CREDIT",
+            remark: `Order ${updated.order.id} completed`,
+            vendorId: updated.order.vendorId,
+          },
+        },
+      },
     });
 
     // Notify user and vendor
     io.to(updated.order.userId).emit("delivery_completed", { deliveryId });
     io.to(updated.order.vendorId).emit("delivery_completed", { deliveryId });
 
-       const sessions = await prisma.session.findMany({ where: { userId, deviceToken: { not: null } } });
+    const sessions = await prisma.session.findMany({
+      where: { userId, deviceToken: { not: null } },
+    });
     for (const s of sessions) {
-      if (s.devicePlatform === "expo") await sendExpo(s.deviceToken!, "Order Delivered", ` your order #${(updated.orderId).toString().slice(0,6)} has been delivered to you`, { type: "Order", status: "DELIVERED" });
+      if (s.devicePlatform === "expo")
+        await sendExpo(
+          s.deviceToken!,
+          "Order Delivered",
+          ` your order #${updated.orderId
+            .toString()
+            .slice(0, 6)} has been delivered to you`,
+          { type: "Order", status: "DELIVERED" }
+        );
     }
-
-
 
     return successResponse(res, "Delivery completed successfully", updated);
   } catch (error) {
@@ -672,19 +872,18 @@ export const getActiveDeliveries = async (req: Request, res: Response) => {
         riderId: rider.id,
         status: { in: ["ACCEPTED", "IN_TRANSIT", "PICKED_UP"] },
       },
-      include: { 
-        rider:{
-          include:{
-            kyc:true,
-            vehicle:true,
-            user:true
-          }
+      include: {
+        rider: {
+          include: {
+            kyc: true,
+            vehicle: true,
+            user: true,
+          },
         },
         order: {
           include: {
             vendor: { include: { user: true } },
             user: true,
-
           },
         },
       },
@@ -720,45 +919,46 @@ export const getRiderDeliveryHistory = async (req: Request, res: Response) => {
       orderBy: { completedAt: "desc" },
     });
 
-    return successResponse(res, "Delivery history fetched successfully", deliveries);
+    return successResponse(
+      res,
+      "Delivery history fetched successfully",
+      deliveries
+    );
   } catch (error) {
     console.error("getRiderDeliveryHistory error:", error);
     return errorResponse(res, "Failed to fetch rider delivery history");
   }
 };
-export const getSingleRiderDelivery = async(req:Request, res:Response) =>{
+export const getSingleRiderDelivery = async (req: Request, res: Response) => {
   try {
-    const {deliveryId}= req.params;
-    if(!deliveryId) return errorResponse(res, "Delivery id not found");
-    
+    const { deliveryId } = req.params;
+    if (!deliveryId) return errorResponse(res, "Delivery id not found");
+
     const delivery = await prisma.delivery.findUnique({
-      where:{id:deliveryId},
-      include:{
-        order:{
-          include:{
+      where: { id: deliveryId },
+      include: {
+        order: {
+          include: {
             user: true,
-            vendor:{
-              include:{
-                user:{
-                  include:{
-                    kycDocument:true,
-                    vendorApplication: true
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+            vendor: {
+              include: {
+                user: {
+                  include: {
+                    kycDocument: true,
+                    vendorApplication: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
-    
-    if (!delivery) return errorResponse(res, "Delivery not found")
 
-    return successResponse(res, "Delivery fetched succesfully", delivery)
- 
-    
+    if (!delivery) return errorResponse(res, "Delivery not found");
+
+    return successResponse(res, "Delivery fetched succesfully", delivery);
   } catch (error) {
-        return errorResponse(res, "Failed to fetch delivery");
+    return errorResponse(res, "Failed to fetch delivery");
   }
-
-}
+};
