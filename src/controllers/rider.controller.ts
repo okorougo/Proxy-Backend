@@ -826,6 +826,9 @@ export const completeDelivery = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
     const { deliveryId } = req.params;
+    const { otp } = req.body;
+
+    if (!otp) return errorResponse(res, "OTP is required to complete delivery");
 
     const rider = await prisma.rider.findUnique({ where: { userId } });
     if (!rider) return errorResponse(res, "Rider not found");
@@ -840,7 +843,7 @@ export const completeDelivery = async (req: Request, res: Response) => {
 
     const updated = await prisma.delivery.update({
       where: { id: deliveryId },
-      data: { status: "DELIVERED", completedAt: new Date() },
+      data: { status: "DELIVERED", completedAt: new Date(), OTP: null },
       include: { order: {
         include:{
           transaction:true

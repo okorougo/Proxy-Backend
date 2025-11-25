@@ -687,7 +687,7 @@ export const createMultiVendorOrder = async (
           data: {
             orderId: order.id,
             transactionId: transaction.id,
-            OTP: otp,
+            OTP: null,
             pickupAddress: "Digital Delivery",
             pickupLat: 0,
             pickupLng: 0,

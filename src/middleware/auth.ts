@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import prisma from "../lib/prisma";
+import { errorResponse } from "../utils/response";
 
 export interface AuthRequest extends Request {
   user?: { id: string; email: string; role: string };
@@ -8,10 +9,10 @@ export interface AuthRequest extends Request {
 
 export async function authMiddleware(req: AuthRequest, res: Response, next: NextFunction) {
   const header = req.headers.authorization;
-  if (!header) return res.status(401).json({ error: "Authorization header missing" });
+  if (!header) return errorResponse(res, "Authorization header missing", null, 401);
 
   const token = header.split(" ")[1];
-  if (!token) return res.status(401).json({ error: "Token missing" });
+  if (!token) return errorResponse(res, "Token missing", null, 401);
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET!) as { id: string; email: string; role: string };
@@ -19,13 +20,11 @@ export async function authMiddleware(req: AuthRequest, res: Response, next: Next
       where: { id: payload?.id }
     });
      if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      errorResponse(res, "User not found", null, 404);
     }
 
     if (user.isBanned) {
-      return res.status(403).json({
-        message: "Account banned",
-      });
+      errorResponse(res, "User is banned", null, 403);
     }
     req.user = payload;  // ✅ This is where req.user.id comes from
     next();
