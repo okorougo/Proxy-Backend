@@ -283,6 +283,7 @@ export const getCategories = async (req: AuthRequest, res: Response) => {
   try {
     const categories = await prisma.category.findMany({
       orderBy: { createdAt: "desc" },
+      include: { subCategories: true }, // optional: include sub-categories
     });
     res.json({ categories });
   } catch (err) {
@@ -290,6 +291,106 @@ export const getCategories = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: "Failed to fetch categories" });
   }
 };
+
+export const updateSubCategory = async (req: AuthRequest, res: Response) => {
+  try {
+    if (req.user?.role !== "ADMIN") {
+      return res.status(403).json({ error: "Only admin can update sub-categories" });
+    }
+
+    const { id } = req.params;
+    const { name, description, categoryId } = req.body;
+
+    const subCategory = await prisma.subCategory.findUnique({ where: { id } });
+    if (!subCategory) return res.status(404).json({ error: "Sub-category not found" });
+
+
+    const updated = await prisma.subCategory.update({
+      where: { id },
+      data: {
+        name: name || subCategory.name,
+        description: description || subCategory.description,
+        categoryId: categoryId || subCategory.categoryId,
+      },
+    });
+
+    res.json({ message: "Sub-category updated successfully", subCategory: updated });
+  } catch (err) {
+    console.error("updateSubCategory error:", err);
+    res.status(500).json({ error: "Failed to update sub-category" });
+  }
+};
+
+// Delete Sub-Category
+export const deleteSubCategory = async (req: AuthRequest, res: Response) => {
+  try {
+    if (req.user?.role !== "ADMIN") {
+      return res.status(403).json({ error: "Only admin can delete sub-categories" });
+    }
+
+    const { id } = req.params;
+
+    const subCategory = await prisma.subCategory.findUnique({ where: { id } });
+    if (!subCategory) return res.status(404).json({ error: "Sub-category not found" });
+
+    const listingCount = await prisma.listing.count({ where: { subCategoryId: id } });
+    if (listingCount > 0) {
+      return res.status(400).json({ error: "Cannot delete sub-category with existing listings" });
+    }
+
+    await prisma.subCategory.delete({ where: { id } });
+
+    res.json({ message: "Sub-category deleted successfully" });
+  } catch (err) {
+    console.error("deleteSubCategory error:", err);
+    res.status(500).json({ error: "Failed to delete sub-category" });
+  }
+};
+
+// Get Sub-Categories
+export const getSubCategories = async (req: AuthRequest, res: Response) => {
+  try {
+    const subCategories = await prisma.subCategory.findMany({
+      include: { category: true }, // optional: include parent category
+      orderBy: { createdAt: "desc" },
+    });
+    res.json({ subCategories });
+  } catch (err) {
+    console.error("getSubCategories error:", err);
+    res.status(500).json({ error: "Failed to fetch sub-categories" });
+  }
+};
+export const createSubCategory = async (req: AuthRequest, res: Response) => {
+  try {
+    if (req.user?.role !== "ADMIN") {
+      return res.status(403).json({ error: "Only admin can create sub-categories" });
+    }
+
+    const { name, description, categoryId } = req.body;
+    if (!name) return res.status(400).json({ error: "Sub-category name is required" });
+    if (!categoryId) return res.status(400).json({ error: "Parent categoryId is required" });
+
+    // Check if parent category exists
+    const parentCategory = await prisma.category.findUnique({ where: { id: categoryId } });
+    if (!parentCategory) return res.status(404).json({ error: "Parent category not found" });
+
+    // Check if sub-category already exists under this category
+    const exists = await prisma.subCategory.findFirst({ 
+      where: { name, categoryId }
+    });
+    if (exists) return res.status(409).json({ error: "Sub-category already exists under this category" });
+
+    const subCategory = await prisma.subCategory.create({
+      data: { name, description, categoryId },
+    });
+
+    res.status(201).json({ message: "Sub-category created successfully", subCategory });
+  } catch (err) {
+    console.error("createSubCategory error:", err);
+    res.status(500).json({ error: "Failed to create sub-category" });
+  }
+};
+
 export const updateCategory = async (req: AuthRequest, res: Response) => {
   try {
     if (req.user?.role !== "ADMIN") {

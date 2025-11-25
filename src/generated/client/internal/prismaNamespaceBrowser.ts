@@ -53,6 +53,7 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   Category: 'Category',
+  SubCategory: 'SubCategory',
   VendorApplication: 'VendorApplication',
   KycVerification: 'KycVerification',
   Listing: 'Listing',
@@ -129,6 +130,18 @@ export const CategoryScalarFieldEnum = {
 export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
 
 
+export const SubCategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  categoryId: 'categoryId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SubCategoryScalarFieldEnum = (typeof SubCategoryScalarFieldEnum)[keyof typeof SubCategoryScalarFieldEnum]
+
+
 export const VendorApplicationScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -172,6 +185,7 @@ export const ListingScalarFieldEnum = {
   updatedAt: 'updatedAt',
   status: 'status',
   categoryId: 'categoryId',
+  subCategoryId: 'subCategoryId',
   extraDetails: 'extraDetails',
   rejectionNote: 'rejectionNote'
 } as const
@@ -350,6 +364,7 @@ export type ReviewScalarFieldEnum = (typeof ReviewScalarFieldEnum)[keyof typeof 
 export const DeliveryScalarFieldEnum = {
   id: 'id',
   transactionId: 'transactionId',
+  OTP: 'OTP',
   riderId: 'riderId',
   orderId: 'orderId',
   pickupLat: 'pickupLat',

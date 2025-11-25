@@ -637,7 +637,15 @@ export const createMultiVendorOrder = async (
             },
             include: {
               listings: { include: { listing: { include: { media: true } } } },
-              vendor: true,
+              vendor: {
+                include:{
+                  user:{
+                    include:{
+                      Session:true
+                    }
+                  }
+                }
+              },
               user: true,
             },
           }),
@@ -749,6 +757,16 @@ export const createMultiVendorOrder = async (
           });
         }
       }
+      // Notify vendor of new order (could be via email, push, etc.) - omitted for brevity
+      await sendExpo(
+        order.vendor.user.Session[0]?.deviceToken as string,
+        "New Order Received",
+        `You have received a new order (#${(order.id).slice(0,6)}) from ${order.user.name}.`,
+        {
+          type: "new_order",
+          orderId: (order.id).slice(0,6),
+        }
+      );
 
       results.push({ order, transaction, delivery });
     }

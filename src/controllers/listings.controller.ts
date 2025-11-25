@@ -19,6 +19,7 @@ export const createListing = async (req: AuthRequest, res: Response) => {
       currency = "NGN",
       isDigital = false,
       categoryId,
+      subCategoryId, // ← new
       condition,
       stock,
       extraDetails,
@@ -36,6 +37,24 @@ export const createListing = async (req: AuthRequest, res: Response) => {
         return errorResponse(res, "Invalid JSON format for extraDetails");
       }
     }
+    const category = await prisma.category.findUnique({
+      where: { id: categoryId },
+    });
+    if (!category) return errorResponse(res, "Category not found");
+
+    // Validate sub-category if provided
+    if (subCategoryId) {
+      const subCategory = await prisma.subCategory.findUnique({
+        where: { id: subCategoryId },
+      });
+      if (!subCategory) return errorResponse(res, "Sub-category not found");
+      if (subCategory.categoryId !== categoryId) {
+        return errorResponse(
+          res,
+          "Sub-category does not belong to the selected category"
+        );
+      }
+    }
 
     // Create listing record
     const listing = await prisma.listing.create({
@@ -50,6 +69,9 @@ export const createListing = async (req: AuthRequest, res: Response) => {
         stock: stock ? Number(stock) : null,
         seller: { connect: { id: req.user!.id } },
         category: { connect: { id: categoryId } },
+        subCategory: subCategoryId
+          ? { connect: { id: subCategoryId } }
+          : undefined,
         status: "PENDING",
         extraDetails: parsedDetails ?? undefined,
       },
@@ -126,6 +148,7 @@ export const updateListing = async (req: AuthRequest, res: Response) => {
       currency,
       isDigital,
       categoryId,
+      subCategoryId, // ← new
       condition,
       stock,
       extraDetails,
@@ -165,8 +188,30 @@ export const updateListing = async (req: AuthRequest, res: Response) => {
     if (stock !== undefined) dataToUpdate.stock = Number(stock);
     if (typeof isDigital !== "undefined")
       dataToUpdate.isDigital = Boolean(isDigital);
-    if (categoryId) dataToUpdate.category = { connect: { id: categoryId } };
     if (parsedDetails) dataToUpdate.extraDetails = parsedDetails;
+    if (categoryId) {
+      const category = await prisma.category.findUnique({
+        where: { id: categoryId },
+      });
+      if (!category) return errorResponse(res, "Category not found");
+      dataToUpdate.category = { connect: { id: categoryId } };
+    }
+
+    // Validate sub-category if provided
+    if (subCategoryId) {
+      const subCategory = await prisma.subCategory.findUnique({
+        where: { id: subCategoryId },
+      });
+      if (!subCategory) return errorResponse(res, "Sub-category not found");
+      const parentIdToCheck = categoryId || existing.categoryId;
+      if (subCategory.categoryId !== parentIdToCheck) {
+        return errorResponse(
+          res,
+          "Sub-category does not belong to the selected category"
+        );
+      }
+      dataToUpdate.subCategory = { connect: { id: subCategoryId } };
+    }
 
     // Handle file uploads
     const files = req.files as
@@ -208,7 +253,7 @@ export const updateListing = async (req: AuthRequest, res: Response) => {
     const updated = await prisma.listing.update({
       where: { id },
       data: dataToUpdate,
-      include: { media: true, category: true },
+      include: { media: true, category: true,subCategory: true  },
     });
 
     return successResponse(res, "Listing updated successfully", updated);
@@ -217,7 +262,6 @@ export const updateListing = async (req: AuthRequest, res: Response) => {
     return errorResponse(res, "Listing update failed");
   }
 };
-
 
 /* ==========================================================
    🔴 DELETE LISTING & CLOUDINARY MEDIA
@@ -491,7 +535,8 @@ export const searchListings = async (req: Request, res: Response) => {
     // 🧮 Sorting
     let orderBy: any = { createdAt: order as "asc" | "desc" };
     if (sortBy === "price") orderBy = { price: order as "asc" | "desc" };
-    if (sortBy === "popularity") orderBy = { transactions: { _count: order as "asc" | "desc" } };
+    if (sortBy === "popularity")
+      orderBy = { transactions: { _count: order as "asc" | "desc" } };
 
     // ✅ Fetch Listings
     const listings = await prisma.listing.findMany({
@@ -597,14 +642,14 @@ export const getUserOrders = async (req: AuthRequest, res: Response) => {
         },
         transaction: true,
         delivery: {
-          include:{
-            rider:{
-              include:{
-                kyc:true,
-                vehicle:true
-              }
-            }
-          }
+          include: {
+            rider: {
+              include: {
+                kyc: true,
+                vehicle: true,
+              },
+            },
+          },
         },
       },
       orderBy: { createdAt: "desc" },
@@ -675,7 +720,8 @@ export const getUserOrders = async (req: AuthRequest, res: Response) => {
               dropoffLng: order.delivery.dropoffLng,
               pickupAddress: order.delivery.pickupAddress,
               dropoffAddress: order.delivery.dropoffAddress,
-              rider: order.delivery.rider
+              rider: order.delivery.rider,
+              otp: order.delivery.OTP,
             }
           : null,
         listings: order.listings.map((item) => ({

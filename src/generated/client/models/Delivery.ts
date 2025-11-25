@@ -53,6 +53,7 @@ export type DeliverySumAggregateOutputType = {
 export type DeliveryMinAggregateOutputType = {
   id: string | null
   transactionId: string | null
+  OTP: string | null
   riderId: string | null
   orderId: string | null
   pickupLat: number | null
@@ -78,6 +79,7 @@ export type DeliveryMinAggregateOutputType = {
 export type DeliveryMaxAggregateOutputType = {
   id: string | null
   transactionId: string | null
+  OTP: string | null
   riderId: string | null
   orderId: string | null
   pickupLat: number | null
@@ -103,6 +105,7 @@ export type DeliveryMaxAggregateOutputType = {
 export type DeliveryCountAggregateOutputType = {
   id: number
   transactionId: number
+  OTP: number
   riderId: number
   orderId: number
   pickupLat: number
@@ -155,6 +158,7 @@ export type DeliverySumAggregateInputType = {
 export type DeliveryMinAggregateInputType = {
   id?: true
   transactionId?: true
+  OTP?: true
   riderId?: true
   orderId?: true
   pickupLat?: true
@@ -180,6 +184,7 @@ export type DeliveryMinAggregateInputType = {
 export type DeliveryMaxAggregateInputType = {
   id?: true
   transactionId?: true
+  OTP?: true
   riderId?: true
   orderId?: true
   pickupLat?: true
@@ -205,6 +210,7 @@ export type DeliveryMaxAggregateInputType = {
 export type DeliveryCountAggregateInputType = {
   id?: true
   transactionId?: true
+  OTP?: true
   riderId?: true
   orderId?: true
   pickupLat?: true
@@ -318,6 +324,7 @@ export type DeliveryGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 export type DeliveryGroupByOutputType = {
   id: string
   transactionId: string
+  OTP: string
   riderId: string | null
   orderId: string
   pickupLat: number
@@ -367,6 +374,7 @@ export type DeliveryWhereInput = {
   NOT?: Prisma.DeliveryWhereInput | Prisma.DeliveryWhereInput[]
   id?: Prisma.StringFilter<"Delivery"> | string
   transactionId?: Prisma.StringFilter<"Delivery"> | string
+  OTP?: Prisma.StringFilter<"Delivery"> | string
   riderId?: Prisma.StringNullableFilter<"Delivery"> | string | null
   orderId?: Prisma.StringFilter<"Delivery"> | string
   pickupLat?: Prisma.FloatFilter<"Delivery"> | number
@@ -396,6 +404,7 @@ export type DeliveryWhereInput = {
 export type DeliveryOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   transactionId?: Prisma.SortOrder
+  OTP?: Prisma.SortOrder
   riderId?: Prisma.SortOrderInput | Prisma.SortOrder
   orderId?: Prisma.SortOrder
   pickupLat?: Prisma.SortOrder
@@ -424,6 +433,7 @@ export type DeliveryOrderByWithRelationInput = {
 
 export type DeliveryWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  OTP?: string
   orderId?: string
   AND?: Prisma.DeliveryWhereInput | Prisma.DeliveryWhereInput[]
   OR?: Prisma.DeliveryWhereInput[]
@@ -452,11 +462,12 @@ export type DeliveryWhereUniqueInput = Prisma.AtLeast<{
   transaction?: Prisma.XOR<Prisma.TransactionScalarRelationFilter, Prisma.TransactionWhereInput>
   rider?: Prisma.XOR<Prisma.RiderNullableScalarRelationFilter, Prisma.RiderWhereInput> | null
   order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
-}, "id" | "orderId">
+}, "id" | "OTP" | "orderId">
 
 export type DeliveryOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   transactionId?: Prisma.SortOrder
+  OTP?: Prisma.SortOrder
   riderId?: Prisma.SortOrderInput | Prisma.SortOrder
   orderId?: Prisma.SortOrder
   pickupLat?: Prisma.SortOrder
@@ -491,6 +502,7 @@ export type DeliveryScalarWhereWithAggregatesInput = {
   NOT?: Prisma.DeliveryScalarWhereWithAggregatesInput | Prisma.DeliveryScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Delivery"> | string
   transactionId?: Prisma.StringWithAggregatesFilter<"Delivery"> | string
+  OTP?: Prisma.StringWithAggregatesFilter<"Delivery"> | string
   riderId?: Prisma.StringNullableWithAggregatesFilter<"Delivery"> | string | null
   orderId?: Prisma.StringWithAggregatesFilter<"Delivery"> | string
   pickupLat?: Prisma.FloatWithAggregatesFilter<"Delivery"> | number
@@ -516,6 +528,7 @@ export type DeliveryScalarWhereWithAggregatesInput = {
 
 export type DeliveryCreateInput = {
   id?: string
+  OTP: string
   pickupLat: number
   pickupLng: number
   dropoffLat: number
@@ -543,6 +556,7 @@ export type DeliveryCreateInput = {
 export type DeliveryUncheckedCreateInput = {
   id?: string
   transactionId: string
+  OTP: string
   riderId?: string | null
   orderId: string
   pickupLat: number
@@ -568,6 +582,7 @@ export type DeliveryUncheckedCreateInput = {
 
 export type DeliveryUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  OTP?: Prisma.StringFieldUpdateOperationsInput | string
   pickupLat?: Prisma.FloatFieldUpdateOperationsInput | number
   pickupLng?: Prisma.FloatFieldUpdateOperationsInput | number
   dropoffLat?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -595,6 +610,7 @@ export type DeliveryUpdateInput = {
 export type DeliveryUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   transactionId?: Prisma.StringFieldUpdateOperationsInput | string
+  OTP?: Prisma.StringFieldUpdateOperationsInput | string
   riderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   orderId?: Prisma.StringFieldUpdateOperationsInput | string
   pickupLat?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -621,6 +637,7 @@ export type DeliveryUncheckedUpdateInput = {
 export type DeliveryCreateManyInput = {
   id?: string
   transactionId: string
+  OTP: string
   riderId?: string | null
   orderId: string
   pickupLat: number
@@ -646,6 +663,7 @@ export type DeliveryCreateManyInput = {
 
 export type DeliveryUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  OTP?: Prisma.StringFieldUpdateOperationsInput | string
   pickupLat?: Prisma.FloatFieldUpdateOperationsInput | number
   pickupLng?: Prisma.FloatFieldUpdateOperationsInput | number
   dropoffLat?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -670,6 +688,7 @@ export type DeliveryUpdateManyMutationInput = {
 export type DeliveryUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   transactionId?: Prisma.StringFieldUpdateOperationsInput | string
+  OTP?: Prisma.StringFieldUpdateOperationsInput | string
   riderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   orderId?: Prisma.StringFieldUpdateOperationsInput | string
   pickupLat?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -711,6 +730,7 @@ export type DeliveryOrderByRelationAggregateInput = {
 export type DeliveryCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   transactionId?: Prisma.SortOrder
+  OTP?: Prisma.SortOrder
   riderId?: Prisma.SortOrder
   orderId?: Prisma.SortOrder
   pickupLat?: Prisma.SortOrder
@@ -749,6 +769,7 @@ export type DeliveryAvgOrderByAggregateInput = {
 export type DeliveryMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   transactionId?: Prisma.SortOrder
+  OTP?: Prisma.SortOrder
   riderId?: Prisma.SortOrder
   orderId?: Prisma.SortOrder
   pickupLat?: Prisma.SortOrder
@@ -774,6 +795,7 @@ export type DeliveryMaxOrderByAggregateInput = {
 export type DeliveryMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   transactionId?: Prisma.SortOrder
+  OTP?: Prisma.SortOrder
   riderId?: Prisma.SortOrder
   orderId?: Prisma.SortOrder
   pickupLat?: Prisma.SortOrder
@@ -930,6 +952,7 @@ export type DeliveryUncheckedUpdateManyWithoutRiderNestedInput = {
 
 export type DeliveryCreateWithoutOrderInput = {
   id?: string
+  OTP: string
   pickupLat: number
   pickupLng: number
   dropoffLat: number
@@ -956,6 +979,7 @@ export type DeliveryCreateWithoutOrderInput = {
 export type DeliveryUncheckedCreateWithoutOrderInput = {
   id?: string
   transactionId: string
+  OTP: string
   riderId?: string | null
   pickupLat: number
   pickupLng: number
@@ -996,6 +1020,7 @@ export type DeliveryUpdateToOneWithWhereWithoutOrderInput = {
 
 export type DeliveryUpdateWithoutOrderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  OTP?: Prisma.StringFieldUpdateOperationsInput | string
   pickupLat?: Prisma.FloatFieldUpdateOperationsInput | number
   pickupLng?: Prisma.FloatFieldUpdateOperationsInput | number
   dropoffLat?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1022,6 +1047,7 @@ export type DeliveryUpdateWithoutOrderInput = {
 export type DeliveryUncheckedUpdateWithoutOrderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   transactionId?: Prisma.StringFieldUpdateOperationsInput | string
+  OTP?: Prisma.StringFieldUpdateOperationsInput | string
   riderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pickupLat?: Prisma.FloatFieldUpdateOperationsInput | number
   pickupLng?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1046,6 +1072,7 @@ export type DeliveryUncheckedUpdateWithoutOrderInput = {
 
 export type DeliveryCreateWithoutTransactionInput = {
   id?: string
+  OTP: string
   pickupLat: number
   pickupLng: number
   dropoffLat: number
@@ -1071,6 +1098,7 @@ export type DeliveryCreateWithoutTransactionInput = {
 
 export type DeliveryUncheckedCreateWithoutTransactionInput = {
   id?: string
+  OTP: string
   riderId?: string | null
   orderId: string
   pickupLat: number
@@ -1126,6 +1154,7 @@ export type DeliveryScalarWhereInput = {
   NOT?: Prisma.DeliveryScalarWhereInput | Prisma.DeliveryScalarWhereInput[]
   id?: Prisma.StringFilter<"Delivery"> | string
   transactionId?: Prisma.StringFilter<"Delivery"> | string
+  OTP?: Prisma.StringFilter<"Delivery"> | string
   riderId?: Prisma.StringNullableFilter<"Delivery"> | string | null
   orderId?: Prisma.StringFilter<"Delivery"> | string
   pickupLat?: Prisma.FloatFilter<"Delivery"> | number
@@ -1151,6 +1180,7 @@ export type DeliveryScalarWhereInput = {
 
 export type DeliveryCreateWithoutRiderInput = {
   id?: string
+  OTP: string
   pickupLat: number
   pickupLng: number
   dropoffLat: number
@@ -1177,6 +1207,7 @@ export type DeliveryCreateWithoutRiderInput = {
 export type DeliveryUncheckedCreateWithoutRiderInput = {
   id?: string
   transactionId: string
+  OTP: string
   orderId: string
   pickupLat: number
   pickupLng: number
@@ -1227,6 +1258,7 @@ export type DeliveryUpdateManyWithWhereWithoutRiderInput = {
 
 export type DeliveryCreateManyTransactionInput = {
   id?: string
+  OTP: string
   riderId?: string | null
   orderId: string
   pickupLat: number
@@ -1252,6 +1284,7 @@ export type DeliveryCreateManyTransactionInput = {
 
 export type DeliveryUpdateWithoutTransactionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  OTP?: Prisma.StringFieldUpdateOperationsInput | string
   pickupLat?: Prisma.FloatFieldUpdateOperationsInput | number
   pickupLng?: Prisma.FloatFieldUpdateOperationsInput | number
   dropoffLat?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1277,6 +1310,7 @@ export type DeliveryUpdateWithoutTransactionInput = {
 
 export type DeliveryUncheckedUpdateWithoutTransactionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  OTP?: Prisma.StringFieldUpdateOperationsInput | string
   riderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   orderId?: Prisma.StringFieldUpdateOperationsInput | string
   pickupLat?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1302,6 +1336,7 @@ export type DeliveryUncheckedUpdateWithoutTransactionInput = {
 
 export type DeliveryUncheckedUpdateManyWithoutTransactionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  OTP?: Prisma.StringFieldUpdateOperationsInput | string
   riderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   orderId?: Prisma.StringFieldUpdateOperationsInput | string
   pickupLat?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1328,6 +1363,7 @@ export type DeliveryUncheckedUpdateManyWithoutTransactionInput = {
 export type DeliveryCreateManyRiderInput = {
   id?: string
   transactionId: string
+  OTP: string
   orderId: string
   pickupLat: number
   pickupLng: number
@@ -1352,6 +1388,7 @@ export type DeliveryCreateManyRiderInput = {
 
 export type DeliveryUpdateWithoutRiderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  OTP?: Prisma.StringFieldUpdateOperationsInput | string
   pickupLat?: Prisma.FloatFieldUpdateOperationsInput | number
   pickupLng?: Prisma.FloatFieldUpdateOperationsInput | number
   dropoffLat?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1378,6 +1415,7 @@ export type DeliveryUpdateWithoutRiderInput = {
 export type DeliveryUncheckedUpdateWithoutRiderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   transactionId?: Prisma.StringFieldUpdateOperationsInput | string
+  OTP?: Prisma.StringFieldUpdateOperationsInput | string
   orderId?: Prisma.StringFieldUpdateOperationsInput | string
   pickupLat?: Prisma.FloatFieldUpdateOperationsInput | number
   pickupLng?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1403,6 +1441,7 @@ export type DeliveryUncheckedUpdateWithoutRiderInput = {
 export type DeliveryUncheckedUpdateManyWithoutRiderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   transactionId?: Prisma.StringFieldUpdateOperationsInput | string
+  OTP?: Prisma.StringFieldUpdateOperationsInput | string
   orderId?: Prisma.StringFieldUpdateOperationsInput | string
   pickupLat?: Prisma.FloatFieldUpdateOperationsInput | number
   pickupLng?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1430,6 +1469,7 @@ export type DeliveryUncheckedUpdateManyWithoutRiderInput = {
 export type DeliverySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   transactionId?: boolean
+  OTP?: boolean
   riderId?: boolean
   orderId?: boolean
   pickupLat?: boolean
@@ -1459,6 +1499,7 @@ export type DeliverySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type DeliverySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   transactionId?: boolean
+  OTP?: boolean
   riderId?: boolean
   orderId?: boolean
   pickupLat?: boolean
@@ -1488,6 +1529,7 @@ export type DeliverySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
 export type DeliverySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   transactionId?: boolean
+  OTP?: boolean
   riderId?: boolean
   orderId?: boolean
   pickupLat?: boolean
@@ -1517,6 +1559,7 @@ export type DeliverySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
 export type DeliverySelectScalar = {
   id?: boolean
   transactionId?: boolean
+  OTP?: boolean
   riderId?: boolean
   orderId?: boolean
   pickupLat?: boolean
@@ -1540,7 +1583,7 @@ export type DeliverySelectScalar = {
   updatedAt?: boolean
 }
 
-export type DeliveryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "transactionId" | "riderId" | "orderId" | "pickupLat" | "pickupLng" | "dropoffLat" | "dropoffLng" | "pickupAddress" | "dropoffAddress" | "status" | "distanceKm" | "etaMinutes" | "fareAmount" | "isDigital" | "digitalFiles" | "riderArrivedAt" | "riderLat" | "riderLng" | "startedAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["delivery"]>
+export type DeliveryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "transactionId" | "OTP" | "riderId" | "orderId" | "pickupLat" | "pickupLng" | "dropoffLat" | "dropoffLng" | "pickupAddress" | "dropoffAddress" | "status" | "distanceKm" | "etaMinutes" | "fareAmount" | "isDigital" | "digitalFiles" | "riderArrivedAt" | "riderLat" | "riderLng" | "startedAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["delivery"]>
 export type DeliveryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   transaction?: boolean | Prisma.TransactionDefaultArgs<ExtArgs>
   rider?: boolean | Prisma.Delivery$riderArgs<ExtArgs>
@@ -1567,6 +1610,7 @@ export type $DeliveryPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     transactionId: string
+    OTP: string
     riderId: string | null
     orderId: string
     pickupLat: number
@@ -2016,6 +2060,7 @@ export interface Prisma__DeliveryClient<T, Null = never, ExtArgs extends runtime
 export interface DeliveryFieldRefs {
   readonly id: Prisma.FieldRef<"Delivery", 'String'>
   readonly transactionId: Prisma.FieldRef<"Delivery", 'String'>
+  readonly OTP: Prisma.FieldRef<"Delivery", 'String'>
   readonly riderId: Prisma.FieldRef<"Delivery", 'String'>
   readonly orderId: Prisma.FieldRef<"Delivery", 'String'>
   readonly pickupLat: Prisma.FieldRef<"Delivery", 'Float'>

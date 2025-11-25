@@ -53,6 +53,7 @@ export type ListingMinAggregateOutputType = {
   updatedAt: Date | null
   status: $Enums.ListingStatus | null
   categoryId: string | null
+  subCategoryId: string | null
   rejectionNote: string | null
 }
 
@@ -71,6 +72,7 @@ export type ListingMaxAggregateOutputType = {
   updatedAt: Date | null
   status: $Enums.ListingStatus | null
   categoryId: string | null
+  subCategoryId: string | null
   rejectionNote: string | null
 }
 
@@ -89,6 +91,7 @@ export type ListingCountAggregateOutputType = {
   updatedAt: number
   status: number
   categoryId: number
+  subCategoryId: number
   extraDetails: number
   rejectionNote: number
   _all: number
@@ -122,6 +125,7 @@ export type ListingMinAggregateInputType = {
   updatedAt?: true
   status?: true
   categoryId?: true
+  subCategoryId?: true
   rejectionNote?: true
 }
 
@@ -140,6 +144,7 @@ export type ListingMaxAggregateInputType = {
   updatedAt?: true
   status?: true
   categoryId?: true
+  subCategoryId?: true
   rejectionNote?: true
 }
 
@@ -158,6 +163,7 @@ export type ListingCountAggregateInputType = {
   updatedAt?: true
   status?: true
   categoryId?: true
+  subCategoryId?: true
   extraDetails?: true
   rejectionNote?: true
   _all?: true
@@ -264,6 +270,7 @@ export type ListingGroupByOutputType = {
   updatedAt: Date
   status: $Enums.ListingStatus
   categoryId: string
+  subCategoryId: string | null
   extraDetails: runtime.JsonValue | null
   rejectionNote: string | null
   _count: ListingCountAggregateOutputType | null
@@ -306,6 +313,7 @@ export type ListingWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Listing"> | Date | string
   status?: Prisma.EnumListingStatusFilter<"Listing"> | $Enums.ListingStatus
   categoryId?: Prisma.StringFilter<"Listing"> | string
+  subCategoryId?: Prisma.StringNullableFilter<"Listing"> | string | null
   extraDetails?: Prisma.JsonNullableFilter<"Listing">
   rejectionNote?: Prisma.StringNullableFilter<"Listing"> | string | null
   seller?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -313,6 +321,7 @@ export type ListingWhereInput = {
   digitalFiles?: Prisma.DigitalFileListRelationFilter
   transactions?: Prisma.TransactionListRelationFilter
   Message?: Prisma.MessageListRelationFilter
+  subCategory?: Prisma.XOR<Prisma.SubCategoryNullableScalarRelationFilter, Prisma.SubCategoryWhereInput> | null
   category?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.CategoryWhereInput>
   OrderItem?: Prisma.OrderItemListRelationFilter
 }
@@ -332,6 +341,7 @@ export type ListingOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
+  subCategoryId?: Prisma.SortOrderInput | Prisma.SortOrder
   extraDetails?: Prisma.SortOrderInput | Prisma.SortOrder
   rejectionNote?: Prisma.SortOrderInput | Prisma.SortOrder
   seller?: Prisma.UserOrderByWithRelationInput
@@ -339,6 +349,7 @@ export type ListingOrderByWithRelationInput = {
   digitalFiles?: Prisma.DigitalFileOrderByRelationAggregateInput
   transactions?: Prisma.TransactionOrderByRelationAggregateInput
   Message?: Prisma.MessageOrderByRelationAggregateInput
+  subCategory?: Prisma.SubCategoryOrderByWithRelationInput
   category?: Prisma.CategoryOrderByWithRelationInput
   OrderItem?: Prisma.OrderItemOrderByRelationAggregateInput
 }
@@ -361,6 +372,7 @@ export type ListingWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Listing"> | Date | string
   status?: Prisma.EnumListingStatusFilter<"Listing"> | $Enums.ListingStatus
   categoryId?: Prisma.StringFilter<"Listing"> | string
+  subCategoryId?: Prisma.StringNullableFilter<"Listing"> | string | null
   extraDetails?: Prisma.JsonNullableFilter<"Listing">
   rejectionNote?: Prisma.StringNullableFilter<"Listing"> | string | null
   seller?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -368,6 +380,7 @@ export type ListingWhereUniqueInput = Prisma.AtLeast<{
   digitalFiles?: Prisma.DigitalFileListRelationFilter
   transactions?: Prisma.TransactionListRelationFilter
   Message?: Prisma.MessageListRelationFilter
+  subCategory?: Prisma.XOR<Prisma.SubCategoryNullableScalarRelationFilter, Prisma.SubCategoryWhereInput> | null
   category?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.CategoryWhereInput>
   OrderItem?: Prisma.OrderItemListRelationFilter
 }, "id">
@@ -387,6 +400,7 @@ export type ListingOrderByWithAggregationInput = {
   updatedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
+  subCategoryId?: Prisma.SortOrderInput | Prisma.SortOrder
   extraDetails?: Prisma.SortOrderInput | Prisma.SortOrder
   rejectionNote?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ListingCountOrderByAggregateInput
@@ -414,6 +428,7 @@ export type ListingScalarWhereWithAggregatesInput = {
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Listing"> | Date | string
   status?: Prisma.EnumListingStatusWithAggregatesFilter<"Listing"> | $Enums.ListingStatus
   categoryId?: Prisma.StringWithAggregatesFilter<"Listing"> | string
+  subCategoryId?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
   extraDetails?: Prisma.JsonNullableWithAggregatesFilter<"Listing">
   rejectionNote?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
 }
@@ -438,6 +453,7 @@ export type ListingCreateInput = {
   digitalFiles?: Prisma.DigitalFileCreateNestedManyWithoutListingInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutListingInput
   Message?: Prisma.MessageCreateNestedManyWithoutListingInput
+  subCategory?: Prisma.SubCategoryCreateNestedOneWithoutListingsInput
   category: Prisma.CategoryCreateNestedOneWithoutListingsInput
   OrderItem?: Prisma.OrderItemCreateNestedManyWithoutListingInput
 }
@@ -457,6 +473,7 @@ export type ListingUncheckedCreateInput = {
   updatedAt?: Date | string
   status?: $Enums.ListingStatus
   categoryId: string
+  subCategoryId?: string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutListingInput
@@ -486,6 +503,7 @@ export type ListingUpdateInput = {
   digitalFiles?: Prisma.DigitalFileUpdateManyWithoutListingNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutListingNestedInput
   Message?: Prisma.MessageUpdateManyWithoutListingNestedInput
+  subCategory?: Prisma.SubCategoryUpdateOneWithoutListingsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutListingsNestedInput
   OrderItem?: Prisma.OrderItemUpdateManyWithoutListingNestedInput
 }
@@ -505,6 +523,7 @@ export type ListingUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  subCategoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   media?: Prisma.MediaUncheckedUpdateManyWithoutListingNestedInput
@@ -529,6 +548,7 @@ export type ListingCreateManyInput = {
   updatedAt?: Date | string
   status?: $Enums.ListingStatus
   categoryId: string
+  subCategoryId?: string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
 }
@@ -565,6 +585,7 @@ export type ListingUncheckedUpdateManyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  subCategoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -594,6 +615,7 @@ export type ListingCountOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
+  subCategoryId?: Prisma.SortOrder
   extraDetails?: Prisma.SortOrder
   rejectionNote?: Prisma.SortOrder
 }
@@ -619,6 +641,7 @@ export type ListingMaxOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
+  subCategoryId?: Prisma.SortOrder
   rejectionNote?: Prisma.SortOrder
 }
 
@@ -637,6 +660,7 @@ export type ListingMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
+  subCategoryId?: Prisma.SortOrder
   rejectionNote?: Prisma.SortOrder
 }
 
@@ -737,6 +761,48 @@ export type ListingUncheckedUpdateManyWithoutCategoryNestedInput = {
   connect?: Prisma.ListingWhereUniqueInput | Prisma.ListingWhereUniqueInput[]
   update?: Prisma.ListingUpdateWithWhereUniqueWithoutCategoryInput | Prisma.ListingUpdateWithWhereUniqueWithoutCategoryInput[]
   updateMany?: Prisma.ListingUpdateManyWithWhereWithoutCategoryInput | Prisma.ListingUpdateManyWithWhereWithoutCategoryInput[]
+  deleteMany?: Prisma.ListingScalarWhereInput | Prisma.ListingScalarWhereInput[]
+}
+
+export type ListingCreateNestedManyWithoutSubCategoryInput = {
+  create?: Prisma.XOR<Prisma.ListingCreateWithoutSubCategoryInput, Prisma.ListingUncheckedCreateWithoutSubCategoryInput> | Prisma.ListingCreateWithoutSubCategoryInput[] | Prisma.ListingUncheckedCreateWithoutSubCategoryInput[]
+  connectOrCreate?: Prisma.ListingCreateOrConnectWithoutSubCategoryInput | Prisma.ListingCreateOrConnectWithoutSubCategoryInput[]
+  createMany?: Prisma.ListingCreateManySubCategoryInputEnvelope
+  connect?: Prisma.ListingWhereUniqueInput | Prisma.ListingWhereUniqueInput[]
+}
+
+export type ListingUncheckedCreateNestedManyWithoutSubCategoryInput = {
+  create?: Prisma.XOR<Prisma.ListingCreateWithoutSubCategoryInput, Prisma.ListingUncheckedCreateWithoutSubCategoryInput> | Prisma.ListingCreateWithoutSubCategoryInput[] | Prisma.ListingUncheckedCreateWithoutSubCategoryInput[]
+  connectOrCreate?: Prisma.ListingCreateOrConnectWithoutSubCategoryInput | Prisma.ListingCreateOrConnectWithoutSubCategoryInput[]
+  createMany?: Prisma.ListingCreateManySubCategoryInputEnvelope
+  connect?: Prisma.ListingWhereUniqueInput | Prisma.ListingWhereUniqueInput[]
+}
+
+export type ListingUpdateManyWithoutSubCategoryNestedInput = {
+  create?: Prisma.XOR<Prisma.ListingCreateWithoutSubCategoryInput, Prisma.ListingUncheckedCreateWithoutSubCategoryInput> | Prisma.ListingCreateWithoutSubCategoryInput[] | Prisma.ListingUncheckedCreateWithoutSubCategoryInput[]
+  connectOrCreate?: Prisma.ListingCreateOrConnectWithoutSubCategoryInput | Prisma.ListingCreateOrConnectWithoutSubCategoryInput[]
+  upsert?: Prisma.ListingUpsertWithWhereUniqueWithoutSubCategoryInput | Prisma.ListingUpsertWithWhereUniqueWithoutSubCategoryInput[]
+  createMany?: Prisma.ListingCreateManySubCategoryInputEnvelope
+  set?: Prisma.ListingWhereUniqueInput | Prisma.ListingWhereUniqueInput[]
+  disconnect?: Prisma.ListingWhereUniqueInput | Prisma.ListingWhereUniqueInput[]
+  delete?: Prisma.ListingWhereUniqueInput | Prisma.ListingWhereUniqueInput[]
+  connect?: Prisma.ListingWhereUniqueInput | Prisma.ListingWhereUniqueInput[]
+  update?: Prisma.ListingUpdateWithWhereUniqueWithoutSubCategoryInput | Prisma.ListingUpdateWithWhereUniqueWithoutSubCategoryInput[]
+  updateMany?: Prisma.ListingUpdateManyWithWhereWithoutSubCategoryInput | Prisma.ListingUpdateManyWithWhereWithoutSubCategoryInput[]
+  deleteMany?: Prisma.ListingScalarWhereInput | Prisma.ListingScalarWhereInput[]
+}
+
+export type ListingUncheckedUpdateManyWithoutSubCategoryNestedInput = {
+  create?: Prisma.XOR<Prisma.ListingCreateWithoutSubCategoryInput, Prisma.ListingUncheckedCreateWithoutSubCategoryInput> | Prisma.ListingCreateWithoutSubCategoryInput[] | Prisma.ListingUncheckedCreateWithoutSubCategoryInput[]
+  connectOrCreate?: Prisma.ListingCreateOrConnectWithoutSubCategoryInput | Prisma.ListingCreateOrConnectWithoutSubCategoryInput[]
+  upsert?: Prisma.ListingUpsertWithWhereUniqueWithoutSubCategoryInput | Prisma.ListingUpsertWithWhereUniqueWithoutSubCategoryInput[]
+  createMany?: Prisma.ListingCreateManySubCategoryInputEnvelope
+  set?: Prisma.ListingWhereUniqueInput | Prisma.ListingWhereUniqueInput[]
+  disconnect?: Prisma.ListingWhereUniqueInput | Prisma.ListingWhereUniqueInput[]
+  delete?: Prisma.ListingWhereUniqueInput | Prisma.ListingWhereUniqueInput[]
+  connect?: Prisma.ListingWhereUniqueInput | Prisma.ListingWhereUniqueInput[]
+  update?: Prisma.ListingUpdateWithWhereUniqueWithoutSubCategoryInput | Prisma.ListingUpdateWithWhereUniqueWithoutSubCategoryInput[]
+  updateMany?: Prisma.ListingUpdateManyWithWhereWithoutSubCategoryInput | Prisma.ListingUpdateManyWithWhereWithoutSubCategoryInput[]
   deleteMany?: Prisma.ListingScalarWhereInput | Prisma.ListingScalarWhereInput[]
 }
 
@@ -863,6 +929,7 @@ export type ListingCreateWithoutSellerInput = {
   digitalFiles?: Prisma.DigitalFileCreateNestedManyWithoutListingInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutListingInput
   Message?: Prisma.MessageCreateNestedManyWithoutListingInput
+  subCategory?: Prisma.SubCategoryCreateNestedOneWithoutListingsInput
   category: Prisma.CategoryCreateNestedOneWithoutListingsInput
   OrderItem?: Prisma.OrderItemCreateNestedManyWithoutListingInput
 }
@@ -881,6 +948,7 @@ export type ListingUncheckedCreateWithoutSellerInput = {
   updatedAt?: Date | string
   status?: $Enums.ListingStatus
   categoryId: string
+  subCategoryId?: string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutListingInput
@@ -934,6 +1002,7 @@ export type ListingScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Listing"> | Date | string
   status?: Prisma.EnumListingStatusFilter<"Listing"> | $Enums.ListingStatus
   categoryId?: Prisma.StringFilter<"Listing"> | string
+  subCategoryId?: Prisma.StringNullableFilter<"Listing"> | string | null
   extraDetails?: Prisma.JsonNullableFilter<"Listing">
   rejectionNote?: Prisma.StringNullableFilter<"Listing"> | string | null
 }
@@ -958,6 +1027,7 @@ export type ListingCreateWithoutCategoryInput = {
   digitalFiles?: Prisma.DigitalFileCreateNestedManyWithoutListingInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutListingInput
   Message?: Prisma.MessageCreateNestedManyWithoutListingInput
+  subCategory?: Prisma.SubCategoryCreateNestedOneWithoutListingsInput
   OrderItem?: Prisma.OrderItemCreateNestedManyWithoutListingInput
 }
 
@@ -975,6 +1045,7 @@ export type ListingUncheckedCreateWithoutCategoryInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   status?: $Enums.ListingStatus
+  subCategoryId?: string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutListingInput
@@ -1010,6 +1081,80 @@ export type ListingUpdateManyWithWhereWithoutCategoryInput = {
   data: Prisma.XOR<Prisma.ListingUpdateManyMutationInput, Prisma.ListingUncheckedUpdateManyWithoutCategoryInput>
 }
 
+export type ListingCreateWithoutSubCategoryInput = {
+  id?: string
+  title: string
+  description: string
+  priceCents: number
+  price: number
+  currency?: string
+  isDigital?: boolean
+  condition?: string | null
+  stock?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  status?: $Enums.ListingStatus
+  extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  rejectionNote?: string | null
+  seller: Prisma.UserCreateNestedOneWithoutListingsInput
+  media?: Prisma.MediaCreateNestedManyWithoutListingInput
+  digitalFiles?: Prisma.DigitalFileCreateNestedManyWithoutListingInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutListingInput
+  Message?: Prisma.MessageCreateNestedManyWithoutListingInput
+  category: Prisma.CategoryCreateNestedOneWithoutListingsInput
+  OrderItem?: Prisma.OrderItemCreateNestedManyWithoutListingInput
+}
+
+export type ListingUncheckedCreateWithoutSubCategoryInput = {
+  id?: string
+  title: string
+  description: string
+  priceCents: number
+  price: number
+  currency?: string
+  isDigital?: boolean
+  condition?: string | null
+  stock?: number | null
+  sellerId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  status?: $Enums.ListingStatus
+  categoryId: string
+  extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  rejectionNote?: string | null
+  media?: Prisma.MediaUncheckedCreateNestedManyWithoutListingInput
+  digitalFiles?: Prisma.DigitalFileUncheckedCreateNestedManyWithoutListingInput
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutListingInput
+  Message?: Prisma.MessageUncheckedCreateNestedManyWithoutListingInput
+  OrderItem?: Prisma.OrderItemUncheckedCreateNestedManyWithoutListingInput
+}
+
+export type ListingCreateOrConnectWithoutSubCategoryInput = {
+  where: Prisma.ListingWhereUniqueInput
+  create: Prisma.XOR<Prisma.ListingCreateWithoutSubCategoryInput, Prisma.ListingUncheckedCreateWithoutSubCategoryInput>
+}
+
+export type ListingCreateManySubCategoryInputEnvelope = {
+  data: Prisma.ListingCreateManySubCategoryInput | Prisma.ListingCreateManySubCategoryInput[]
+  skipDuplicates?: boolean
+}
+
+export type ListingUpsertWithWhereUniqueWithoutSubCategoryInput = {
+  where: Prisma.ListingWhereUniqueInput
+  update: Prisma.XOR<Prisma.ListingUpdateWithoutSubCategoryInput, Prisma.ListingUncheckedUpdateWithoutSubCategoryInput>
+  create: Prisma.XOR<Prisma.ListingCreateWithoutSubCategoryInput, Prisma.ListingUncheckedCreateWithoutSubCategoryInput>
+}
+
+export type ListingUpdateWithWhereUniqueWithoutSubCategoryInput = {
+  where: Prisma.ListingWhereUniqueInput
+  data: Prisma.XOR<Prisma.ListingUpdateWithoutSubCategoryInput, Prisma.ListingUncheckedUpdateWithoutSubCategoryInput>
+}
+
+export type ListingUpdateManyWithWhereWithoutSubCategoryInput = {
+  where: Prisma.ListingScalarWhereInput
+  data: Prisma.XOR<Prisma.ListingUpdateManyMutationInput, Prisma.ListingUncheckedUpdateManyWithoutSubCategoryInput>
+}
+
 export type ListingCreateWithoutDigitalFilesInput = {
   id?: string
   title: string
@@ -1029,6 +1174,7 @@ export type ListingCreateWithoutDigitalFilesInput = {
   media?: Prisma.MediaCreateNestedManyWithoutListingInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutListingInput
   Message?: Prisma.MessageCreateNestedManyWithoutListingInput
+  subCategory?: Prisma.SubCategoryCreateNestedOneWithoutListingsInput
   category: Prisma.CategoryCreateNestedOneWithoutListingsInput
   OrderItem?: Prisma.OrderItemCreateNestedManyWithoutListingInput
 }
@@ -1048,6 +1194,7 @@ export type ListingUncheckedCreateWithoutDigitalFilesInput = {
   updatedAt?: Date | string
   status?: $Enums.ListingStatus
   categoryId: string
+  subCategoryId?: string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutListingInput
@@ -1091,6 +1238,7 @@ export type ListingUpdateWithoutDigitalFilesInput = {
   media?: Prisma.MediaUpdateManyWithoutListingNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutListingNestedInput
   Message?: Prisma.MessageUpdateManyWithoutListingNestedInput
+  subCategory?: Prisma.SubCategoryUpdateOneWithoutListingsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutListingsNestedInput
   OrderItem?: Prisma.OrderItemUpdateManyWithoutListingNestedInput
 }
@@ -1110,6 +1258,7 @@ export type ListingUncheckedUpdateWithoutDigitalFilesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  subCategoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   media?: Prisma.MediaUncheckedUpdateManyWithoutListingNestedInput
@@ -1137,6 +1286,7 @@ export type ListingCreateWithoutMediaInput = {
   digitalFiles?: Prisma.DigitalFileCreateNestedManyWithoutListingInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutListingInput
   Message?: Prisma.MessageCreateNestedManyWithoutListingInput
+  subCategory?: Prisma.SubCategoryCreateNestedOneWithoutListingsInput
   category: Prisma.CategoryCreateNestedOneWithoutListingsInput
   OrderItem?: Prisma.OrderItemCreateNestedManyWithoutListingInput
 }
@@ -1156,6 +1306,7 @@ export type ListingUncheckedCreateWithoutMediaInput = {
   updatedAt?: Date | string
   status?: $Enums.ListingStatus
   categoryId: string
+  subCategoryId?: string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
   digitalFiles?: Prisma.DigitalFileUncheckedCreateNestedManyWithoutListingInput
@@ -1199,6 +1350,7 @@ export type ListingUpdateWithoutMediaInput = {
   digitalFiles?: Prisma.DigitalFileUpdateManyWithoutListingNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutListingNestedInput
   Message?: Prisma.MessageUpdateManyWithoutListingNestedInput
+  subCategory?: Prisma.SubCategoryUpdateOneWithoutListingsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutListingsNestedInput
   OrderItem?: Prisma.OrderItemUpdateManyWithoutListingNestedInput
 }
@@ -1218,6 +1370,7 @@ export type ListingUncheckedUpdateWithoutMediaInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  subCategoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   digitalFiles?: Prisma.DigitalFileUncheckedUpdateManyWithoutListingNestedInput
@@ -1246,6 +1399,7 @@ export type ListingCreateWithoutOrderItemInput = {
   digitalFiles?: Prisma.DigitalFileCreateNestedManyWithoutListingInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutListingInput
   Message?: Prisma.MessageCreateNestedManyWithoutListingInput
+  subCategory?: Prisma.SubCategoryCreateNestedOneWithoutListingsInput
   category: Prisma.CategoryCreateNestedOneWithoutListingsInput
 }
 
@@ -1264,6 +1418,7 @@ export type ListingUncheckedCreateWithoutOrderItemInput = {
   updatedAt?: Date | string
   status?: $Enums.ListingStatus
   categoryId: string
+  subCategoryId?: string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutListingInput
@@ -1308,6 +1463,7 @@ export type ListingUpdateWithoutOrderItemInput = {
   digitalFiles?: Prisma.DigitalFileUpdateManyWithoutListingNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutListingNestedInput
   Message?: Prisma.MessageUpdateManyWithoutListingNestedInput
+  subCategory?: Prisma.SubCategoryUpdateOneWithoutListingsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutListingsNestedInput
 }
 
@@ -1326,6 +1482,7 @@ export type ListingUncheckedUpdateWithoutOrderItemInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  subCategoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   media?: Prisma.MediaUncheckedUpdateManyWithoutListingNestedInput
@@ -1353,6 +1510,7 @@ export type ListingCreateWithoutMessageInput = {
   media?: Prisma.MediaCreateNestedManyWithoutListingInput
   digitalFiles?: Prisma.DigitalFileCreateNestedManyWithoutListingInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutListingInput
+  subCategory?: Prisma.SubCategoryCreateNestedOneWithoutListingsInput
   category: Prisma.CategoryCreateNestedOneWithoutListingsInput
   OrderItem?: Prisma.OrderItemCreateNestedManyWithoutListingInput
 }
@@ -1372,6 +1530,7 @@ export type ListingUncheckedCreateWithoutMessageInput = {
   updatedAt?: Date | string
   status?: $Enums.ListingStatus
   categoryId: string
+  subCategoryId?: string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutListingInput
@@ -1415,6 +1574,7 @@ export type ListingUpdateWithoutMessageInput = {
   media?: Prisma.MediaUpdateManyWithoutListingNestedInput
   digitalFiles?: Prisma.DigitalFileUpdateManyWithoutListingNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutListingNestedInput
+  subCategory?: Prisma.SubCategoryUpdateOneWithoutListingsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutListingsNestedInput
   OrderItem?: Prisma.OrderItemUpdateManyWithoutListingNestedInput
 }
@@ -1434,6 +1594,7 @@ export type ListingUncheckedUpdateWithoutMessageInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  subCategoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   media?: Prisma.MediaUncheckedUpdateManyWithoutListingNestedInput
@@ -1461,6 +1622,7 @@ export type ListingCreateWithoutTransactionsInput = {
   media?: Prisma.MediaCreateNestedManyWithoutListingInput
   digitalFiles?: Prisma.DigitalFileCreateNestedManyWithoutListingInput
   Message?: Prisma.MessageCreateNestedManyWithoutListingInput
+  subCategory?: Prisma.SubCategoryCreateNestedOneWithoutListingsInput
   category: Prisma.CategoryCreateNestedOneWithoutListingsInput
   OrderItem?: Prisma.OrderItemCreateNestedManyWithoutListingInput
 }
@@ -1480,6 +1642,7 @@ export type ListingUncheckedCreateWithoutTransactionsInput = {
   updatedAt?: Date | string
   status?: $Enums.ListingStatus
   categoryId: string
+  subCategoryId?: string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutListingInput
@@ -1523,6 +1686,7 @@ export type ListingUpdateWithoutTransactionsInput = {
   media?: Prisma.MediaUpdateManyWithoutListingNestedInput
   digitalFiles?: Prisma.DigitalFileUpdateManyWithoutListingNestedInput
   Message?: Prisma.MessageUpdateManyWithoutListingNestedInput
+  subCategory?: Prisma.SubCategoryUpdateOneWithoutListingsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutListingsNestedInput
   OrderItem?: Prisma.OrderItemUpdateManyWithoutListingNestedInput
 }
@@ -1542,6 +1706,7 @@ export type ListingUncheckedUpdateWithoutTransactionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  subCategoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   media?: Prisma.MediaUncheckedUpdateManyWithoutListingNestedInput
@@ -1564,6 +1729,7 @@ export type ListingCreateManySellerInput = {
   updatedAt?: Date | string
   status?: $Enums.ListingStatus
   categoryId: string
+  subCategoryId?: string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
 }
@@ -1587,6 +1753,7 @@ export type ListingUpdateWithoutSellerInput = {
   digitalFiles?: Prisma.DigitalFileUpdateManyWithoutListingNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutListingNestedInput
   Message?: Prisma.MessageUpdateManyWithoutListingNestedInput
+  subCategory?: Prisma.SubCategoryUpdateOneWithoutListingsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutListingsNestedInput
   OrderItem?: Prisma.OrderItemUpdateManyWithoutListingNestedInput
 }
@@ -1605,6 +1772,7 @@ export type ListingUncheckedUpdateWithoutSellerInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  subCategoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   media?: Prisma.MediaUncheckedUpdateManyWithoutListingNestedInput
@@ -1628,6 +1796,7 @@ export type ListingUncheckedUpdateManyWithoutSellerInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  subCategoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -1646,6 +1815,7 @@ export type ListingCreateManyCategoryInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   status?: $Enums.ListingStatus
+  subCategoryId?: string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
 }
@@ -1670,6 +1840,7 @@ export type ListingUpdateWithoutCategoryInput = {
   digitalFiles?: Prisma.DigitalFileUpdateManyWithoutListingNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutListingNestedInput
   Message?: Prisma.MessageUpdateManyWithoutListingNestedInput
+  subCategory?: Prisma.SubCategoryUpdateOneWithoutListingsNestedInput
   OrderItem?: Prisma.OrderItemUpdateManyWithoutListingNestedInput
 }
 
@@ -1687,6 +1858,7 @@ export type ListingUncheckedUpdateWithoutCategoryInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  subCategoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   media?: Prisma.MediaUncheckedUpdateManyWithoutListingNestedInput
@@ -1710,6 +1882,93 @@ export type ListingUncheckedUpdateManyWithoutCategoryInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  subCategoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type ListingCreateManySubCategoryInput = {
+  id?: string
+  title: string
+  description: string
+  priceCents: number
+  price: number
+  currency?: string
+  isDigital?: boolean
+  condition?: string | null
+  stock?: number | null
+  sellerId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  status?: $Enums.ListingStatus
+  categoryId: string
+  extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  rejectionNote?: string | null
+}
+
+export type ListingUpdateWithoutSubCategoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  priceCents?: Prisma.IntFieldUpdateOperationsInput | number
+  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stock?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seller?: Prisma.UserUpdateOneRequiredWithoutListingsNestedInput
+  media?: Prisma.MediaUpdateManyWithoutListingNestedInput
+  digitalFiles?: Prisma.DigitalFileUpdateManyWithoutListingNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutListingNestedInput
+  Message?: Prisma.MessageUpdateManyWithoutListingNestedInput
+  category?: Prisma.CategoryUpdateOneRequiredWithoutListingsNestedInput
+  OrderItem?: Prisma.OrderItemUpdateManyWithoutListingNestedInput
+}
+
+export type ListingUncheckedUpdateWithoutSubCategoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  priceCents?: Prisma.IntFieldUpdateOperationsInput | number
+  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stock?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  sellerId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  media?: Prisma.MediaUncheckedUpdateManyWithoutListingNestedInput
+  digitalFiles?: Prisma.DigitalFileUncheckedUpdateManyWithoutListingNestedInput
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutListingNestedInput
+  Message?: Prisma.MessageUncheckedUpdateManyWithoutListingNestedInput
+  OrderItem?: Prisma.OrderItemUncheckedUpdateManyWithoutListingNestedInput
+}
+
+export type ListingUncheckedUpdateManyWithoutSubCategoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  priceCents?: Prisma.IntFieldUpdateOperationsInput | number
+  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stock?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  sellerId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -1796,6 +2055,7 @@ export type ListingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   updatedAt?: boolean
   status?: boolean
   categoryId?: boolean
+  subCategoryId?: boolean
   extraDetails?: boolean
   rejectionNote?: boolean
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1803,6 +2063,7 @@ export type ListingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   digitalFiles?: boolean | Prisma.Listing$digitalFilesArgs<ExtArgs>
   transactions?: boolean | Prisma.Listing$transactionsArgs<ExtArgs>
   Message?: boolean | Prisma.Listing$MessageArgs<ExtArgs>
+  subCategory?: boolean | Prisma.Listing$subCategoryArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   OrderItem?: boolean | Prisma.Listing$OrderItemArgs<ExtArgs>
   _count?: boolean | Prisma.ListingCountOutputTypeDefaultArgs<ExtArgs>
@@ -1823,9 +2084,11 @@ export type ListingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   updatedAt?: boolean
   status?: boolean
   categoryId?: boolean
+  subCategoryId?: boolean
   extraDetails?: boolean
   rejectionNote?: boolean
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  subCategory?: boolean | Prisma.Listing$subCategoryArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["listing"]>
 
@@ -1844,9 +2107,11 @@ export type ListingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   updatedAt?: boolean
   status?: boolean
   categoryId?: boolean
+  subCategoryId?: boolean
   extraDetails?: boolean
   rejectionNote?: boolean
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  subCategory?: boolean | Prisma.Listing$subCategoryArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["listing"]>
 
@@ -1865,27 +2130,31 @@ export type ListingSelectScalar = {
   updatedAt?: boolean
   status?: boolean
   categoryId?: boolean
+  subCategoryId?: boolean
   extraDetails?: boolean
   rejectionNote?: boolean
 }
 
-export type ListingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "priceCents" | "price" | "currency" | "isDigital" | "condition" | "stock" | "sellerId" | "createdAt" | "updatedAt" | "status" | "categoryId" | "extraDetails" | "rejectionNote", ExtArgs["result"]["listing"]>
+export type ListingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "priceCents" | "price" | "currency" | "isDigital" | "condition" | "stock" | "sellerId" | "createdAt" | "updatedAt" | "status" | "categoryId" | "subCategoryId" | "extraDetails" | "rejectionNote", ExtArgs["result"]["listing"]>
 export type ListingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   media?: boolean | Prisma.Listing$mediaArgs<ExtArgs>
   digitalFiles?: boolean | Prisma.Listing$digitalFilesArgs<ExtArgs>
   transactions?: boolean | Prisma.Listing$transactionsArgs<ExtArgs>
   Message?: boolean | Prisma.Listing$MessageArgs<ExtArgs>
+  subCategory?: boolean | Prisma.Listing$subCategoryArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   OrderItem?: boolean | Prisma.Listing$OrderItemArgs<ExtArgs>
   _count?: boolean | Prisma.ListingCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ListingIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  subCategory?: boolean | Prisma.Listing$subCategoryArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
 }
 export type ListingIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  subCategory?: boolean | Prisma.Listing$subCategoryArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
 }
 
@@ -1897,6 +2166,7 @@ export type $ListingPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     digitalFiles: Prisma.$DigitalFilePayload<ExtArgs>[]
     transactions: Prisma.$TransactionPayload<ExtArgs>[]
     Message: Prisma.$MessagePayload<ExtArgs>[]
+    subCategory: Prisma.$SubCategoryPayload<ExtArgs> | null
     category: Prisma.$CategoryPayload<ExtArgs>
     OrderItem: Prisma.$OrderItemPayload<ExtArgs>[]
   }
@@ -1915,6 +2185,7 @@ export type $ListingPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     updatedAt: Date
     status: $Enums.ListingStatus
     categoryId: string
+    subCategoryId: string | null
     extraDetails: runtime.JsonValue | null
     rejectionNote: string | null
   }, ExtArgs["result"]["listing"]>
@@ -2316,6 +2587,7 @@ export interface Prisma__ListingClient<T, Null = never, ExtArgs extends runtime.
   digitalFiles<T extends Prisma.Listing$digitalFilesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Listing$digitalFilesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DigitalFilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   transactions<T extends Prisma.Listing$transactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Listing$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   Message<T extends Prisma.Listing$MessageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Listing$MessageArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  subCategory<T extends Prisma.Listing$subCategoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Listing$subCategoryArgs<ExtArgs>>): Prisma.Prisma__SubCategoryClient<runtime.Types.Result.GetResult<Prisma.$SubCategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   category<T extends Prisma.CategoryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CategoryDefaultArgs<ExtArgs>>): Prisma.Prisma__CategoryClient<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   OrderItem<T extends Prisma.Listing$OrderItemArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Listing$OrderItemArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -2361,6 +2633,7 @@ export interface ListingFieldRefs {
   readonly updatedAt: Prisma.FieldRef<"Listing", 'DateTime'>
   readonly status: Prisma.FieldRef<"Listing", 'ListingStatus'>
   readonly categoryId: Prisma.FieldRef<"Listing", 'String'>
+  readonly subCategoryId: Prisma.FieldRef<"Listing", 'String'>
   readonly extraDetails: Prisma.FieldRef<"Listing", 'Json'>
   readonly rejectionNote: Prisma.FieldRef<"Listing", 'String'>
 }
@@ -2852,6 +3125,25 @@ export type Listing$MessageArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[]
+}
+
+/**
+ * Listing.subCategory
+ */
+export type Listing$subCategoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SubCategory
+   */
+  select?: Prisma.SubCategorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SubCategory
+   */
+  omit?: Prisma.SubCategoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SubCategoryInclude<ExtArgs> | null
+  where?: Prisma.SubCategoryWhereInput
 }
 
 /**

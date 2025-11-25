@@ -5,6 +5,7 @@ import { uploadToCloudinary } from "../lib/cloudinary";
 import { errorResponse, successResponse } from "../utils/response";
 import { io } from "../server";
 import { sendExpo, sendFcm } from "../lib/notifications";
+import { sendEmail } from "../services/emailService";
 
 /** 🧍 Rider Registration */
 export const registerRider = async (req: AuthRequest, res: Response) => {
@@ -777,7 +778,12 @@ export const startDelivery = async (req: AuthRequest, res: Response) => {
       where: { id: deliveryId, riderId: rider.id },
       data: { status: "IN_TRANSIT", startedAt: new Date() },
       include: {
-        order: true,
+        order: {
+          include:{
+            user:true,
+            vendor:true
+          }
+        },
       },
     });
 
@@ -786,6 +792,27 @@ export const startDelivery = async (req: AuthRequest, res: Response) => {
       status: "IN_TRANSIT",
       message: "Delivery is now in transit",
     });
+    // Notify user through push notification
+    const sessions = await prisma.session.findMany({
+      where: { userId: delivery.order.userId, deviceToken: { not: null } },
+    });
+    for (const s of sessions) {
+      if (s.devicePlatform === "expo")
+        await sendExpo(
+          s.deviceToken!,
+          "Delivery In Transit",
+          `Your delivery is now in transit`,
+          { type: "delivery_status", status: "IN_TRANSIT" }
+        );
+    }
+    // Sending OTP for delivery confirmation could be implemented here through email/SMS
+    await sendEmail(
+      delivery.order.user.email,
+      "Your Delivery is In Transit",
+      `Hello,'n\nYour delivery for order #${delivery.order.id
+        .toString()
+        .slice(0, 6)} is now in transit. The OTP for confirming delivery is: <strong>${delivery.OTP}</strong>\n\nThank you for using our service! `
+    );
     io.to(delivery.order.userId).emit("delivery_in_transit", { deliveryId });
     io.to(delivery.order.vendorId).emit("delivery_in_transit", { deliveryId });
 

@@ -10,6 +10,7 @@
  */
 export type * from './models/User'
 export type * from './models/Category'
+export type * from './models/SubCategory'
 export type * from './models/VendorApplication'
 export type * from './models/KycVerification'
 export type * from './models/Listing'
