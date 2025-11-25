@@ -56,6 +56,8 @@ export const login = async (req: Request, res: Response) => {
 
     const match = await bcrypt.compare(password, user.password || "");
     if (!match) return errorResponse(res, "Invalid credentials", "INVALID_CREDENTIALS", 401);
+    if (user.isBanned)
+      return errorResponse(res, "User is banned", "USER_BANNED", 403);
 
     const token = jwt.sign(
       { id: user.id, email: user.email },
@@ -273,6 +275,10 @@ export const vendorLogin = async (req: Request, res: Response) => {
     if (user.vendorApplication.status === "REJECTED") {
       return errorResponse(res, "Vendor application was rejected", "VENDOR_REJECTED", 403);
     }
+    if (user.isBanned){
+       return errorResponse(res, "User is banned", "USER_BANNED", 403);
+    }
+     
 
     // if approved → allow login
     const token = jwt.sign(

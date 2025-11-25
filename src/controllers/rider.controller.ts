@@ -837,6 +837,9 @@ export const completeDelivery = async (req: Request, res: Response) => {
       where: { id: deliveryId },
       include: { order: true },
     });
+    if(otp !== delivery?.OTP){
+      return errorResponse(res, "Invalid OTP provided");
+    }
     if (!delivery) return errorResponse(res, "Delivery not found");
     if (delivery.status !== "IN_TRANSIT")
       return errorResponse(res, "Cannot complete this delivery");
