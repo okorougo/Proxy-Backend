@@ -340,7 +340,9 @@ export const getPopularListings = async (req: Request, res: Response) => {
         status: "APPROVED",
       },
       include: {
-        category: true,
+        category: {
+          include: { subCategories: true },
+        },
         media: true,
         seller: {
           include: {
@@ -382,7 +384,9 @@ export const getNewListings = async (req: Request, res: Response) => {
     const listings = await prisma.listing.findMany({
       where: { status: "APPROVED" },
       include: {
-        category: true,
+        category: {
+          include: { subCategories: true },
+        },
         media: true,
         seller: {
           include: {
