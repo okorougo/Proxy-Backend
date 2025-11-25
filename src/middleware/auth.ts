@@ -19,12 +19,12 @@ export async function authMiddleware(req: AuthRequest, res: Response, next: Next
     const user = await prisma.user.findUnique({
       where: { id: payload?.id }
     });
-     if (!user) {
-      errorResponse(res, "User not found", null, 404);
+    if (!user) {
+      return errorResponse(res, "User not found", null, 404);
     }
 
     if (user.isBanned) {
-      errorResponse(res, "User is banned", null, 403);
+      return errorResponse(res, "User is banned", null, 403);
     }
     req.user = payload;  // ✅ This is where req.user.id comes from
     next();
