@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getDashboardStats, listKycRequests, updateKycStatus, listReports, resolveReport, listUsers, banUser, unbanUser, updateUserRole,listAllListings, approveListing, rejectListing, removeListing, createCategory, getCategories, updateCategory, deleteCategory, adminLogin, getRiderMonthlyStats, getSingleRider, getRiderDashboardStats, getAllRiders, getSingleUser} from "../controllers/admin.controller";
+import { getDashboardStats, listKycRequests, updateKycStatus, listReports, resolveReport, listUsers, banUser, unbanUser, updateUserRole,listAllListings, approveListing, rejectListing, removeListing, createCategory, getCategories, updateCategory, deleteCategory, adminLogin, getRiderMonthlyStats, getSingleRider, getRiderDashboardStats, getAllRiders, getSingleUser, createSubCategory, updateSubCategory, deleteSubCategory} from "../controllers/admin.controller";
 import multer from "multer";
 import { authMiddleware } from "../middleware/auth";
 import { adminOnly, modOrAdmin } from "../middleware/admin";
@@ -40,8 +40,11 @@ router.post("/remove", authMiddleware, adminOnly, removeListing);
 
 // Add category
 router.post("/add-category", authMiddleware,adminOnly,upload.single("image"), createCategory)
+router.post("/add-sub-category", authMiddleware,adminOnly, createSubCategory)
 router.get("/get-category", getCategories);
 router.put("/edit-category/:id", authMiddleware, upload.single("image"), updateCategory);
+router.put("/edit-sub-category/:id", authMiddleware, updateSubCategory);
 router.delete("/delete-category/:id", authMiddleware, deleteCategory);
+router.delete("/delete-sub-category/:id", authMiddleware, deleteSubCategory);
 
 export default router;

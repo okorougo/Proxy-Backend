@@ -496,7 +496,7 @@ socket.on("delivery_location_update", async ({ deliveryId, lat, lng }) => {
 cron.schedule("*/10 * * * *", async () => {
   try {
     const response = await axios.get(
-      "https://proxy-backend-6of2.onrender.com/api/listings/popular"
+      "https://proxy-backend-6of2.onrender.com/api/admin/get-category"
     );
     console.log("Fetched sucessfully")
   } catch (error: any) {
