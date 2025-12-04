@@ -1079,14 +1079,7 @@ export const saveVendorBank = async (req:AuthRequest, res:Response) => {
     const vendorId = vendor.id;
     const { bankName, bankCode, accountName, accountNumber } = req.body;
 
-    // Prevent overwriting existing bank details
-    const existing = await prisma.vendorBank.findUnique({ where: { vendorId } });
-    if (existing) {
-      return res.status(400).json({
-        status: false,
-        message: "Bank details already added",
-      });
-    }
+
 
     const bank = await prisma.vendorBank.upsert({
       create: {
@@ -1105,6 +1098,10 @@ export const saveVendorBank = async (req:AuthRequest, res:Response) => {
       where: { vendorId
       }
     });
+
+    if(!bank){
+      return res.status(500).json({ status: false, message: "Failed to save bank details" });
+    }
 
     return res.json({
       status: true,
