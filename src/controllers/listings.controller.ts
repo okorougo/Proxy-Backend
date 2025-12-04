@@ -315,6 +315,7 @@ export const getAllListingsByVendor = async (
         category: true,
         media: true,
         transactions: true,
+        subCategory: true,
       },
       orderBy: { createdAt: "desc" },
     });
