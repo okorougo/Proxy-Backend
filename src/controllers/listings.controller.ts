@@ -579,14 +579,24 @@ export const searchListings = async (req: Request, res: Response) => {
 
 export const getListingsByCategory = async (req: Request, res: Response) => {
   try {
-    const { categoryId, limit = "10", cursor } = req.query;
+    const { categoryId, subcategoryId, limit = "10", cursor } = req.query;
 
-    if (!categoryId) return errorResponse(res, "categoryId is required");
+      if (!categoryId && !subcategoryId) {
+      return errorResponse(res, "categoryId or subcategoryId is required");
+    }
 
     const pageSize = parseInt(limit as string, 10);
 
+    const where: any = {
+      status: "APPROVED",
+    };
+    
+    // Allow category OR subcategory search
+    if (categoryId) where.categoryId = categoryId as string;
+    if (subcategoryId) where.subcategoryId = subcategoryId as string;
+
     const listings = await prisma.listing.findMany({
-      where: { categoryId: categoryId as string, status: "APPROVED" },
+      where,
       include: {
         media: true,
         seller: {
@@ -602,10 +612,12 @@ export const getListingsByCategory = async (req: Request, res: Response) => {
             },
           },
         },
+        category: true,
+        subCategory: true, // 👈 important so frontend sees it
       },
       orderBy: { createdAt: "desc" },
       take: pageSize,
-      skip: cursor ? 1 : 0, // Skip the cursor item itself
+      skip: cursor ? 1 : 0,
       cursor: cursor ? { id: cursor as string } : undefined,
     });
 
