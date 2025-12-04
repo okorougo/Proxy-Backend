@@ -17,6 +17,7 @@ import {
   saveVendorBank,
   getBanks,
   resolveAccount,
+  getWallet,
 } from "../controllers/vendor.controller";
 
 const router = Router();
@@ -39,4 +40,6 @@ router.post("/withdrawals/request", authMiddleware, requestWithdrawal);
 router.post("/update-bank", authMiddleware, saveVendorBank);
 router.get("/get-bank", authMiddleware, getBanks);
 router.post("/resolve-account", resolveAccount);
+
+router.get("/get-wallet", authMiddleware, getWallet);
 export default router;

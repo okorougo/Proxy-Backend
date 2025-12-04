@@ -1114,3 +1114,27 @@ export const saveVendorBank = async (req:AuthRequest, res:Response) => {
     return res.status(500).json({ status: false, message: "Failed to save bank details" });
   }
 };
+export const getWallet = async (req:AuthRequest, res:Response) => {
+     const userId = req.user?.id;
+    if (!userId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
+
+    // ✅ Find vendor for logged-in user
+    const vendor = await prisma.vendorApplication.findUnique({
+      where: { userId },
+    });
+    if (!vendor)
+      return errorResponse(res, "Vendor not found", "NO_VENDOR", 404);
+
+    const vendorId = vendor.id;
+
+  const wallet = await prisma.vendorWallet.findUnique({
+    where: { vendorId },
+    include: {
+      withdrawals: {
+        orderBy: { createdAt: "desc" },
+      },
+    },
+  });
+
+  return res.json({ status: true, data: wallet });
+};
