@@ -207,6 +207,7 @@ export type SubCategoryOrderByWithRelationInput = {
 
 export type SubCategoryWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  name_categoryId?: Prisma.SubCategoryNameCategoryIdCompoundUniqueInput
   AND?: Prisma.SubCategoryWhereInput | Prisma.SubCategoryWhereInput[]
   OR?: Prisma.SubCategoryWhereInput[]
   NOT?: Prisma.SubCategoryWhereInput | Prisma.SubCategoryWhereInput[]
@@ -217,7 +218,7 @@ export type SubCategoryWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"SubCategory"> | Date | string
   category?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.CategoryWhereInput>
   listings?: Prisma.ListingListRelationFilter
-}, "id">
+}, "id" | "name_categoryId">
 
 export type SubCategoryOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -317,6 +318,11 @@ export type SubCategoryListRelationFilter = {
 
 export type SubCategoryOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type SubCategoryNameCategoryIdCompoundUniqueInput = {
+  name: string
+  categoryId: string
 }
 
 export type SubCategoryCountOrderByAggregateInput = {
