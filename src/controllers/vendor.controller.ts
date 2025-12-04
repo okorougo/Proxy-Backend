@@ -1036,7 +1036,7 @@ export const getBanks = async (req: Request, res: Response) => {
         },
       }
     );
-   return successResponse(res, "Banks fetched successfully", banks.data.data);
+   return successResponse(res, "Banks fetched successfully", banks.data);
   } catch (err) {
     return errorResponse(res, "Failed to fetch banks");
   }
