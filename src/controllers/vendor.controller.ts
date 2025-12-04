@@ -1138,3 +1138,19 @@ export const getWallet = async (req:AuthRequest, res:Response) => {
 
   return res.json({ status: true, data: wallet });
 };
+export const getVendorBanksDetails = async (req:AuthRequest, res:Response) => {
+     const userId = req.user?.id;
+    if (!userId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
+    // ✅ Find vendor for logged-in user
+    const vendor = await prisma.vendorApplication.findUnique({
+      where: { userId },
+    });
+    if (!vendor)
+      return errorResponse(res, "Vendor not found", "NO_VENDOR", 404);
+    const vendorId = vendor.id;
+
+  const bank = await prisma.vendorBank.findUnique({
+    where: { vendorId },
+  });
+  return res.json({ status: true, data: bank });
+};

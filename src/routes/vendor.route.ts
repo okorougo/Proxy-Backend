@@ -18,6 +18,7 @@ import {
   getBanks,
   resolveAccount,
   getWallet,
+  getVendorBanksDetails,
 } from "../controllers/vendor.controller";
 
 const router = Router();
@@ -42,4 +43,6 @@ router.get("/get-bank", authMiddleware, getBanks);
 router.post("/resolve-account", resolveAccount);
 
 router.get("/get-wallet", authMiddleware, getWallet);
+
+router.get("/get-vendor-bank-details", authMiddleware, getVendorBanksDetails);
 export default router;
