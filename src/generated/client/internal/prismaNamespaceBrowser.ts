@@ -412,6 +412,7 @@ export const WithdrawalRequestScalarFieldEnum = {
   bankName: 'bankName',
   accountName: 'accountName',
   accountNumber: 'accountNumber',
+  bankCode: 'bankCode',
   status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',

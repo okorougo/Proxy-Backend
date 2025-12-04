@@ -231,7 +231,9 @@ export const getVendorDashboardStats = async (
         NOT: { status: { in: ["COMPLETED", "CANCELLED", "REJECTED"] } },
       },
     });
-
+      const wallet = await prisma.vendorWallet.findUnique({
+    where: { vendorId }
+  });
     // 2️⃣ Order Requests (pending confirmation)
     const orderRequests = await prisma.order.count({
       where: { vendorId, status: "PENDING" },
@@ -357,6 +359,8 @@ export const getVendorDashboardStats = async (
       todayNewOrders,
       monthlyRevenue: { labels, values },
       popularListings,
+    walletBalance: wallet?.balance || 0,
+    totalEarned: wallet?.totalEarned || 0,
     });
   } catch (err) {
     console.error("getVendorDashboardStats error:", err);
@@ -503,7 +507,9 @@ export const getVendorOrders = async (req: AuthRequest, res: Response) => {
             phone: order.delivery.rider?.user.phone,
             vehicle: order.delivery.rider?.vehicle,
             kyc: order.delivery.rider?.kyc,
-            vehicleType: order.delivery.rider?.vehicleType
+            vehicleType: order.delivery.rider?.vehicleType,
+            currentLat: order.delivery.rider?.currentLat,
+            currentLng: order.delivery.rider?.currentLng,
           } : null,
         listings: order.listings.map((item) => ({
           id: item.id,
@@ -976,5 +982,135 @@ export const updateVendor = async (req: Request, res: Response) => {
   } catch (err) {
     console.error("❌ updateUser error:", err);
     return errorResponse(res, "Failed to update profile", "UPDATE_ERROR", 500);
+  }
+};
+
+export const requestWithdrawal = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user.id;
+    const { amount } = req.body;
+
+      if (!userId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
+
+    // ✅ Find vendor for logged-in user
+    const vendor = await prisma.vendorApplication.findUnique({
+      where: { userId },
+    });
+    if (!vendor)
+      return errorResponse(res, "Vendor not found", "NO_VENDOR", 404);
+
+    const vendorId = vendor.id;
+
+    const wallet = await prisma.vendorWallet.findUnique({ where: { vendorId } });
+    if (!wallet) return errorResponse(res, "Wallet not found");
+    if (wallet.balance < amount) return errorResponse(res, "Insufficient funds");
+
+    const bank = await prisma.vendorBank.findUnique({ where: { vendorId }});
+    if (!bank) return errorResponse(res, "Vendor has no registered bank");
+
+    // Create withdrawal request for admin approval
+    const request = await prisma.withdrawalRequest.create({
+      data: {
+        vendorId,
+        amount,
+        bankName: bank.bankName,
+        bankCode: bank.bankCode,
+        accountName: bank.accountName,
+        accountNumber: bank.accountNumber,
+      }
+    });
+
+    return successResponse(res, "Withdrawal request submitted", request);
+  } catch (err) {
+    console.error(err);
+    return errorResponse(res, "Failed to request withdrawal");
+  }
+};
+export const getBanks = async (req: Request, res: Response) => {
+  try {
+    const banks = await axios.get(
+      "https://api.paystack.co/bank?country=nigeria",
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET}`,
+        },
+      }
+    );
+   return successResponse(res, "Banks fetched successfully", banks.data.data);
+  } catch (err) {
+    return errorResponse(res, "Failed to fetch banks");
+  }
+};
+export const resolveAccount = async (req:AuthRequest, res:Response) => {
+  try {
+    const { accountNumber, bankCode } = req.body;
+
+    if (!accountNumber || !bankCode)
+      return res.status(400).json({ status: false, message: "Missing fields" });
+
+    const resolve = await axios.get(
+      `https://api.paystack.co/bank/resolve?account_number=${accountNumber}&bank_code=${bankCode}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET}`,
+        },
+      }
+    );
+
+ return successResponse(res, "Account resolved", resolve.data.data);
+  } catch (err) {
+    return errorResponse(res, "Account resolution failed");
+  }
+};
+export const saveVendorBank = async (req:AuthRequest, res:Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
+
+    // ✅ Find vendor for logged-in user
+    const vendor = await prisma.vendorApplication.findUnique({
+      where: { userId },
+    });
+    if (!vendor)
+      return errorResponse(res, "Vendor not found", "NO_VENDOR", 404);
+
+    const vendorId = vendor.id;
+    const { bankName, bankCode, accountName, accountNumber } = req.body;
+
+    // Prevent overwriting existing bank details
+    const existing = await prisma.vendorBank.findUnique({ where: { vendorId } });
+    if (existing) {
+      return res.status(400).json({
+        status: false,
+        message: "Bank details already added",
+      });
+    }
+
+    const bank = await prisma.vendorBank.upsert({
+      create: {
+        vendorId,
+        bankName,
+        bankCode,
+        accountName,
+        accountNumber,
+      },
+      update:{
+        bankName,
+        bankCode,
+        accountName,
+        accountNumber,
+      },
+      where: { vendorId
+      }
+    });
+
+    return res.json({
+      status: true,
+      message: "Bank details saved",
+      data: bank,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ status: false, message: "Failed to save bank details" });
   }
 };

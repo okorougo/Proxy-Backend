@@ -13,6 +13,10 @@ import {
   getVendorOrders,
   pushOrderToRiders,
   updateVendor,
+  requestWithdrawal,
+  saveVendorBank,
+  getBanks,
+  resolveAccount,
 } from "../controllers/vendor.controller";
 
 const router = Router();
@@ -28,4 +32,11 @@ router.get("/dashboard", authMiddleware, getVendorDashboardStats);
 router.get("/get-vendor/:id", authMiddleware, getVendorById);
 router.post("/push-order-to-rider/:deliveryId", authMiddleware, pushOrderToRiders);
 router.put("/update", authMiddleware, updateVendor);
+// Vendor withdrawal Requests
+router.post("/withdrawals/request", authMiddleware, requestWithdrawal);
+
+// Getting bank details and saving bank details will be done in user routes since
+router.post("/update-bank", authMiddleware, saveVendorBank);
+router.get("/get-bank", authMiddleware, getBanks);
+router.post("/resolve-account", resolveAccount);
 export default router;

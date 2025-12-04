@@ -1,10 +1,11 @@
-import { Response } from "express";
+import { Response , Request} from "express";
 import prisma from "../lib/prisma";
 import { AuthRequest } from "../middleware/auth";
 import { successResponse, errorResponse } from "../utils/response";
 import { uploadToCloudinary } from "../lib/cloudinary"; 
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import axios from "axios";
 
 // Dashboard overview (counts, stats)
 export const adminLogin = async (req: any, res: Response) => {
@@ -611,4 +612,70 @@ export const getRiderMonthlyStats = async (req: AuthRequest, res: Response) => {
     console.error("getRiderMonthlyStats error:", err);
     return errorResponse(res, "Failed to get monthly stats");
   }
+};
+export const approveWithdrawal = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const withdrawal = await prisma.withdrawalRequest.findUnique({ where: { id }});
+    if (!withdrawal) return errorResponse(res, "Withdrawal not found");
+
+    if (withdrawal.status !== "PENDING")
+      return errorResponse(res, "Already processed");
+
+    // Deduct balance instantly
+    await prisma.vendorWallet.update({
+      where: { vendorId: withdrawal.vendorId },
+      data: {
+        balance: { decrement: withdrawal.amount },
+        withdrawn: { increment: withdrawal.amount },
+        walletTransaction: {
+          create: {
+            amount: withdrawal.amount,
+            type: "DEBIT",
+            vendorId: withdrawal.vendorId,
+            remark: "Withdrawal approved"
+          }
+        }
+      }
+    });
+
+    // Now call Paystack
+    const transfer = await axios.post(
+      "https://api.paystack.co/transfer",
+      {
+        source: "balance",
+        amount: withdrawal.amount * 100,
+        recipient: {
+          type: "nuban",
+          name: withdrawal.accountName,
+          account_number: withdrawal.accountNumber,
+          bank_code: withdrawal.bankCode,
+          currency: "NGN",
+        }
+      },
+      { headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET}` } }
+    );
+
+    await prisma.withdrawalRequest.update({
+      where: { id },
+      data: { status: "COMPLETED" }
+    });
+
+    return successResponse(res, "Withdrawal approved & transferred", transfer.data);
+
+  } catch (err) {
+    console.log(err);
+    return errorResponse(res, "Withdrawal approval failed");
+  }
+};
+export const rejectWithdrawal = async (req: AuthRequest, res: Response) => {
+  const { id } = req.params;
+
+  const withdrawal = await prisma.withdrawalRequest.update({
+    where: { id },
+    data: { status: "REJECTED" }
+  });
+
+  return successResponse(res, "Withdrawal rejected", withdrawal);
 };

@@ -41,6 +41,7 @@ export type WithdrawalRequestMinAggregateOutputType = {
   bankName: string | null
   accountName: string | null
   accountNumber: string | null
+  bankCode: string | null
   status: $Enums.WithdrawalStatus | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -54,6 +55,7 @@ export type WithdrawalRequestMaxAggregateOutputType = {
   bankName: string | null
   accountName: string | null
   accountNumber: string | null
+  bankCode: string | null
   status: $Enums.WithdrawalStatus | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -67,6 +69,7 @@ export type WithdrawalRequestCountAggregateOutputType = {
   bankName: number
   accountName: number
   accountNumber: number
+  bankCode: number
   status: number
   createdAt: number
   updatedAt: number
@@ -90,6 +93,7 @@ export type WithdrawalRequestMinAggregateInputType = {
   bankName?: true
   accountName?: true
   accountNumber?: true
+  bankCode?: true
   status?: true
   createdAt?: true
   updatedAt?: true
@@ -103,6 +107,7 @@ export type WithdrawalRequestMaxAggregateInputType = {
   bankName?: true
   accountName?: true
   accountNumber?: true
+  bankCode?: true
   status?: true
   createdAt?: true
   updatedAt?: true
@@ -116,6 +121,7 @@ export type WithdrawalRequestCountAggregateInputType = {
   bankName?: true
   accountName?: true
   accountNumber?: true
+  bankCode?: true
   status?: true
   createdAt?: true
   updatedAt?: true
@@ -216,6 +222,7 @@ export type WithdrawalRequestGroupByOutputType = {
   bankName: string
   accountName: string
   accountNumber: string
+  bankCode: string
   status: $Enums.WithdrawalStatus
   createdAt: Date
   updatedAt: Date
@@ -252,6 +259,7 @@ export type WithdrawalRequestWhereInput = {
   bankName?: Prisma.StringFilter<"WithdrawalRequest"> | string
   accountName?: Prisma.StringFilter<"WithdrawalRequest"> | string
   accountNumber?: Prisma.StringFilter<"WithdrawalRequest"> | string
+  bankCode?: Prisma.StringFilter<"WithdrawalRequest"> | string
   status?: Prisma.EnumWithdrawalStatusFilter<"WithdrawalRequest"> | $Enums.WithdrawalStatus
   createdAt?: Prisma.DateTimeFilter<"WithdrawalRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"WithdrawalRequest"> | Date | string
@@ -267,6 +275,7 @@ export type WithdrawalRequestOrderByWithRelationInput = {
   bankName?: Prisma.SortOrder
   accountName?: Prisma.SortOrder
   accountNumber?: Prisma.SortOrder
+  bankCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -285,6 +294,7 @@ export type WithdrawalRequestWhereUniqueInput = Prisma.AtLeast<{
   bankName?: Prisma.StringFilter<"WithdrawalRequest"> | string
   accountName?: Prisma.StringFilter<"WithdrawalRequest"> | string
   accountNumber?: Prisma.StringFilter<"WithdrawalRequest"> | string
+  bankCode?: Prisma.StringFilter<"WithdrawalRequest"> | string
   status?: Prisma.EnumWithdrawalStatusFilter<"WithdrawalRequest"> | $Enums.WithdrawalStatus
   createdAt?: Prisma.DateTimeFilter<"WithdrawalRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"WithdrawalRequest"> | Date | string
@@ -300,6 +310,7 @@ export type WithdrawalRequestOrderByWithAggregationInput = {
   bankName?: Prisma.SortOrder
   accountName?: Prisma.SortOrder
   accountNumber?: Prisma.SortOrder
+  bankCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -321,6 +332,7 @@ export type WithdrawalRequestScalarWhereWithAggregatesInput = {
   bankName?: Prisma.StringWithAggregatesFilter<"WithdrawalRequest"> | string
   accountName?: Prisma.StringWithAggregatesFilter<"WithdrawalRequest"> | string
   accountNumber?: Prisma.StringWithAggregatesFilter<"WithdrawalRequest"> | string
+  bankCode?: Prisma.StringWithAggregatesFilter<"WithdrawalRequest"> | string
   status?: Prisma.EnumWithdrawalStatusWithAggregatesFilter<"WithdrawalRequest"> | $Enums.WithdrawalStatus
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"WithdrawalRequest"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"WithdrawalRequest"> | Date | string
@@ -333,6 +345,7 @@ export type WithdrawalRequestCreateInput = {
   bankName: string
   accountName: string
   accountNumber: string
+  bankCode: string
   status?: $Enums.WithdrawalStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -347,6 +360,7 @@ export type WithdrawalRequestUncheckedCreateInput = {
   bankName: string
   accountName: string
   accountNumber: string
+  bankCode: string
   status?: $Enums.WithdrawalStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -359,6 +373,7 @@ export type WithdrawalRequestUpdateInput = {
   bankName?: Prisma.StringFieldUpdateOperationsInput | string
   accountName?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  bankCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumWithdrawalStatusFieldUpdateOperationsInput | $Enums.WithdrawalStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -373,6 +388,7 @@ export type WithdrawalRequestUncheckedUpdateInput = {
   bankName?: Prisma.StringFieldUpdateOperationsInput | string
   accountName?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  bankCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumWithdrawalStatusFieldUpdateOperationsInput | $Enums.WithdrawalStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -386,6 +402,7 @@ export type WithdrawalRequestCreateManyInput = {
   bankName: string
   accountName: string
   accountNumber: string
+  bankCode: string
   status?: $Enums.WithdrawalStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -398,6 +415,7 @@ export type WithdrawalRequestUpdateManyMutationInput = {
   bankName?: Prisma.StringFieldUpdateOperationsInput | string
   accountName?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  bankCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumWithdrawalStatusFieldUpdateOperationsInput | $Enums.WithdrawalStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -410,6 +428,7 @@ export type WithdrawalRequestUncheckedUpdateManyInput = {
   bankName?: Prisma.StringFieldUpdateOperationsInput | string
   accountName?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  bankCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumWithdrawalStatusFieldUpdateOperationsInput | $Enums.WithdrawalStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -433,6 +452,7 @@ export type WithdrawalRequestCountOrderByAggregateInput = {
   bankName?: Prisma.SortOrder
   accountName?: Prisma.SortOrder
   accountNumber?: Prisma.SortOrder
+  bankCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -450,6 +470,7 @@ export type WithdrawalRequestMaxOrderByAggregateInput = {
   bankName?: Prisma.SortOrder
   accountName?: Prisma.SortOrder
   accountNumber?: Prisma.SortOrder
+  bankCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -463,6 +484,7 @@ export type WithdrawalRequestMinOrderByAggregateInput = {
   bankName?: Prisma.SortOrder
   accountName?: Prisma.SortOrder
   accountNumber?: Prisma.SortOrder
+  bankCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -567,6 +589,7 @@ export type WithdrawalRequestCreateWithoutVendorInput = {
   bankName: string
   accountName: string
   accountNumber: string
+  bankCode: string
   status?: $Enums.WithdrawalStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -579,6 +602,7 @@ export type WithdrawalRequestUncheckedCreateWithoutVendorInput = {
   bankName: string
   accountName: string
   accountNumber: string
+  bankCode: string
   status?: $Enums.WithdrawalStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -621,6 +645,7 @@ export type WithdrawalRequestScalarWhereInput = {
   bankName?: Prisma.StringFilter<"WithdrawalRequest"> | string
   accountName?: Prisma.StringFilter<"WithdrawalRequest"> | string
   accountNumber?: Prisma.StringFilter<"WithdrawalRequest"> | string
+  bankCode?: Prisma.StringFilter<"WithdrawalRequest"> | string
   status?: Prisma.EnumWithdrawalStatusFilter<"WithdrawalRequest"> | $Enums.WithdrawalStatus
   createdAt?: Prisma.DateTimeFilter<"WithdrawalRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"WithdrawalRequest"> | Date | string
@@ -633,6 +658,7 @@ export type WithdrawalRequestCreateWithoutVendorWalletInput = {
   bankName: string
   accountName: string
   accountNumber: string
+  bankCode: string
   status?: $Enums.WithdrawalStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -646,6 +672,7 @@ export type WithdrawalRequestUncheckedCreateWithoutVendorWalletInput = {
   bankName: string
   accountName: string
   accountNumber: string
+  bankCode: string
   status?: $Enums.WithdrawalStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -683,6 +710,7 @@ export type WithdrawalRequestCreateManyVendorInput = {
   bankName: string
   accountName: string
   accountNumber: string
+  bankCode: string
   status?: $Enums.WithdrawalStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -695,6 +723,7 @@ export type WithdrawalRequestUpdateWithoutVendorInput = {
   bankName?: Prisma.StringFieldUpdateOperationsInput | string
   accountName?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  bankCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumWithdrawalStatusFieldUpdateOperationsInput | $Enums.WithdrawalStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -707,6 +736,7 @@ export type WithdrawalRequestUncheckedUpdateWithoutVendorInput = {
   bankName?: Prisma.StringFieldUpdateOperationsInput | string
   accountName?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  bankCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumWithdrawalStatusFieldUpdateOperationsInput | $Enums.WithdrawalStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -719,6 +749,7 @@ export type WithdrawalRequestUncheckedUpdateManyWithoutVendorInput = {
   bankName?: Prisma.StringFieldUpdateOperationsInput | string
   accountName?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  bankCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumWithdrawalStatusFieldUpdateOperationsInput | $Enums.WithdrawalStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -732,6 +763,7 @@ export type WithdrawalRequestCreateManyVendorWalletInput = {
   bankName: string
   accountName: string
   accountNumber: string
+  bankCode: string
   status?: $Enums.WithdrawalStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -743,6 +775,7 @@ export type WithdrawalRequestUpdateWithoutVendorWalletInput = {
   bankName?: Prisma.StringFieldUpdateOperationsInput | string
   accountName?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  bankCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumWithdrawalStatusFieldUpdateOperationsInput | $Enums.WithdrawalStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -756,6 +789,7 @@ export type WithdrawalRequestUncheckedUpdateWithoutVendorWalletInput = {
   bankName?: Prisma.StringFieldUpdateOperationsInput | string
   accountName?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  bankCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumWithdrawalStatusFieldUpdateOperationsInput | $Enums.WithdrawalStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -768,6 +802,7 @@ export type WithdrawalRequestUncheckedUpdateManyWithoutVendorWalletInput = {
   bankName?: Prisma.StringFieldUpdateOperationsInput | string
   accountName?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  bankCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumWithdrawalStatusFieldUpdateOperationsInput | $Enums.WithdrawalStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -782,6 +817,7 @@ export type WithdrawalRequestSelect<ExtArgs extends runtime.Types.Extensions.Int
   bankName?: boolean
   accountName?: boolean
   accountNumber?: boolean
+  bankCode?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -797,6 +833,7 @@ export type WithdrawalRequestSelectCreateManyAndReturn<ExtArgs extends runtime.T
   bankName?: boolean
   accountName?: boolean
   accountNumber?: boolean
+  bankCode?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -812,6 +849,7 @@ export type WithdrawalRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   bankName?: boolean
   accountName?: boolean
   accountNumber?: boolean
+  bankCode?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -827,13 +865,14 @@ export type WithdrawalRequestSelectScalar = {
   bankName?: boolean
   accountName?: boolean
   accountNumber?: boolean
+  bankCode?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   vendorWalletId?: boolean
 }
 
-export type WithdrawalRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "vendorId" | "amount" | "bankName" | "accountName" | "accountNumber" | "status" | "createdAt" | "updatedAt" | "vendorWalletId", ExtArgs["result"]["withdrawalRequest"]>
+export type WithdrawalRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "vendorId" | "amount" | "bankName" | "accountName" | "accountNumber" | "bankCode" | "status" | "createdAt" | "updatedAt" | "vendorWalletId", ExtArgs["result"]["withdrawalRequest"]>
 export type WithdrawalRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   vendor?: boolean | Prisma.VendorApplicationDefaultArgs<ExtArgs>
   vendorWallet?: boolean | Prisma.WithdrawalRequest$vendorWalletArgs<ExtArgs>
@@ -860,6 +899,7 @@ export type $WithdrawalRequestPayload<ExtArgs extends runtime.Types.Extensions.I
     bankName: string
     accountName: string
     accountNumber: string
+    bankCode: string
     status: $Enums.WithdrawalStatus
     createdAt: Date
     updatedAt: Date
@@ -1295,6 +1335,7 @@ export interface WithdrawalRequestFieldRefs {
   readonly bankName: Prisma.FieldRef<"WithdrawalRequest", 'String'>
   readonly accountName: Prisma.FieldRef<"WithdrawalRequest", 'String'>
   readonly accountNumber: Prisma.FieldRef<"WithdrawalRequest", 'String'>
+  readonly bankCode: Prisma.FieldRef<"WithdrawalRequest", 'String'>
   readonly status: Prisma.FieldRef<"WithdrawalRequest", 'WithdrawalStatus'>
   readonly createdAt: Prisma.FieldRef<"WithdrawalRequest", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"WithdrawalRequest", 'DateTime'>

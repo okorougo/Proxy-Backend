@@ -409,6 +409,7 @@ model WithdrawalRequest {
   bankName      String
   accountName   String
   accountNumber String
+  bankCode      String
   status        WithdrawalStatus @default(PENDING)
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
