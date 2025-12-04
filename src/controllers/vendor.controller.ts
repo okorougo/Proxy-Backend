@@ -1053,7 +1053,7 @@ export const resolveAccount = async (req:Request, res:Response) => {
       `https://api.paystack.co/bank/resolve?account_number=${accountNumber}&bank_code=${bankCode}`,
       {
         headers: {
-          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY_LIVE}`,
         },
       }
     );
