@@ -1059,6 +1059,7 @@ export const resolveAccount = async (req:AuthRequest, res:Response) => {
 
  return successResponse(res, "Account resolved", resolve.data);
   } catch (err) {
+    console.error(err);
     return errorResponse(res, "Account resolution failed");
   }
 };
