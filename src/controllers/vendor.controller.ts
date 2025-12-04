@@ -1060,7 +1060,7 @@ export const resolveAccount = async (req:Request, res:Response) => {
 
  return successResponse(res, "Account resolved", resolve.data);
   } catch (err) {
-    console.error(err);
+   console.error("PAYSTACK ERROR:", err.response?.data || err.message);
     return errorResponse(res, "Account resolution failed");
   }
 };
