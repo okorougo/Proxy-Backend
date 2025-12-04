@@ -1041,7 +1041,7 @@ export const getBanks = async (req: Request, res: Response) => {
     return errorResponse(res, "Failed to fetch banks");
   }
 };
-export const resolveAccount = async (req:AuthRequest, res:Response) => {
+export const resolveAccount = async (req:Request, res:Response) => {
   try {
     const { accountNumber, bankCode } = req.body;
 
