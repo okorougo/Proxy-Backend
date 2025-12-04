@@ -4,10 +4,11 @@ import { sendEmail } from "../services/emailService";
 import { errorResponse, successResponse } from "../utils/response";
 import { AuthRequest } from "../middleware/auth";
 import geohash from "ngeohash";
-import { generateSignedDownloadUrl } from "../lib/cloudinary";
 import axios from "axios";
-import { io } from "../server";
 import { sendExpo, sendFcm } from "../lib/notifications";
+import dotenv from "dotenv";
+dotenv.config();
+
 
 function generateGeohash(
   latitude: number,
