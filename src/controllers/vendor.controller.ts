@@ -423,7 +423,17 @@ export const getVendorOrders = async (req: AuthRequest, res: Response) => {
           },
         },
         transaction: true,
-        delivery: true,
+        delivery: {
+          include:{
+            rider:{
+              include:{
+                user:true,
+                kyc:true,
+                vehicle:true
+              }
+            }
+          }
+        },
       },
       orderBy: { createdAt: "desc" },
     });
@@ -486,6 +496,15 @@ export const getVendorOrders = async (req: AuthRequest, res: Response) => {
               dropoffLng: order.delivery.dropoffLng,
             }
           : null,
+          rider: order.delivery?.riderId ? {
+            id: order.delivery.riderId,
+            name: order.delivery.rider?.user.name,
+            email: order.delivery.rider?.user.email,
+            phone: order.delivery.rider?.user.phone,
+            vehicle: order.delivery.rider?.vehicle,
+            kyc: order.delivery.rider?.kyc,
+            
+          } : null,
         listings: order.listings.map((item) => ({
           id: item.id,
           title: item.listing.title,
