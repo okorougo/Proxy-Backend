@@ -503,7 +503,7 @@ export const getVendorOrders = async (req: AuthRequest, res: Response) => {
             phone: order.delivery.rider?.user.phone,
             vehicle: order.delivery.rider?.vehicle,
             kyc: order.delivery.rider?.kyc,
-            
+            vehicleType: order.delivery.rider?.vehicleType
           } : null,
         listings: order.listings.map((item) => ({
           id: item.id,
