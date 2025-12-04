@@ -40,7 +40,7 @@ router.post("/withdrawals/request", authMiddleware, requestWithdrawal);
 // Getting bank details and saving bank details will be done in user routes since
 router.post("/update-bank", authMiddleware, saveVendorBank);
 router.get("/get-bank", authMiddleware, getBanks);
-router.post("/resolve-account", resolveAccount);
+router.post("/resolve-account",authMiddleware, resolveAccount);
 
 router.get("/get-wallet", authMiddleware, getWallet);
 
