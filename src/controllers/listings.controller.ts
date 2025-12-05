@@ -587,8 +587,10 @@ export const getListingsByCategory = async (req: Request, res: Response) => {
 
     const pageSize = parseInt(limit as string, 10);
 
-    const where: any = {
-      status: "APPROVED",
+    const where:any = {
+        status: "APPROVED" as const,
+        ...(categoryId && { categoryId: categoryId }),
+        ...(subcategoryId && {subCategoryId: subcategoryId })
     };
     
     // Allow category OR subcategory search
