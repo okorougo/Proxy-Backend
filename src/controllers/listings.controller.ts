@@ -577,25 +577,42 @@ export const searchListings = async (req: Request, res: Response) => {
   }
 };
 
+
 export const getListingsByCategory = async (req: Request, res: Response) => {
   try {
-    const { categoryId, subcategoryId, limit = "10", cursor } = req.query;
+    // Accept either `subCategoryId` (camelCase) or `subcategoryId` (lowercase)
+    const {
+      categoryId,
+      subCategoryId: subCategoryIdCamel,
+      subcategoryId: subCategoryIdLower,
+      limit = "10",
+      cursor,
+    } = req.query;
 
-      if (!categoryId && !subcategoryId) {
+    // prefer camelCase but accept lowercase fallback
+    const effectiveSubCategoryId = (subCategoryIdCamel || subCategoryIdLower) as string | undefined;
+
+    if (!categoryId && !effectiveSubCategoryId) {
       return errorResponse(res, "categoryId or subcategoryId is required");
     }
 
     const pageSize = parseInt(limit as string, 10);
 
-    const where:any = {
-        status: "APPROVED" as const,
-        ...(categoryId && { categoryId: categoryId }),
-        ...(subcategoryId && {subCategoryId: subcategoryId })
+    // Build Prisma `where` using the correct field name `subCategoryId`
+    const where: any = {
+      status: "APPROVED" as const,
+      ...(categoryId && { categoryId: categoryId as string }),
+      ...(effectiveSubCategoryId && { subCategoryId: effectiveSubCategoryId }),
     };
-    
-    // Allow category OR subcategory search
+
+    // (Optional) redundant explicit assignment for clarity
     if (categoryId) where.categoryId = categoryId as string;
-    if (subcategoryId) where.subcategoryId = subcategoryId as string;
+    if (effectiveSubCategoryId) where.subCategoryId = effectiveSubCategoryId as string;
+
+    // Debug logging while testing
+    console.log("getListingsByCategory - req.query:", req.query);
+    console.log("getListingsByCategory - effectiveSubCategoryId:", effectiveSubCategoryId);
+    console.log("getListingsByCategory - where:", where);
 
     const listings = await prisma.listing.findMany({
       where,
@@ -615,7 +632,7 @@ export const getListingsByCategory = async (req: Request, res: Response) => {
           },
         },
         category: true,
-        subCategory: true, // 👈 important so frontend sees it
+        subCategory: true,
       },
       orderBy: { createdAt: "desc" },
       take: pageSize,
