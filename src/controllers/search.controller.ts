@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import prisma from "../lib/prisma";
 import { errorResponse, successResponse } from "../utils/response";
+import dotenv from 'dotenv';
+dotenv.config();
 
 export const searchByRadius = async (req: Request, res: Response) => {
   try {
@@ -90,5 +92,111 @@ export const searchListings = async (req: Request, res: Response) => {
   } catch (err) {
     console.error(err);
     return errorResponse(res, "Search listings failed");
+  }
+};
+const GOOGLE_KEY = process.env.GOOGLE_PLACES_API_KEY;
+
+
+
+export const autocompleteLocation = async (req: Request, res: Response) => {
+  try {
+    const input = req.query.input;
+
+    if (!input || typeof input !== 'string') {
+      return errorResponse(
+        res,
+        "Input query parameter is required",
+        "MISSING_INPUT",
+        400
+      );
+    }
+
+    const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
+      input
+    )}&components=country:ng&types=address&key=${GOOGLE_KEY}`;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeout);
+
+    const data = await response.json();
+
+    if (data.status !== "OK") {
+      return errorResponse(
+        res,
+        data.error_message || "Google Places API error",
+        data.status,
+        502
+      );
+    }
+
+    const predictions = data.predictions.map((p: any) => ({
+      placeId: p.place_id,
+      description: p.description,
+    }));
+
+    return successResponse(res, "Autocomplete successful", predictions);
+  } catch (err: any) {
+    console.error("Autocomplete error:", err);
+
+    if (err.name === "AbortError") {
+      return errorResponse(res, "Google request timed out", "TIMEOUT", 504);
+    }
+
+    return errorResponse(res, "Autocomplete location failed");
+  }
+};
+
+export const getLocationDetails = async (req: Request, res: Response) => {
+  try {
+    const placeId = req.query.placeId;
+
+    if (!placeId || typeof placeId !== 'string') {
+      return errorResponse(
+        res,
+        "placeId query parameter is required",
+        "MISSING_PLACE_ID",
+        400
+      );
+    }
+
+    const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(
+      placeId
+    )}&fields=geometry,formatted_address&key=${GOOGLE_KEY}`;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeout);
+
+    const data = await response.json();
+
+    if (data.status !== "OK") {
+      return errorResponse(
+        res,
+        data.error_message || "Google Places API error",
+        data.status,
+        502
+      );
+    }
+
+    const location = data.result.geometry.location;
+
+    return successResponse(res, "Location details retrieved successfully", {
+      latitude: location.lat,
+      longitude: location.lng,
+      address: data.result.formatted_address,
+    });
+  } catch (err: any) {
+    console.error("Place details error:", err);
+
+    if (err.name === "AbortError") {
+      return errorResponse(res, "Google request timed out", "TIMEOUT", 504);
+    }
+
+    return errorResponse(res, "Get location details failed");
   }
 };
