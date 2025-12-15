@@ -88,7 +88,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export const stripePayment =  async (req: Request, res: Response) => {
 
-  console.log("Stripe Key:", process.env.STRIPE_SECRET_KEY?.slice(0,5));
   try {
     const { amount, currency = "usd", receipt_email  } = req.body;
 
@@ -118,7 +117,7 @@ export const stripePayment =  async (req: Request, res: Response) => {
     //     },
     //   },
     // });
-        console.log("Creating PaymentIntent for amount:", amount);
+  
     // 3️⃣ Create Payment Intent
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(amount * 100),

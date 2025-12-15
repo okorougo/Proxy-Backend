@@ -116,7 +116,7 @@ app.get("/auth/google/callback",
 
 
 io.on("connection", (socket) => {
-  console.log("socket connected", socket.id);
+  // console.log("socket connected", socket.id);
 
   // user joins with a sessionId and userId
   socket.on("join", async (data: { sessionId: string; userId: string }) => {
@@ -138,10 +138,10 @@ io.on("connection", (socket) => {
       socket.data.userId = data.userId;
       socket.data.sessionId = data.sessionId;
 
-      console.log(`User ${data.userId} is online via session ${data.sessionId}`);
+      // console.log(`User ${data.userId} is online via session ${data.sessionId}`);
       socket.emit("joined", { message: "You are online" });
     } catch (err) {
-      console.error("Join error:", err);
+  
       socket.emit("error", { message: "Failed to join" });
     }
   });
@@ -345,7 +345,7 @@ io.on("connection", (socket) => {
 
   socket.on("rider_toggle_online", async (data) => {
     const { riderId, isOnline } = data;
-    console.log(`Rider_id ${riderId}, rider is ${isOnline}`)
+    // console.log(`Rider_id ${riderId}, rider is ${isOnline}`)
     await prisma.rider.update({ 
       where: { id: riderId },
       data: { isOnline: isOnline },
@@ -490,7 +490,7 @@ socket.on("delivery_location_update", async ({ deliveryId, lat, lng }) => {
         where: { id: socket.data.sessionId },
         data: { isOnline: false, socketId: null, lastSeen: new Date() },
       });
-      console.log(`User ${socket.data.userId} went offline`);
+      // console.log(`User ${socket.data.userId} went offline`);
     }
   });
 });

@@ -610,9 +610,7 @@ export const getListingsByCategory = async (req: Request, res: Response) => {
     if (effectiveSubCategoryId) where.subCategoryId = effectiveSubCategoryId as string;
 
     // Debug logging while testing
-    console.log("getListingsByCategory - req.query:", req.query);
-    console.log("getListingsByCategory - effectiveSubCategoryId:", effectiveSubCategoryId);
-    console.log("getListingsByCategory - where:", where);
+
 
     const listings = await prisma.listing.findMany({
       where,

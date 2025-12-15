@@ -583,7 +583,7 @@ export const createMultiVendorOrder = async (
       // Stripe verification can be done via webhooks if needed
       paystackRef = reference as string;
       amountPaid = Number(amountPaidByCustomer) || 0;
-      console.log("Stripe payment reference:", paystackRef);
+
     } else {
       return errorResponse(res, "Invalid payment type", "INVALID_PAYMENT_TYPE");
     }
@@ -1109,7 +1109,6 @@ export const saveVendorBank = async (req:AuthRequest, res:Response) => {
       data: bank,
     });
   } catch (err) {
-    console.log(err);
     return res.status(500).json({ status: false, message: "Failed to save bank details" });
   }
 };

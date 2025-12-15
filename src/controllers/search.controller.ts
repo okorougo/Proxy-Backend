@@ -200,3 +200,50 @@ export const getLocationDetails = async (req: Request, res: Response) => {
     return errorResponse(res, "Get location details failed");
   }
 };
+
+export const getDirections = async (req: Request, res: Response) => {
+  try {
+    const { originLat, originLng, destLat, destLng } = req.query;
+    if (
+      !originLat || isNaN(Number(originLat)) ||
+      !originLng || isNaN(Number(originLng)) ||
+      !destLat || isNaN(Number(destLat)) ||
+      !destLng || isNaN(Number(destLng))
+    ) {
+      return errorResponse(
+        res,
+        "Invalid or missing origin/destination coordinates",
+        "INVALID_COORDINATES",
+        400
+      );
+    }
+    const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${originLat},${originLng}&destination=${destLat},${destLng}&key=${GOOGLE_KEY}`;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeout);
+    const data = await response.json();
+
+    if (data.status !== "OK") {
+      return errorResponse(
+        res,
+        data.error_message || "Google Directions API error",
+        data.status,
+        502
+      );
+    }
+    const route = data.routes[0];
+
+    return successResponse(res, "Directions retrieved successfully", route);
+  } catch (err: any) {
+    console.error("Get directions error:", err);
+
+    if (err.name === "AbortError") {
+      return errorResponse(res, "Google request timed out", "TIMEOUT", 504);
+    }
+
+    return errorResponse(res, "Get directions failed");
+  }
+};
+

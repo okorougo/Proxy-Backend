@@ -49,7 +49,7 @@ export const adminLogin = async (req: any, res: Response) => {
       },
     });
   } catch (err) {
-    console.error("adminLogin error:", err);
+  
     return errorResponse(res, "Internal server error", "SERVER_ERROR", 500);
   }
 };
@@ -67,7 +67,6 @@ export const getDashboardStats = async (req: AuthRequest, res: Response) => {
       reports,
     });
   } catch (err) {
-    console.error("Dashboard error:", err);
     return errorResponse(res, "Failed to load dashboard stats");
   }
 };
@@ -275,7 +274,6 @@ export const createCategory = async (req: AuthRequest, res: Response) => {
 
     res.status(201).json({ message: "Category created successfully", category });
   } catch (err) {
-    console.error("createCategory error:", err);
     res.status(500).json({ error: "Failed to create category" });
   }
 };
@@ -317,7 +315,6 @@ export const updateSubCategory = async (req: AuthRequest, res: Response) => {
 
     res.json({ message: "Sub-category updated successfully", subCategory: updated });
   } catch (err) {
-    console.error("updateSubCategory error:", err);
     res.status(500).json({ error: "Failed to update sub-category" });
   }
 };
@@ -665,7 +662,6 @@ export const approveWithdrawal = async (req: AuthRequest, res: Response) => {
     return successResponse(res, "Withdrawal approved & transferred", transfer.data);
 
   } catch (err) {
-    console.log(err);
     return errorResponse(res, "Withdrawal approval failed");
   }
 };
