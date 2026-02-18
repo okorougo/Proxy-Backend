@@ -170,10 +170,15 @@ export const registerVendor = async (req: Request, res: Response) => {
 
     let user = await prisma.user.findUnique({ where: { email } });
 
+    const existingPhoneUser = await prisma.user.findUnique({ where: { phone } });
+
 
     // If user doesn't exist, create one silently
     if (!user) {
       const hashed = await bcrypt.hash(password, 10);
+      if (existingPhoneUser) {
+        return errorResponse(res, "Phone number already exists", "PHONE_EXISTS", 409);
+      }
       user = await prisma.user.create({
         data: {
           name,
@@ -198,7 +203,10 @@ export const registerVendor = async (req: Request, res: Response) => {
         </div>
       `;
       await sendEmail(email, "Verify Your Email - Proxy", html);
-
+      // If the phone number of an existing user is being used, and the current user is not the same as the existing phone user, return error
+      if (existingPhoneUser && existingPhoneUser.email !== email) {
+        return errorResponse(res, "Phone number already exists", "PHONE_EXISTS", 409);
+      }
       await prisma.user.upsert({
         where: email ? { email } : { phone },
         update: { otpCode: otp, otpExpiresAt: expiresAt },
