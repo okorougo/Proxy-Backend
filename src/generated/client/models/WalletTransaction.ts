@@ -27,17 +27,17 @@ export type AggregateWalletTransaction = {
 }
 
 export type WalletTransactionAvgAggregateOutputType = {
-  amount: number | null
+  amount: runtime.Decimal | null
 }
 
 export type WalletTransactionSumAggregateOutputType = {
-  amount: number | null
+  amount: runtime.Decimal | null
 }
 
 export type WalletTransactionMinAggregateOutputType = {
   id: string | null
   vendorId: string | null
-  amount: number | null
+  amount: runtime.Decimal | null
   type: string | null
   remark: string | null
   createdAt: Date | null
@@ -47,7 +47,7 @@ export type WalletTransactionMinAggregateOutputType = {
 export type WalletTransactionMaxAggregateOutputType = {
   id: string | null
   vendorId: string | null
-  amount: number | null
+  amount: runtime.Decimal | null
   type: string | null
   remark: string | null
   createdAt: Date | null
@@ -194,7 +194,7 @@ export type WalletTransactionGroupByArgs<ExtArgs extends runtime.Types.Extension
 export type WalletTransactionGroupByOutputType = {
   id: string
   vendorId: string
-  amount: number
+  amount: runtime.Decimal
   type: string
   remark: string | null
   createdAt: Date
@@ -227,7 +227,7 @@ export type WalletTransactionWhereInput = {
   NOT?: Prisma.WalletTransactionWhereInput | Prisma.WalletTransactionWhereInput[]
   id?: Prisma.StringFilter<"WalletTransaction"> | string
   vendorId?: Prisma.StringFilter<"WalletTransaction"> | string
-  amount?: Prisma.FloatFilter<"WalletTransaction"> | number
+  amount?: Prisma.DecimalFilter<"WalletTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   type?: Prisma.StringFilter<"WalletTransaction"> | string
   remark?: Prisma.StringNullableFilter<"WalletTransaction"> | string | null
   createdAt?: Prisma.DateTimeFilter<"WalletTransaction"> | Date | string
@@ -254,7 +254,7 @@ export type WalletTransactionWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.WalletTransactionWhereInput[]
   NOT?: Prisma.WalletTransactionWhereInput | Prisma.WalletTransactionWhereInput[]
   vendorId?: Prisma.StringFilter<"WalletTransaction"> | string
-  amount?: Prisma.FloatFilter<"WalletTransaction"> | number
+  amount?: Prisma.DecimalFilter<"WalletTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   type?: Prisma.StringFilter<"WalletTransaction"> | string
   remark?: Prisma.StringNullableFilter<"WalletTransaction"> | string | null
   createdAt?: Prisma.DateTimeFilter<"WalletTransaction"> | Date | string
@@ -284,7 +284,7 @@ export type WalletTransactionScalarWhereWithAggregatesInput = {
   NOT?: Prisma.WalletTransactionScalarWhereWithAggregatesInput | Prisma.WalletTransactionScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"WalletTransaction"> | string
   vendorId?: Prisma.StringWithAggregatesFilter<"WalletTransaction"> | string
-  amount?: Prisma.FloatWithAggregatesFilter<"WalletTransaction"> | number
+  amount?: Prisma.DecimalWithAggregatesFilter<"WalletTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   type?: Prisma.StringWithAggregatesFilter<"WalletTransaction"> | string
   remark?: Prisma.StringNullableWithAggregatesFilter<"WalletTransaction"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"WalletTransaction"> | Date | string
@@ -293,7 +293,7 @@ export type WalletTransactionScalarWhereWithAggregatesInput = {
 
 export type WalletTransactionCreateInput = {
   id?: string
-  amount: number
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   type: string
   remark?: string | null
   createdAt?: Date | string
@@ -304,7 +304,7 @@ export type WalletTransactionCreateInput = {
 export type WalletTransactionUncheckedCreateInput = {
   id?: string
   vendorId: string
-  amount: number
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   type: string
   remark?: string | null
   createdAt?: Date | string
@@ -313,7 +313,7 @@ export type WalletTransactionUncheckedCreateInput = {
 
 export type WalletTransactionUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   remark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -324,7 +324,7 @@ export type WalletTransactionUpdateInput = {
 export type WalletTransactionUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   vendorId?: Prisma.StringFieldUpdateOperationsInput | string
-  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   remark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -334,7 +334,7 @@ export type WalletTransactionUncheckedUpdateInput = {
 export type WalletTransactionCreateManyInput = {
   id?: string
   vendorId: string
-  amount: number
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   type: string
   remark?: string | null
   createdAt?: Date | string
@@ -343,7 +343,7 @@ export type WalletTransactionCreateManyInput = {
 
 export type WalletTransactionUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   remark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -352,7 +352,7 @@ export type WalletTransactionUpdateManyMutationInput = {
 export type WalletTransactionUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   vendorId?: Prisma.StringFieldUpdateOperationsInput | string
-  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   remark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -493,7 +493,7 @@ export type WalletTransactionUncheckedUpdateManyWithoutVendorWalletNestedInput =
 
 export type WalletTransactionCreateWithoutVendorInput = {
   id?: string
-  amount: number
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   type: string
   remark?: string | null
   createdAt?: Date | string
@@ -502,7 +502,7 @@ export type WalletTransactionCreateWithoutVendorInput = {
 
 export type WalletTransactionUncheckedCreateWithoutVendorInput = {
   id?: string
-  amount: number
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   type: string
   remark?: string | null
   createdAt?: Date | string
@@ -541,7 +541,7 @@ export type WalletTransactionScalarWhereInput = {
   NOT?: Prisma.WalletTransactionScalarWhereInput | Prisma.WalletTransactionScalarWhereInput[]
   id?: Prisma.StringFilter<"WalletTransaction"> | string
   vendorId?: Prisma.StringFilter<"WalletTransaction"> | string
-  amount?: Prisma.FloatFilter<"WalletTransaction"> | number
+  amount?: Prisma.DecimalFilter<"WalletTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   type?: Prisma.StringFilter<"WalletTransaction"> | string
   remark?: Prisma.StringNullableFilter<"WalletTransaction"> | string | null
   createdAt?: Prisma.DateTimeFilter<"WalletTransaction"> | Date | string
@@ -550,7 +550,7 @@ export type WalletTransactionScalarWhereInput = {
 
 export type WalletTransactionCreateWithoutVendorWalletInput = {
   id?: string
-  amount: number
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   type: string
   remark?: string | null
   createdAt?: Date | string
@@ -560,7 +560,7 @@ export type WalletTransactionCreateWithoutVendorWalletInput = {
 export type WalletTransactionUncheckedCreateWithoutVendorWalletInput = {
   id?: string
   vendorId: string
-  amount: number
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   type: string
   remark?: string | null
   createdAt?: Date | string
@@ -594,7 +594,7 @@ export type WalletTransactionUpdateManyWithWhereWithoutVendorWalletInput = {
 
 export type WalletTransactionCreateManyVendorInput = {
   id?: string
-  amount: number
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   type: string
   remark?: string | null
   createdAt?: Date | string
@@ -603,7 +603,7 @@ export type WalletTransactionCreateManyVendorInput = {
 
 export type WalletTransactionUpdateWithoutVendorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   remark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -612,7 +612,7 @@ export type WalletTransactionUpdateWithoutVendorInput = {
 
 export type WalletTransactionUncheckedUpdateWithoutVendorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   remark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -621,7 +621,7 @@ export type WalletTransactionUncheckedUpdateWithoutVendorInput = {
 
 export type WalletTransactionUncheckedUpdateManyWithoutVendorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   remark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -631,7 +631,7 @@ export type WalletTransactionUncheckedUpdateManyWithoutVendorInput = {
 export type WalletTransactionCreateManyVendorWalletInput = {
   id?: string
   vendorId: string
-  amount: number
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   type: string
   remark?: string | null
   createdAt?: Date | string
@@ -639,7 +639,7 @@ export type WalletTransactionCreateManyVendorWalletInput = {
 
 export type WalletTransactionUpdateWithoutVendorWalletInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   remark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -649,7 +649,7 @@ export type WalletTransactionUpdateWithoutVendorWalletInput = {
 export type WalletTransactionUncheckedUpdateWithoutVendorWalletInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   vendorId?: Prisma.StringFieldUpdateOperationsInput | string
-  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   remark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -658,7 +658,7 @@ export type WalletTransactionUncheckedUpdateWithoutVendorWalletInput = {
 export type WalletTransactionUncheckedUpdateManyWithoutVendorWalletInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   vendorId?: Prisma.StringFieldUpdateOperationsInput | string
-  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   remark?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -735,7 +735,7 @@ export type $WalletTransactionPayload<ExtArgs extends runtime.Types.Extensions.I
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     vendorId: string
-    amount: number
+    amount: runtime.Decimal
     type: string
     remark: string | null
     createdAt: Date
@@ -1167,7 +1167,7 @@ export interface Prisma__WalletTransactionClient<T, Null = never, ExtArgs extend
 export interface WalletTransactionFieldRefs {
   readonly id: Prisma.FieldRef<"WalletTransaction", 'String'>
   readonly vendorId: Prisma.FieldRef<"WalletTransaction", 'String'>
-  readonly amount: Prisma.FieldRef<"WalletTransaction", 'Float'>
+  readonly amount: Prisma.FieldRef<"WalletTransaction", 'Decimal'>
   readonly type: Prisma.FieldRef<"WalletTransaction", 'String'>
   readonly remark: Prisma.FieldRef<"WalletTransaction", 'String'>
   readonly createdAt: Prisma.FieldRef<"WalletTransaction", 'DateTime'>

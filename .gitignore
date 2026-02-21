@@ -2,3 +2,11 @@ node_modules
 env
 .env
 dist
+implementation_complete.md
+index.md
+quick_reference.md
+readme_setup.md
+start_here.txt
+system_architecture.md
+visual_overview.md
+wallet_escrow_implementation.md

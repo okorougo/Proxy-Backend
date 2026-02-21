@@ -23,6 +23,7 @@ export const createListing = async (req: AuthRequest, res: Response) => {
       condition,
       stock,
       extraDetails,
+      isRenderedService = false, // for service listings that require booking
     } = req.body;
 
     if (!title || !description || !price) {
@@ -74,6 +75,7 @@ export const createListing = async (req: AuthRequest, res: Response) => {
           : undefined,
         status: "PENDING",
         extraDetails: parsedDetails ?? undefined,
+        isRenderedService: Boolean(isRenderedService),
       },
     });
 

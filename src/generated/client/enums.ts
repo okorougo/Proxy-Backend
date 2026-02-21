@@ -36,6 +36,29 @@ export const KycStatus = {
 export type KycStatus = (typeof KycStatus)[keyof typeof KycStatus]
 
 
+export const ServiceStatus = {
+  BOOKED: 'BOOKED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  CONFIRMED: 'CONFIRMED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type ServiceStatus = (typeof ServiceStatus)[keyof typeof ServiceStatus]
+
+
+export const OrderStatus = {
+  PENDING: 'PENDING',
+  PAID: 'PAID',
+  PROCESSING: 'PROCESSING',
+  DELIVERED: 'DELIVERED',
+  CANCELLED: 'CANCELLED',
+  REFUNDED: 'REFUNDED'
+} as const
+
+export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
+
+
 export const ReportStatus = {
   PENDING: 'PENDING',
   REVIEWED: 'REVIEWED',
@@ -63,6 +86,16 @@ export const ListingStatus = {
 } as const
 
 export type ListingStatus = (typeof ListingStatus)[keyof typeof ListingStatus]
+
+
+export const EscrowStatus = {
+  PENDING: 'PENDING',
+  HELD: 'HELD',
+  RELEASED: 'RELEASED',
+  REFUNDED: 'REFUNDED'
+} as const
+
+export type EscrowStatus = (typeof EscrowStatus)[keyof typeof EscrowStatus]
 
 
 export const PaymentMethod = {
@@ -95,6 +128,22 @@ export const WithdrawalStatus = {
 } as const
 
 export type WithdrawalStatus = (typeof WithdrawalStatus)[keyof typeof WithdrawalStatus]
+
+
+export const PlatformWalletType = {
+  ESCROW: 'ESCROW',
+  REVENUE: 'REVENUE'
+} as const
+
+export type PlatformWalletType = (typeof PlatformWalletType)[keyof typeof PlatformWalletType]
+
+
+export const WalletTxType = {
+  CREDIT: 'CREDIT',
+  DEBIT: 'DEBIT'
+} as const
+
+export type WalletTxType = (typeof WalletTxType)[keyof typeof WalletTxType]
 
 
 export const DeliveryStatus = {

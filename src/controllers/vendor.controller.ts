@@ -229,7 +229,7 @@ export const getVendorDashboardStats = async (
     const runningOrders = await prisma.order.count({
       where: {
         vendorId,
-        NOT: { status: { in: ["COMPLETED", "CANCELLED", "REJECTED"] } },
+        NOT: { status: { in: ["DELIVERED", "CANCELLED", "PROCESSING"] } },
       },
     });
       const wallet = await prisma.vendorWallet.findUnique({
@@ -340,7 +340,9 @@ export const getVendorDashboardStats = async (
         listingMap.set(id, {
           id,
           title: item.listing.title,
-          price: item.listing.price,
+          price: typeof item.listing.price === "object" && typeof item.listing.price.toNumber === "function"
+            ? item.listing.price.toNumber()
+            : Number(item.listing.price),
           image: item.listing.media?.[0]?.url ?? null,
           totalSold: qty,
         });
@@ -536,77 +538,33 @@ export const getVendorOrders = async (req: AuthRequest, res: Response) => {
 
 type CartItem = { id: string; quantity: number };
 
-export const createMultiVendorOrder = async (
-  req: AuthRequest,
-  res: Response
-) => {
+export const createMultiVendorOrder = async (req: AuthRequest, res: Response) => {
   try {
-    const { reference } = req.query;
     const userId = req.user?.id;
     const {
       items,
       dropoffAddress,
       dropoffLat,
       dropoffLng,
-      paymentType,
-      amountPaidByCustomer,
+      paymentType, // must be "WALLET"
     } = req.body;
-    if (!reference) return errorResponse(res, "Missing payment reference");
-
-    // 1️⃣ Verify payment based on payment type
-    let amountPaid = 0;
-    let paystackRef = reference as string;
-
-    if (paymentType === "PAYSTACK") {
-      // Verify payment from Paystack
-      const response = await axios.get(
-        `https://api.paystack.co/transaction/verify/${reference}`,
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
-          },
-        }
-      );
-
-      const paystackData = response.data;
-      if (paystackData.status !== true)
-        return errorResponse(res, "Invalid payment verification");
-
-      const payment = paystackData.data;
-      if (payment.status !== "success")
-        return errorResponse(res, "Payment not successful");
-
-      amountPaid = payment.amount / 100;
-      paystackRef = payment.reference;
-    } else if (paymentType === "STRIPE") {
-      // For Stripe, just store the reference without verification
-      // Stripe verification can be done via webhooks if needed
-      paystackRef = reference as string;
-      amountPaid = Number(amountPaidByCustomer) || 0;
-
-    } else {
-      return errorResponse(res, "Invalid payment type", "INVALID_PAYMENT_TYPE");
-    }
 
     if (!userId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
     if (!Array.isArray(items) || items.length === 0)
       return errorResponse(res, "Cart items required");
 
-    // Fetch all listings referenced by the cart (authoritative)
-    const listingIds = Array.from(
-      new Set((items as CartItem[]).map((i) => i.id))
-    );
+    if (paymentType !== "WALLET")
+      return errorResponse(res, "Only wallet payment is allowed", "INVALID_PAYMENT_TYPE");
+
+    // Fetch all listings referenced by the cart
+    const listingIds = Array.from(new Set((items as CartItem[]).map(i => i.id)));
     const listings = await prisma.listing.findMany({
       where: { id: { in: listingIds } },
       include: {
         seller: {
           include: {
-            vendorApplication: {
-              include: {
-                user: true,
-              },
-            },
-          },
+            vendorApplication: true
+          }
         },
         media: true,
       },
@@ -614,195 +572,463 @@ export const createMultiVendorOrder = async (
 
     if (listings.length === 0) return errorResponse(res, "Listings not found");
 
-    // Map listingId -> listing (typed so .get() returns a proper listing type instead of unknown)
-    const listingMap = new Map<string, (typeof listings)[number]>(
-      listings.map((l) => [l.id, l])
+    const listingMap = new Map<string, typeof listings[number]>(
+      listings.map(l => [l.id, l])
     );
 
-    // Group items by seller (use listing.sellerId — do NOT trust client-provided vendorId)
+    // Group items by vendor
     const grouped: Record<string, { listing: any; quantity: number }[]> = {};
     for (const it of items as CartItem[]) {
       const listing = listingMap.get(it.id);
       if (!listing) return errorResponse(res, `Listing ${it.id} not found`);
-
-      const vendorId = listing.seller?.vendorApplication?.id as string;
-
+      const vendorId = listing.seller?.vendorApplication?.id;
+      if (!vendorId) return errorResponse(res, `Vendor not approved for listing ${listing.id}`);
       if (!grouped[vendorId]) grouped[vendorId] = [];
       grouped[vendorId].push({ listing, quantity: Number(it.quantity || 1) });
     }
 
+    const customerWallet = await prisma.customerWallet.findUnique({ where: { userId } });
+    if (!customerWallet) return errorResponse(res, "Customer wallet not found");
+
     const results: any[] = [];
 
-    // perform each vendor order creation inside the same prisma transaction batch per vendor (but we can batch all writes too)
-    for (const [vendorId, vendorItems] of Object.entries(grouped)) {
-      // calculate totals and prepare order items
-      let totalAmount = 0;
-      const orderItemsCreate = vendorItems.map((v) => {
-        const unitPrice = Number(v.listing.price ?? 0);
-        const qty = Number(v.quantity ?? 1);
-        totalAmount += unitPrice * qty;
-        return {
-          listingId: v.listing.id,
-          quantity: qty,
-          unitPrice,
-        };
-      });
-
-      // create order + orderItems + transaction atomically
-      const [order, transaction] = await prisma
-        .$transaction([
-          // create order
-          prisma.order.create({
-            data: {
-              userId,
-              vendorId,
-              totalAmount,
-              status: "PENDING",
-              isDigital: vendorItems.every((i) => i.listing.isDigital === true),
-              listings: { create: orderItemsCreate },
-            },
-            include: {
-              listings: { include: { listing: { include: { media: true } } } },
-              vendor: {
-                include:{
-                  user:{
-                    include:{
-                      Session:true
-                    }
-                  }
-                }
-              },
-              user: true,
-            },
-          }),
-          // create transaction associated to the order
-          // we'll create this after the order in a second query so we can reference order.id; using $transaction above is fine, but to keep ordering clearer:
-        ])
-        .then(async ([createdOrder]) => {
-          const txn = await prisma.transaction.create({
-            data: {
-              orderId: createdOrder.id,
-              buyerId: userId,
-              sellerId: vendorId,
-              amountCents: Math.round(totalAmount * 100),
-              status: "COMPLETED", // payment pending by default
-              method: paymentType, // Use the payment type from request
-              amountPaid: amountPaid,
-              paystackRef,
-            },
-          });
-          return [createdOrder, txn];
-        })
-        .then((arr) => arr as any[]);
-
-      // optionally auto create delivery for physical items (you might rather create delivery after payment success)
-      let delivery = null;
-      if (order.isDigital) {
-        const digitalFiles = vendorItems.flatMap((i) =>
-          i.listing.media.map((file: any) => ({
-            id: file.id,
-            name: file.publicId,
-            url: file.url, // direct accessible file URL
-          }))
-        );
-
-        // generate OTP for digital delivery (if any downstream logic needs it)
-        const otp = generateOtp();
-
-        delivery = await prisma.delivery.create({
-          data: {
-            orderId: order.id,
-            transactionId: transaction.id,
-            OTP: null,
-            pickupAddress: "Digital Delivery",
-            pickupLat: 0,
-            pickupLng: 0,
-            dropoffAddress: "Digital File",
-            dropoffLat: 0,
-            dropoffLng: 0,
-            distanceKm: 0,
-            fareAmount: 0,
-            status: "DELIVERED",
-            isDigital: true,
-            digitalFiles: JSON.stringify(digitalFiles),
-          } as any,
+    // Begin DB transaction
+    await prisma.$transaction(async (tx) => {
+      for (const [vendorId, vendorItems] of Object.entries(grouped)) {
+        // 1️⃣ Calculate items total
+        let itemsTotal = 0;
+        const orderItemsCreate = vendorItems.map(v => {
+          const unitPrice = Number(v.listing.price ?? 0);
+          const qty = Number(v.quantity ?? 1);
+          itemsTotal += unitPrice * qty;
+          return { listingId: v.listing.id, quantity: qty, unitPrice };
         });
 
-        // mark order as delivered since digital
-        await prisma.order.update({
-          where: { id: order.id },
-          data: { status: "DELIVERED" },
-        });
-      }
+        // 2️⃣ Calculate delivery fee (for physical items)
+        let deliveryFee = 0;
+        let deliveryData: any = null;
+        const isDigital = vendorItems.every(i => i.listing.isDigital);
+        const isRenderedService = vendorItems.every(i => i.listing.isRenderedService);
 
-      // ✅ PHYSICAL ORDERS — create delivery record
-      if (!order.isDigital && dropoffLat && dropoffLng && dropoffAddress) {
-        const vendorLocation = await prisma.location.findFirst({
-          where: { vendorId },
-        });
+        if (!isDigital && dropoffLat && dropoffLng && dropoffAddress) {
+          const vendorLocation = await tx.location.findFirst({ where: { vendorId } });
+          if (!vendorLocation) throw new Error("Vendor location not found");
 
-          if (vendorLocation) {
           const distanceKm = haversineDistance(
             vendorLocation.lat,
             vendorLocation.lng,
             Number(dropoffLat),
             Number(dropoffLng)
           );
-          const BASE_FARE = 600,
-            RATE_PER_KM = 120,
-            SERVICE_FEE = 100;
-          const fareAmount = Math.round(
-            BASE_FARE + distanceKm * RATE_PER_KM + SERVICE_FEE
+          const BASE_FARE = 600, RATE_PER_KM = 120, SERVICE_FEE = 100;
+          deliveryFee = Math.round(BASE_FARE + distanceKm * RATE_PER_KM + SERVICE_FEE);
+
+          const otp = generateOtp();
+          deliveryData = {
+            OTP: otp,
+            pickupLat: vendorLocation.lat,
+            pickupLng: vendorLocation.lng,
+            pickupAddress: vendorLocation.Address ?? "Vendor address",
+            dropoffLat: Number(dropoffLat),
+            dropoffLng: Number(dropoffLng),
+            dropoffAddress,
+            distanceKm,
+            fareAmount: deliveryFee,
+            status: "PENDING",
+            isDigital: false,
+          };
+        }
+
+        const totalAmount = itemsTotal + deliveryFee;
+
+        // 3️⃣ Check customer wallet balance
+        if (Number(customerWallet.balance) < totalAmount)
+          throw new Error("Insufficient wallet balance");
+
+        // 4️⃣ Deduct wallet and credit platform escrow
+        await tx.customerWallet.update({
+          where: { userId },
+          data: { balance: { decrement: totalAmount } }
+        });
+
+        const escrowWallet = await tx.platformWallet.findFirst({ where: { type: "ESCROW" } });
+        if (!escrowWallet) throw new Error("Escrow wallet not found");
+
+        await tx.platformWallet.update({
+          where: { id: escrowWallet.id },
+          data: { balance: { increment: totalAmount } }
+        });
+
+        // 5️⃣ Calculate commission & vendor amount
+        const commissionRate = 10; // 10% platform commission (can fetch from config)
+        const commissionAmount = totalAmount * (commissionRate / 100);
+        const vendorAmount = totalAmount - commissionAmount;
+
+        // 6️⃣ Create order + order items
+        const order = await tx.order.create({
+          data: {
+            userId,
+            vendorId,
+            totalAmount,
+            status: "PENDING",
+            isDigital,
+            listings: { create: orderItemsCreate },
+          },
+          include: { listings: true, user: true, vendor: { include: { user: {
+            include:{
+              Session:true
+            }
+          } } } }
+        });
+
+        // 7️⃣ Create transaction with escrow
+        const transaction = await tx.transaction.create({
+          data: {
+            orderId: order.id,
+            buyerId: userId,
+            sellerId: vendorId,
+            amountCents: Math.round(totalAmount * 100),
+            amountPaid: totalAmount,
+            method: paymentType,
+            status: "COMPLETED",
+            escrowStatus: "HELD",
+            commissionRate,
+            commissionAmount,
+            vendorAmount,
+          }
+        });
+
+        // 8️⃣ Create delivery if physical
+        let delivery = null;
+        if (deliveryData) {
+          delivery = await tx.delivery.create({
+            data: { ...deliveryData, orderId: order.id, transactionId: transaction.id }
+          });
+        }
+
+        // 9️⃣ Handle digital deliveries
+        if (isDigital) {
+          const digitalFiles = vendorItems.flatMap(i =>
+            i.listing.media.map(file => ({
+              id: file.id,
+              name: file.publicId,
+              url: file.url
+            }))
           );
-          
-          // generate OTP for the physical delivery
           const otp = generateOtp();
 
-          delivery = await prisma.delivery.create({
+          delivery = await tx.delivery.create({
             data: {
               orderId: order.id,
               transactionId: transaction.id,
-              OTP: otp,
-              pickupAddress: vendorLocation.Address ?? "Vendor address",
-              pickupLat: vendorLocation.lat,
-              pickupLng: vendorLocation.lng,
-              dropoffAddress,
-              dropoffLat: Number(dropoffLat),
-              dropoffLng: Number(dropoffLng),
-              distanceKm,
-              fareAmount,
-              status: "PENDING",
-              isDigital: false,
-            } as any,
+              OTP: null,
+              pickupAddress: "Digital Delivery",
+              pickupLat: 0,
+              pickupLng: 0,
+              dropoffAddress: "Digital File",
+              dropoffLat: 0,
+              dropoffLng: 0,
+              distanceKm: 0,
+              fareAmount: 0,
+              status: "DELIVERED",
+              isDigital: true,
+              digitalFiles: JSON.stringify(digitalFiles),
+            }
           });
 
-          // Update order total
-          await prisma.order.update({
+          await tx.order.update({
             where: { id: order.id },
-            data: { totalAmount: { increment: fareAmount } },
+            data: { status: "DELIVERED" }
           });
         }
+
+        // 🔔 Notify vendor via push
+        await sendExpo(
+          order.vendor.user.Session[0]?.deviceToken as string,
+          "New Order Received",
+          `You have a new order (#${(order.id).slice(0,6)}) from ${order.user.name}`,
+          { type: "new_order", orderId: order.id }
+        );
+
+        results.push({ order, transaction, delivery });
       }
-      // Notify vendor of new order (could be via email, push, etc.) - omitted for brevity
-      await sendExpo(
-        order.vendor.user.Session[0]?.deviceToken as string,
-        "New Order Received",
-        `You have received a new order (#${(order.id).slice(0,6)}) from ${order.user.name}.`,
-        {
-          type: "new_order",
-          orderId: (order.id).slice(0,6),
-        }
-      );
+    });
 
-      results.push({ order, transaction, delivery });
-    }
+    return successResponse(res, "Orders created with escrow", results);
 
-    return successResponse(res, "Orders created (per vendor)", results);
-  } catch (err) {
+  } catch (err: any) {
     console.error("createMultiVendorOrder error:", err);
-    return errorResponse(res, "Failed to create orders");
+    return errorResponse(res, err.message || "Failed to create orders");
   }
 };
+
+// export const createMultiVendorOrder = async (
+//   req: AuthRequest,
+//   res: Response
+// ) => {
+//   try {
+//     const { reference } = req.query;
+//     const userId = req.user?.id;
+//     const {
+//       items,
+//       dropoffAddress,
+//       dropoffLat,
+//       dropoffLng,
+//       paymentType,
+//       amountPaidByCustomer,
+//     } = req.body;
+//     if (!reference) return errorResponse(res, "Missing payment reference");
+
+//     // 1️⃣ Verify payment based on payment type
+//     let amountPaid = 0;
+//     let paystackRef = reference as string;
+
+//     if (paymentType === "PAYSTACK") {
+//       // Verify payment from Paystack
+//       const response = await axios.get(
+//         `https://api.paystack.co/transaction/verify/${reference}`,
+//         {
+//           headers: {
+//             Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+//           },
+//         }
+//       );
+
+//       const paystackData = response.data;
+//       if (paystackData.status !== true)
+//         return errorResponse(res, "Invalid payment verification");
+
+//       const payment = paystackData.data;
+//       if (payment.status !== "success")
+//         return errorResponse(res, "Payment not successful");
+
+//       amountPaid = payment.amount / 100;
+//       paystackRef = payment.reference;
+//     } else if (paymentType === "STRIPE") {
+//       // For Stripe, just store the reference without verification
+//       // Stripe verification can be done via webhooks if needed
+//       paystackRef = reference as string;
+//       amountPaid = Number(amountPaidByCustomer) || 0;
+
+//     } else {
+//       return errorResponse(res, "Invalid payment type", "INVALID_PAYMENT_TYPE");
+//     }
+
+//     if (!userId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
+//     if (!Array.isArray(items) || items.length === 0)
+//       return errorResponse(res, "Cart items required");
+
+//     // Fetch all listings referenced by the cart (authoritative)
+//     const listingIds = Array.from(
+//       new Set((items as CartItem[]).map((i) => i.id))
+//     );
+//     const listings = await prisma.listing.findMany({
+//       where: { id: { in: listingIds } },
+//       include: {
+//         seller: {
+//           include: {
+//             vendorApplication: {
+//               include: {
+//                 user: true,
+//               },
+//             },
+//           },
+//         },
+//         media: true,
+//       },
+//     });
+
+//     if (listings.length === 0) return errorResponse(res, "Listings not found");
+
+//     // Map listingId -> listing (typed so .get() returns a proper listing type instead of unknown)
+//     const listingMap = new Map<string, (typeof listings)[number]>(
+//       listings.map((l) => [l.id, l])
+//     );
+
+//     // Group items by seller (use listing.sellerId — do NOT trust client-provided vendorId)
+//     const grouped: Record<string, { listing: any; quantity: number }[]> = {};
+//     for (const it of items as CartItem[]) {
+//       const listing = listingMap.get(it.id);
+//       if (!listing) return errorResponse(res, `Listing ${it.id} not found`);
+
+//       const vendorId = listing.seller?.vendorApplication?.id as string;
+
+//       if (!grouped[vendorId]) grouped[vendorId] = [];
+//       grouped[vendorId].push({ listing, quantity: Number(it.quantity || 1) });
+//     }
+
+//     const results: any[] = [];
+
+//     // perform each vendor order creation inside the same prisma transaction batch per vendor (but we can batch all writes too)
+//     for (const [vendorId, vendorItems] of Object.entries(grouped)) {
+//       // calculate totals and prepare order items
+//       let totalAmount = 0;
+//       const orderItemsCreate = vendorItems.map((v) => {
+//         const unitPrice = Number(v.listing.price ?? 0);
+//         const qty = Number(v.quantity ?? 1);
+//         totalAmount += unitPrice * qty;
+//         return {
+//           listingId: v.listing.id,
+//           quantity: qty,
+//           unitPrice,
+//         };
+//       });
+
+//       // create order + orderItems + transaction atomically
+//       const [order, transaction] = await prisma
+//         .$transaction([
+//           // create order
+//           prisma.order.create({
+//             data: {
+//               userId,
+//               vendorId,
+//               totalAmount,
+//               status: "PENDING",
+//               isDigital: vendorItems.every((i) => i.listing.isDigital === true),
+//               listings: { create: orderItemsCreate },
+//             },
+//             include: {
+//               listings: { include: { listing: { include: { media: true } } } },
+//               vendor: {
+//                 include:{
+//                   user:{
+//                     include:{
+//                       Session:true
+//                     }
+//                   }
+//                 }
+//               },
+//               user: true,
+//             },
+//           }),
+//           // create transaction associated to the order
+//           // we'll create this after the order in a second query so we can reference order.id; using $transaction above is fine, but to keep ordering clearer:
+//         ])
+//         .then(async ([createdOrder]) => {
+//           const txn = await prisma.transaction.create({
+//             data: {
+//               orderId: createdOrder.id,
+//               buyerId: userId,
+//               sellerId: vendorId,
+//               amountCents: Math.round(totalAmount * 100),
+//               status: "COMPLETED", // payment pending by default
+//               method: paymentType, // Use the payment type from request
+//               amountPaid: amountPaid,
+//               paystackRef,
+//             },
+//           });
+//           return [createdOrder, txn];
+//         })
+//         .then((arr) => arr as any[]);
+
+//       // optionally auto create delivery for physical items (you might rather create delivery after payment success)
+//       let delivery = null;
+//       if (order.isDigital) {
+//         const digitalFiles = vendorItems.flatMap((i) =>
+//           i.listing.media.map((file: any) => ({
+//             id: file.id,
+//             name: file.publicId,
+//             url: file.url, // direct accessible file URL
+//           }))
+//         );
+
+//         // generate OTP for digital delivery (if any downstream logic needs it)
+//         const otp = generateOtp();
+
+//         delivery = await prisma.delivery.create({
+//           data: {
+//             orderId: order.id,
+//             transactionId: transaction.id,
+//             OTP: null,
+//             pickupAddress: "Digital Delivery",
+//             pickupLat: 0,
+//             pickupLng: 0,
+//             dropoffAddress: "Digital File",
+//             dropoffLat: 0,
+//             dropoffLng: 0,
+//             distanceKm: 0,
+//             fareAmount: 0,
+//             status: "DELIVERED",
+//             isDigital: true,
+//             digitalFiles: JSON.stringify(digitalFiles),
+//           } as any,
+//         });
+
+//         // mark order as delivered since digital
+//         await prisma.order.update({
+//           where: { id: order.id },
+//           data: { status: "DELIVERED" },
+//         });
+//       }
+
+//       // ✅ PHYSICAL ORDERS — create delivery record
+//       if (!order.isDigital && dropoffLat && dropoffLng && dropoffAddress) {
+//         const vendorLocation = await prisma.location.findFirst({
+//           where: { vendorId },
+//         });
+
+//           if (vendorLocation) {
+//           const distanceKm = haversineDistance(
+//             vendorLocation.lat,
+//             vendorLocation.lng,
+//             Number(dropoffLat),
+//             Number(dropoffLng)
+//           );
+//           const BASE_FARE = 600,
+//             RATE_PER_KM = 120,
+//             SERVICE_FEE = 100;
+//           const fareAmount = Math.round(
+//             BASE_FARE + distanceKm * RATE_PER_KM + SERVICE_FEE
+//           );
+          
+//           // generate OTP for the physical delivery
+//           const otp = generateOtp();
+
+//           delivery = await prisma.delivery.create({
+//             data: {
+//               orderId: order.id,
+//               transactionId: transaction.id,
+//               OTP: otp,
+//               pickupAddress: vendorLocation.Address ?? "Vendor address",
+//               pickupLat: vendorLocation.lat,
+//               pickupLng: vendorLocation.lng,
+//               dropoffAddress,
+//               dropoffLat: Number(dropoffLat),
+//               dropoffLng: Number(dropoffLng),
+//               distanceKm,
+//               fareAmount,
+//               status: "PENDING",
+//               isDigital: false,
+//             } as any,
+//           });
+
+//           // Update order total
+//           await prisma.order.update({
+//             where: { id: order.id },
+//             data: { totalAmount: { increment: fareAmount } },
+//           });
+//         }
+//       }
+//       // Notify vendor of new order (could be via email, push, etc.) - omitted for brevity
+//       await sendExpo(
+//         order.vendor.user.Session[0]?.deviceToken as string,
+//         "New Order Received",
+//         `You have received a new order (#${(order.id).slice(0,6)}) from ${order.user.name}.`,
+//         {
+//           type: "new_order",
+//           orderId: (order.id).slice(0,6),
+//         }
+//       );
+
+//       results.push({ order, transaction, delivery });
+//     }
+
+//     return successResponse(res, "Orders created (per vendor)", results);
+//   } catch (err) {
+//     console.error("createMultiVendorOrder error:", err);
+//     return errorResponse(res, "Failed to create orders");
+//   }
+// };
 export const pushOrderToRiders = async (req: AuthRequest, res: Response) => {
   try {
     const { deliveryId } = req.params;
@@ -1151,4 +1377,87 @@ export const getVendorBanksDetails = async (req:AuthRequest, res:Response) => {
     where: { vendorId },
   });
   return res.json({ status: true, data: bank });
+};
+export const completeSelfDelivery = async (req: AuthRequest, res: Response) => {
+  const { deliveryId } = req.body;
+  const vendorId = req.user?.id;
+
+  const delivery = await prisma.delivery.findUnique({
+    where: { id: deliveryId },
+    include: { order: { include: { transaction: true, vendor: { include: { wallet: true } }, user: true } } },
+  });
+
+  if (!delivery || delivery.order.vendorId !== vendorId)
+    return errorResponse(res, "Unauthorized");
+
+  await prisma.$transaction([
+    prisma.delivery.update({
+      where: { id: deliveryId },
+      data: { status: "DELIVERED", completedAt: new Date() },
+    }),
+    prisma.order.update({
+      where: { id: delivery.order.id },
+      data: { status: "DELIVERED", serviceStatus: "COMPLETED", confirmedAt: new Date() },
+    }),
+    prisma.transaction.update({
+      where: { id: delivery.order.transaction.id },
+      data: { escrowStatus: "RELEASED", releaseAt: new Date() },
+    }),
+    prisma.vendorWallet.update({
+      where: { vendorId },
+      data: {
+        balance: { increment: Number(delivery.order.transaction.vendorAmount) },
+        totalEarned: { increment: Number(delivery.order.transaction.vendorAmount) },
+        walletTransaction: {
+          create: {
+            amount: Number(delivery.order.transaction.vendorAmount),
+            type: "CREDIT",
+            remark: `Service completed for Order ${delivery.order.id}`,
+            vendorId,
+          },
+        },
+      },
+    }),
+  ]);
+
+  // Notify customer
+  const io = req.app.get("io");
+  io.to(delivery.order.userId).emit("delivery_completed", { deliveryId });
+
+  return successResponse(res, "Self-delivery completed and funds released");
+};
+
+export const vendorStartDelivery = async (req: AuthRequest, res: Response) => {
+  const { deliveryId, currentLat, currentLng } = req.body;
+  const vendorId = req.user?.id;
+
+  const delivery = await prisma.delivery.findUnique({
+    where: { id: deliveryId },
+    include: { order: true },
+  });
+
+  if (!delivery || delivery.order.vendorId !== vendorId)
+    return errorResponse(res, "Unauthorized");
+
+  // Update delivery: vendor started coming
+  const updated = await prisma.delivery.update({
+    where: { id: deliveryId },
+    data: {
+      status: "IN_TRANSIT",
+      vendorStartedAt: new Date(),
+      vendorLat: currentLat,
+      vendorLng: currentLng,
+    },
+  });
+
+  // Notify customer: vendor is on the way
+  const io = req.app.get("io");
+  io.to(delivery.order.userId).emit("delivery_vendor_on_the_way", {
+    deliveryId,
+    vendorLat: currentLat,
+    vendorLng: currentLng,
+    status: "Vendor is on the way",
+  });
+
+  return successResponse(res, "Vendor started delivery", updated);
 };

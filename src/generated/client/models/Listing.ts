@@ -28,13 +28,13 @@ export type AggregateListing = {
 
 export type ListingAvgAggregateOutputType = {
   priceCents: number | null
-  price: number | null
+  price: runtime.Decimal | null
   stock: number | null
 }
 
 export type ListingSumAggregateOutputType = {
   priceCents: number | null
-  price: number | null
+  price: runtime.Decimal | null
   stock: number | null
 }
 
@@ -43,7 +43,7 @@ export type ListingMinAggregateOutputType = {
   title: string | null
   description: string | null
   priceCents: number | null
-  price: number | null
+  price: runtime.Decimal | null
   currency: string | null
   isDigital: boolean | null
   condition: string | null
@@ -55,6 +55,7 @@ export type ListingMinAggregateOutputType = {
   categoryId: string | null
   subCategoryId: string | null
   rejectionNote: string | null
+  isRenderedService: boolean | null
 }
 
 export type ListingMaxAggregateOutputType = {
@@ -62,7 +63,7 @@ export type ListingMaxAggregateOutputType = {
   title: string | null
   description: string | null
   priceCents: number | null
-  price: number | null
+  price: runtime.Decimal | null
   currency: string | null
   isDigital: boolean | null
   condition: string | null
@@ -74,6 +75,7 @@ export type ListingMaxAggregateOutputType = {
   categoryId: string | null
   subCategoryId: string | null
   rejectionNote: string | null
+  isRenderedService: boolean | null
 }
 
 export type ListingCountAggregateOutputType = {
@@ -94,6 +96,7 @@ export type ListingCountAggregateOutputType = {
   subCategoryId: number
   extraDetails: number
   rejectionNote: number
+  isRenderedService: number
   _all: number
 }
 
@@ -127,6 +130,7 @@ export type ListingMinAggregateInputType = {
   categoryId?: true
   subCategoryId?: true
   rejectionNote?: true
+  isRenderedService?: true
 }
 
 export type ListingMaxAggregateInputType = {
@@ -146,6 +150,7 @@ export type ListingMaxAggregateInputType = {
   categoryId?: true
   subCategoryId?: true
   rejectionNote?: true
+  isRenderedService?: true
 }
 
 export type ListingCountAggregateInputType = {
@@ -166,6 +171,7 @@ export type ListingCountAggregateInputType = {
   subCategoryId?: true
   extraDetails?: true
   rejectionNote?: true
+  isRenderedService?: true
   _all?: true
 }
 
@@ -260,7 +266,7 @@ export type ListingGroupByOutputType = {
   title: string
   description: string
   priceCents: number
-  price: number
+  price: runtime.Decimal
   currency: string
   isDigital: boolean
   condition: string | null
@@ -273,6 +279,7 @@ export type ListingGroupByOutputType = {
   subCategoryId: string | null
   extraDetails: runtime.JsonValue | null
   rejectionNote: string | null
+  isRenderedService: boolean
   _count: ListingCountAggregateOutputType | null
   _avg: ListingAvgAggregateOutputType | null
   _sum: ListingSumAggregateOutputType | null
@@ -303,7 +310,7 @@ export type ListingWhereInput = {
   title?: Prisma.StringFilter<"Listing"> | string
   description?: Prisma.StringFilter<"Listing"> | string
   priceCents?: Prisma.IntFilter<"Listing"> | number
-  price?: Prisma.FloatFilter<"Listing"> | number
+  price?: Prisma.DecimalFilter<"Listing"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFilter<"Listing"> | string
   isDigital?: Prisma.BoolFilter<"Listing"> | boolean
   condition?: Prisma.StringNullableFilter<"Listing"> | string | null
@@ -316,6 +323,7 @@ export type ListingWhereInput = {
   subCategoryId?: Prisma.StringNullableFilter<"Listing"> | string | null
   extraDetails?: Prisma.JsonNullableFilter<"Listing">
   rejectionNote?: Prisma.StringNullableFilter<"Listing"> | string | null
+  isRenderedService?: Prisma.BoolFilter<"Listing"> | boolean
   seller?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   media?: Prisma.MediaListRelationFilter
   digitalFiles?: Prisma.DigitalFileListRelationFilter
@@ -344,6 +352,7 @@ export type ListingOrderByWithRelationInput = {
   subCategoryId?: Prisma.SortOrderInput | Prisma.SortOrder
   extraDetails?: Prisma.SortOrderInput | Prisma.SortOrder
   rejectionNote?: Prisma.SortOrderInput | Prisma.SortOrder
+  isRenderedService?: Prisma.SortOrder
   seller?: Prisma.UserOrderByWithRelationInput
   media?: Prisma.MediaOrderByRelationAggregateInput
   digitalFiles?: Prisma.DigitalFileOrderByRelationAggregateInput
@@ -362,7 +371,7 @@ export type ListingWhereUniqueInput = Prisma.AtLeast<{
   title?: Prisma.StringFilter<"Listing"> | string
   description?: Prisma.StringFilter<"Listing"> | string
   priceCents?: Prisma.IntFilter<"Listing"> | number
-  price?: Prisma.FloatFilter<"Listing"> | number
+  price?: Prisma.DecimalFilter<"Listing"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFilter<"Listing"> | string
   isDigital?: Prisma.BoolFilter<"Listing"> | boolean
   condition?: Prisma.StringNullableFilter<"Listing"> | string | null
@@ -375,6 +384,7 @@ export type ListingWhereUniqueInput = Prisma.AtLeast<{
   subCategoryId?: Prisma.StringNullableFilter<"Listing"> | string | null
   extraDetails?: Prisma.JsonNullableFilter<"Listing">
   rejectionNote?: Prisma.StringNullableFilter<"Listing"> | string | null
+  isRenderedService?: Prisma.BoolFilter<"Listing"> | boolean
   seller?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   media?: Prisma.MediaListRelationFilter
   digitalFiles?: Prisma.DigitalFileListRelationFilter
@@ -403,6 +413,7 @@ export type ListingOrderByWithAggregationInput = {
   subCategoryId?: Prisma.SortOrderInput | Prisma.SortOrder
   extraDetails?: Prisma.SortOrderInput | Prisma.SortOrder
   rejectionNote?: Prisma.SortOrderInput | Prisma.SortOrder
+  isRenderedService?: Prisma.SortOrder
   _count?: Prisma.ListingCountOrderByAggregateInput
   _avg?: Prisma.ListingAvgOrderByAggregateInput
   _max?: Prisma.ListingMaxOrderByAggregateInput
@@ -418,7 +429,7 @@ export type ListingScalarWhereWithAggregatesInput = {
   title?: Prisma.StringWithAggregatesFilter<"Listing"> | string
   description?: Prisma.StringWithAggregatesFilter<"Listing"> | string
   priceCents?: Prisma.IntWithAggregatesFilter<"Listing"> | number
-  price?: Prisma.FloatWithAggregatesFilter<"Listing"> | number
+  price?: Prisma.DecimalWithAggregatesFilter<"Listing"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringWithAggregatesFilter<"Listing"> | string
   isDigital?: Prisma.BoolWithAggregatesFilter<"Listing"> | boolean
   condition?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
@@ -431,6 +442,7 @@ export type ListingScalarWhereWithAggregatesInput = {
   subCategoryId?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
   extraDetails?: Prisma.JsonNullableWithAggregatesFilter<"Listing">
   rejectionNote?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
+  isRenderedService?: Prisma.BoolWithAggregatesFilter<"Listing"> | boolean
 }
 
 export type ListingCreateInput = {
@@ -438,7 +450,7 @@ export type ListingCreateInput = {
   title: string
   description: string
   priceCents: number
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   isDigital?: boolean
   condition?: string | null
@@ -448,6 +460,7 @@ export type ListingCreateInput = {
   status?: $Enums.ListingStatus
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
+  isRenderedService?: boolean
   seller: Prisma.UserCreateNestedOneWithoutListingsInput
   media?: Prisma.MediaCreateNestedManyWithoutListingInput
   digitalFiles?: Prisma.DigitalFileCreateNestedManyWithoutListingInput
@@ -463,7 +476,7 @@ export type ListingUncheckedCreateInput = {
   title: string
   description: string
   priceCents: number
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   isDigital?: boolean
   condition?: string | null
@@ -476,6 +489,7 @@ export type ListingUncheckedCreateInput = {
   subCategoryId?: string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
+  isRenderedService?: boolean
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutListingInput
   digitalFiles?: Prisma.DigitalFileUncheckedCreateNestedManyWithoutListingInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutListingInput
@@ -488,7 +502,7 @@ export type ListingUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -498,6 +512,7 @@ export type ListingUpdateInput = {
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRenderedService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   seller?: Prisma.UserUpdateOneRequiredWithoutListingsNestedInput
   media?: Prisma.MediaUpdateManyWithoutListingNestedInput
   digitalFiles?: Prisma.DigitalFileUpdateManyWithoutListingNestedInput
@@ -513,7 +528,7 @@ export type ListingUncheckedUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -526,6 +541,7 @@ export type ListingUncheckedUpdateInput = {
   subCategoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRenderedService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   media?: Prisma.MediaUncheckedUpdateManyWithoutListingNestedInput
   digitalFiles?: Prisma.DigitalFileUncheckedUpdateManyWithoutListingNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutListingNestedInput
@@ -538,7 +554,7 @@ export type ListingCreateManyInput = {
   title: string
   description: string
   priceCents: number
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   isDigital?: boolean
   condition?: string | null
@@ -551,6 +567,7 @@ export type ListingCreateManyInput = {
   subCategoryId?: string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
+  isRenderedService?: boolean
 }
 
 export type ListingUpdateManyMutationInput = {
@@ -558,7 +575,7 @@ export type ListingUpdateManyMutationInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -568,6 +585,7 @@ export type ListingUpdateManyMutationInput = {
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRenderedService?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type ListingUncheckedUpdateManyInput = {
@@ -575,7 +593,7 @@ export type ListingUncheckedUpdateManyInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -588,6 +606,7 @@ export type ListingUncheckedUpdateManyInput = {
   subCategoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRenderedService?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type ListingListRelationFilter = {
@@ -618,6 +637,7 @@ export type ListingCountOrderByAggregateInput = {
   subCategoryId?: Prisma.SortOrder
   extraDetails?: Prisma.SortOrder
   rejectionNote?: Prisma.SortOrder
+  isRenderedService?: Prisma.SortOrder
 }
 
 export type ListingAvgOrderByAggregateInput = {
@@ -643,6 +663,7 @@ export type ListingMaxOrderByAggregateInput = {
   categoryId?: Prisma.SortOrder
   subCategoryId?: Prisma.SortOrder
   rejectionNote?: Prisma.SortOrder
+  isRenderedService?: Prisma.SortOrder
 }
 
 export type ListingMinOrderByAggregateInput = {
@@ -662,6 +683,7 @@ export type ListingMinOrderByAggregateInput = {
   categoryId?: Prisma.SortOrder
   subCategoryId?: Prisma.SortOrder
   rejectionNote?: Prisma.SortOrder
+  isRenderedService?: Prisma.SortOrder
 }
 
 export type ListingSumOrderByAggregateInput = {
@@ -814,12 +836,12 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
-export type FloatFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
+export type DecimalFieldUpdateOperationsInput = {
+  set?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type NullableIntFieldUpdateOperationsInput = {
@@ -915,7 +937,7 @@ export type ListingCreateWithoutSellerInput = {
   title: string
   description: string
   priceCents: number
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   isDigital?: boolean
   condition?: string | null
@@ -925,6 +947,7 @@ export type ListingCreateWithoutSellerInput = {
   status?: $Enums.ListingStatus
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
+  isRenderedService?: boolean
   media?: Prisma.MediaCreateNestedManyWithoutListingInput
   digitalFiles?: Prisma.DigitalFileCreateNestedManyWithoutListingInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutListingInput
@@ -939,7 +962,7 @@ export type ListingUncheckedCreateWithoutSellerInput = {
   title: string
   description: string
   priceCents: number
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   isDigital?: boolean
   condition?: string | null
@@ -951,6 +974,7 @@ export type ListingUncheckedCreateWithoutSellerInput = {
   subCategoryId?: string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
+  isRenderedService?: boolean
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutListingInput
   digitalFiles?: Prisma.DigitalFileUncheckedCreateNestedManyWithoutListingInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutListingInput
@@ -992,7 +1016,7 @@ export type ListingScalarWhereInput = {
   title?: Prisma.StringFilter<"Listing"> | string
   description?: Prisma.StringFilter<"Listing"> | string
   priceCents?: Prisma.IntFilter<"Listing"> | number
-  price?: Prisma.FloatFilter<"Listing"> | number
+  price?: Prisma.DecimalFilter<"Listing"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFilter<"Listing"> | string
   isDigital?: Prisma.BoolFilter<"Listing"> | boolean
   condition?: Prisma.StringNullableFilter<"Listing"> | string | null
@@ -1005,6 +1029,7 @@ export type ListingScalarWhereInput = {
   subCategoryId?: Prisma.StringNullableFilter<"Listing"> | string | null
   extraDetails?: Prisma.JsonNullableFilter<"Listing">
   rejectionNote?: Prisma.StringNullableFilter<"Listing"> | string | null
+  isRenderedService?: Prisma.BoolFilter<"Listing"> | boolean
 }
 
 export type ListingCreateWithoutCategoryInput = {
@@ -1012,7 +1037,7 @@ export type ListingCreateWithoutCategoryInput = {
   title: string
   description: string
   priceCents: number
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   isDigital?: boolean
   condition?: string | null
@@ -1022,6 +1047,7 @@ export type ListingCreateWithoutCategoryInput = {
   status?: $Enums.ListingStatus
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
+  isRenderedService?: boolean
   seller: Prisma.UserCreateNestedOneWithoutListingsInput
   media?: Prisma.MediaCreateNestedManyWithoutListingInput
   digitalFiles?: Prisma.DigitalFileCreateNestedManyWithoutListingInput
@@ -1036,7 +1062,7 @@ export type ListingUncheckedCreateWithoutCategoryInput = {
   title: string
   description: string
   priceCents: number
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   isDigital?: boolean
   condition?: string | null
@@ -1048,6 +1074,7 @@ export type ListingUncheckedCreateWithoutCategoryInput = {
   subCategoryId?: string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
+  isRenderedService?: boolean
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutListingInput
   digitalFiles?: Prisma.DigitalFileUncheckedCreateNestedManyWithoutListingInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutListingInput
@@ -1086,7 +1113,7 @@ export type ListingCreateWithoutSubCategoryInput = {
   title: string
   description: string
   priceCents: number
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   isDigital?: boolean
   condition?: string | null
@@ -1096,6 +1123,7 @@ export type ListingCreateWithoutSubCategoryInput = {
   status?: $Enums.ListingStatus
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
+  isRenderedService?: boolean
   seller: Prisma.UserCreateNestedOneWithoutListingsInput
   media?: Prisma.MediaCreateNestedManyWithoutListingInput
   digitalFiles?: Prisma.DigitalFileCreateNestedManyWithoutListingInput
@@ -1110,7 +1138,7 @@ export type ListingUncheckedCreateWithoutSubCategoryInput = {
   title: string
   description: string
   priceCents: number
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   isDigital?: boolean
   condition?: string | null
@@ -1122,6 +1150,7 @@ export type ListingUncheckedCreateWithoutSubCategoryInput = {
   categoryId: string
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
+  isRenderedService?: boolean
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutListingInput
   digitalFiles?: Prisma.DigitalFileUncheckedCreateNestedManyWithoutListingInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutListingInput
@@ -1160,7 +1189,7 @@ export type ListingCreateWithoutDigitalFilesInput = {
   title: string
   description: string
   priceCents: number
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   isDigital?: boolean
   condition?: string | null
@@ -1170,6 +1199,7 @@ export type ListingCreateWithoutDigitalFilesInput = {
   status?: $Enums.ListingStatus
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
+  isRenderedService?: boolean
   seller: Prisma.UserCreateNestedOneWithoutListingsInput
   media?: Prisma.MediaCreateNestedManyWithoutListingInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutListingInput
@@ -1184,7 +1214,7 @@ export type ListingUncheckedCreateWithoutDigitalFilesInput = {
   title: string
   description: string
   priceCents: number
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   isDigital?: boolean
   condition?: string | null
@@ -1197,6 +1227,7 @@ export type ListingUncheckedCreateWithoutDigitalFilesInput = {
   subCategoryId?: string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
+  isRenderedService?: boolean
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutListingInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutListingInput
   Message?: Prisma.MessageUncheckedCreateNestedManyWithoutListingInput
@@ -1224,7 +1255,7 @@ export type ListingUpdateWithoutDigitalFilesInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1234,6 +1265,7 @@ export type ListingUpdateWithoutDigitalFilesInput = {
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRenderedService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   seller?: Prisma.UserUpdateOneRequiredWithoutListingsNestedInput
   media?: Prisma.MediaUpdateManyWithoutListingNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutListingNestedInput
@@ -1248,7 +1280,7 @@ export type ListingUncheckedUpdateWithoutDigitalFilesInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1261,6 +1293,7 @@ export type ListingUncheckedUpdateWithoutDigitalFilesInput = {
   subCategoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRenderedService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   media?: Prisma.MediaUncheckedUpdateManyWithoutListingNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutListingNestedInput
   Message?: Prisma.MessageUncheckedUpdateManyWithoutListingNestedInput
@@ -1272,7 +1305,7 @@ export type ListingCreateWithoutMediaInput = {
   title: string
   description: string
   priceCents: number
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   isDigital?: boolean
   condition?: string | null
@@ -1282,6 +1315,7 @@ export type ListingCreateWithoutMediaInput = {
   status?: $Enums.ListingStatus
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
+  isRenderedService?: boolean
   seller: Prisma.UserCreateNestedOneWithoutListingsInput
   digitalFiles?: Prisma.DigitalFileCreateNestedManyWithoutListingInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutListingInput
@@ -1296,7 +1330,7 @@ export type ListingUncheckedCreateWithoutMediaInput = {
   title: string
   description: string
   priceCents: number
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   isDigital?: boolean
   condition?: string | null
@@ -1309,6 +1343,7 @@ export type ListingUncheckedCreateWithoutMediaInput = {
   subCategoryId?: string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
+  isRenderedService?: boolean
   digitalFiles?: Prisma.DigitalFileUncheckedCreateNestedManyWithoutListingInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutListingInput
   Message?: Prisma.MessageUncheckedCreateNestedManyWithoutListingInput
@@ -1336,7 +1371,7 @@ export type ListingUpdateWithoutMediaInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1346,6 +1381,7 @@ export type ListingUpdateWithoutMediaInput = {
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRenderedService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   seller?: Prisma.UserUpdateOneRequiredWithoutListingsNestedInput
   digitalFiles?: Prisma.DigitalFileUpdateManyWithoutListingNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutListingNestedInput
@@ -1360,7 +1396,7 @@ export type ListingUncheckedUpdateWithoutMediaInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1373,6 +1409,7 @@ export type ListingUncheckedUpdateWithoutMediaInput = {
   subCategoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRenderedService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   digitalFiles?: Prisma.DigitalFileUncheckedUpdateManyWithoutListingNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutListingNestedInput
   Message?: Prisma.MessageUncheckedUpdateManyWithoutListingNestedInput
@@ -1384,7 +1421,7 @@ export type ListingCreateWithoutOrderItemInput = {
   title: string
   description: string
   priceCents: number
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   isDigital?: boolean
   condition?: string | null
@@ -1394,6 +1431,7 @@ export type ListingCreateWithoutOrderItemInput = {
   status?: $Enums.ListingStatus
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
+  isRenderedService?: boolean
   seller: Prisma.UserCreateNestedOneWithoutListingsInput
   media?: Prisma.MediaCreateNestedManyWithoutListingInput
   digitalFiles?: Prisma.DigitalFileCreateNestedManyWithoutListingInput
@@ -1408,7 +1446,7 @@ export type ListingUncheckedCreateWithoutOrderItemInput = {
   title: string
   description: string
   priceCents: number
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   isDigital?: boolean
   condition?: string | null
@@ -1421,6 +1459,7 @@ export type ListingUncheckedCreateWithoutOrderItemInput = {
   subCategoryId?: string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
+  isRenderedService?: boolean
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutListingInput
   digitalFiles?: Prisma.DigitalFileUncheckedCreateNestedManyWithoutListingInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutListingInput
@@ -1448,7 +1487,7 @@ export type ListingUpdateWithoutOrderItemInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1458,6 +1497,7 @@ export type ListingUpdateWithoutOrderItemInput = {
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRenderedService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   seller?: Prisma.UserUpdateOneRequiredWithoutListingsNestedInput
   media?: Prisma.MediaUpdateManyWithoutListingNestedInput
   digitalFiles?: Prisma.DigitalFileUpdateManyWithoutListingNestedInput
@@ -1472,7 +1512,7 @@ export type ListingUncheckedUpdateWithoutOrderItemInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1485,6 +1525,7 @@ export type ListingUncheckedUpdateWithoutOrderItemInput = {
   subCategoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRenderedService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   media?: Prisma.MediaUncheckedUpdateManyWithoutListingNestedInput
   digitalFiles?: Prisma.DigitalFileUncheckedUpdateManyWithoutListingNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutListingNestedInput
@@ -1496,7 +1537,7 @@ export type ListingCreateWithoutMessageInput = {
   title: string
   description: string
   priceCents: number
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   isDigital?: boolean
   condition?: string | null
@@ -1506,6 +1547,7 @@ export type ListingCreateWithoutMessageInput = {
   status?: $Enums.ListingStatus
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
+  isRenderedService?: boolean
   seller: Prisma.UserCreateNestedOneWithoutListingsInput
   media?: Prisma.MediaCreateNestedManyWithoutListingInput
   digitalFiles?: Prisma.DigitalFileCreateNestedManyWithoutListingInput
@@ -1520,7 +1562,7 @@ export type ListingUncheckedCreateWithoutMessageInput = {
   title: string
   description: string
   priceCents: number
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   isDigital?: boolean
   condition?: string | null
@@ -1533,6 +1575,7 @@ export type ListingUncheckedCreateWithoutMessageInput = {
   subCategoryId?: string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
+  isRenderedService?: boolean
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutListingInput
   digitalFiles?: Prisma.DigitalFileUncheckedCreateNestedManyWithoutListingInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutListingInput
@@ -1560,7 +1603,7 @@ export type ListingUpdateWithoutMessageInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1570,6 +1613,7 @@ export type ListingUpdateWithoutMessageInput = {
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRenderedService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   seller?: Prisma.UserUpdateOneRequiredWithoutListingsNestedInput
   media?: Prisma.MediaUpdateManyWithoutListingNestedInput
   digitalFiles?: Prisma.DigitalFileUpdateManyWithoutListingNestedInput
@@ -1584,7 +1628,7 @@ export type ListingUncheckedUpdateWithoutMessageInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1597,6 +1641,7 @@ export type ListingUncheckedUpdateWithoutMessageInput = {
   subCategoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRenderedService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   media?: Prisma.MediaUncheckedUpdateManyWithoutListingNestedInput
   digitalFiles?: Prisma.DigitalFileUncheckedUpdateManyWithoutListingNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutListingNestedInput
@@ -1608,7 +1653,7 @@ export type ListingCreateWithoutTransactionsInput = {
   title: string
   description: string
   priceCents: number
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   isDigital?: boolean
   condition?: string | null
@@ -1618,6 +1663,7 @@ export type ListingCreateWithoutTransactionsInput = {
   status?: $Enums.ListingStatus
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
+  isRenderedService?: boolean
   seller: Prisma.UserCreateNestedOneWithoutListingsInput
   media?: Prisma.MediaCreateNestedManyWithoutListingInput
   digitalFiles?: Prisma.DigitalFileCreateNestedManyWithoutListingInput
@@ -1632,7 +1678,7 @@ export type ListingUncheckedCreateWithoutTransactionsInput = {
   title: string
   description: string
   priceCents: number
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   isDigital?: boolean
   condition?: string | null
@@ -1645,6 +1691,7 @@ export type ListingUncheckedCreateWithoutTransactionsInput = {
   subCategoryId?: string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
+  isRenderedService?: boolean
   media?: Prisma.MediaUncheckedCreateNestedManyWithoutListingInput
   digitalFiles?: Prisma.DigitalFileUncheckedCreateNestedManyWithoutListingInput
   Message?: Prisma.MessageUncheckedCreateNestedManyWithoutListingInput
@@ -1672,7 +1719,7 @@ export type ListingUpdateWithoutTransactionsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1682,6 +1729,7 @@ export type ListingUpdateWithoutTransactionsInput = {
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRenderedService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   seller?: Prisma.UserUpdateOneRequiredWithoutListingsNestedInput
   media?: Prisma.MediaUpdateManyWithoutListingNestedInput
   digitalFiles?: Prisma.DigitalFileUpdateManyWithoutListingNestedInput
@@ -1696,7 +1744,7 @@ export type ListingUncheckedUpdateWithoutTransactionsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1709,6 +1757,7 @@ export type ListingUncheckedUpdateWithoutTransactionsInput = {
   subCategoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRenderedService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   media?: Prisma.MediaUncheckedUpdateManyWithoutListingNestedInput
   digitalFiles?: Prisma.DigitalFileUncheckedUpdateManyWithoutListingNestedInput
   Message?: Prisma.MessageUncheckedUpdateManyWithoutListingNestedInput
@@ -1720,7 +1769,7 @@ export type ListingCreateManySellerInput = {
   title: string
   description: string
   priceCents: number
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   isDigital?: boolean
   condition?: string | null
@@ -1732,6 +1781,7 @@ export type ListingCreateManySellerInput = {
   subCategoryId?: string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
+  isRenderedService?: boolean
 }
 
 export type ListingUpdateWithoutSellerInput = {
@@ -1739,7 +1789,7 @@ export type ListingUpdateWithoutSellerInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1749,6 +1799,7 @@ export type ListingUpdateWithoutSellerInput = {
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRenderedService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   media?: Prisma.MediaUpdateManyWithoutListingNestedInput
   digitalFiles?: Prisma.DigitalFileUpdateManyWithoutListingNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutListingNestedInput
@@ -1763,7 +1814,7 @@ export type ListingUncheckedUpdateWithoutSellerInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1775,6 +1826,7 @@ export type ListingUncheckedUpdateWithoutSellerInput = {
   subCategoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRenderedService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   media?: Prisma.MediaUncheckedUpdateManyWithoutListingNestedInput
   digitalFiles?: Prisma.DigitalFileUncheckedUpdateManyWithoutListingNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutListingNestedInput
@@ -1787,7 +1839,7 @@ export type ListingUncheckedUpdateManyWithoutSellerInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1799,6 +1851,7 @@ export type ListingUncheckedUpdateManyWithoutSellerInput = {
   subCategoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRenderedService?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type ListingCreateManyCategoryInput = {
@@ -1806,7 +1859,7 @@ export type ListingCreateManyCategoryInput = {
   title: string
   description: string
   priceCents: number
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   isDigital?: boolean
   condition?: string | null
@@ -1818,6 +1871,7 @@ export type ListingCreateManyCategoryInput = {
   subCategoryId?: string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
+  isRenderedService?: boolean
 }
 
 export type ListingUpdateWithoutCategoryInput = {
@@ -1825,7 +1879,7 @@ export type ListingUpdateWithoutCategoryInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1835,6 +1889,7 @@ export type ListingUpdateWithoutCategoryInput = {
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRenderedService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   seller?: Prisma.UserUpdateOneRequiredWithoutListingsNestedInput
   media?: Prisma.MediaUpdateManyWithoutListingNestedInput
   digitalFiles?: Prisma.DigitalFileUpdateManyWithoutListingNestedInput
@@ -1849,7 +1904,7 @@ export type ListingUncheckedUpdateWithoutCategoryInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1861,6 +1916,7 @@ export type ListingUncheckedUpdateWithoutCategoryInput = {
   subCategoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRenderedService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   media?: Prisma.MediaUncheckedUpdateManyWithoutListingNestedInput
   digitalFiles?: Prisma.DigitalFileUncheckedUpdateManyWithoutListingNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutListingNestedInput
@@ -1873,7 +1929,7 @@ export type ListingUncheckedUpdateManyWithoutCategoryInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1885,6 +1941,7 @@ export type ListingUncheckedUpdateManyWithoutCategoryInput = {
   subCategoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRenderedService?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type ListingCreateManySubCategoryInput = {
@@ -1892,7 +1949,7 @@ export type ListingCreateManySubCategoryInput = {
   title: string
   description: string
   priceCents: number
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   isDigital?: boolean
   condition?: string | null
@@ -1904,6 +1961,7 @@ export type ListingCreateManySubCategoryInput = {
   categoryId: string
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: string | null
+  isRenderedService?: boolean
 }
 
 export type ListingUpdateWithoutSubCategoryInput = {
@@ -1911,7 +1969,7 @@ export type ListingUpdateWithoutSubCategoryInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1921,6 +1979,7 @@ export type ListingUpdateWithoutSubCategoryInput = {
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRenderedService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   seller?: Prisma.UserUpdateOneRequiredWithoutListingsNestedInput
   media?: Prisma.MediaUpdateManyWithoutListingNestedInput
   digitalFiles?: Prisma.DigitalFileUpdateManyWithoutListingNestedInput
@@ -1935,7 +1994,7 @@ export type ListingUncheckedUpdateWithoutSubCategoryInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1947,6 +2006,7 @@ export type ListingUncheckedUpdateWithoutSubCategoryInput = {
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRenderedService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   media?: Prisma.MediaUncheckedUpdateManyWithoutListingNestedInput
   digitalFiles?: Prisma.DigitalFileUncheckedUpdateManyWithoutListingNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutListingNestedInput
@@ -1959,7 +2019,7 @@ export type ListingUncheckedUpdateManyWithoutSubCategoryInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1971,6 +2031,7 @@ export type ListingUncheckedUpdateManyWithoutSubCategoryInput = {
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   extraDetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRenderedService?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 
@@ -2058,6 +2119,7 @@ export type ListingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   subCategoryId?: boolean
   extraDetails?: boolean
   rejectionNote?: boolean
+  isRenderedService?: boolean
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   media?: boolean | Prisma.Listing$mediaArgs<ExtArgs>
   digitalFiles?: boolean | Prisma.Listing$digitalFilesArgs<ExtArgs>
@@ -2087,6 +2149,7 @@ export type ListingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   subCategoryId?: boolean
   extraDetails?: boolean
   rejectionNote?: boolean
+  isRenderedService?: boolean
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   subCategory?: boolean | Prisma.Listing$subCategoryArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
@@ -2110,6 +2173,7 @@ export type ListingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   subCategoryId?: boolean
   extraDetails?: boolean
   rejectionNote?: boolean
+  isRenderedService?: boolean
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   subCategory?: boolean | Prisma.Listing$subCategoryArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
@@ -2133,9 +2197,10 @@ export type ListingSelectScalar = {
   subCategoryId?: boolean
   extraDetails?: boolean
   rejectionNote?: boolean
+  isRenderedService?: boolean
 }
 
-export type ListingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "priceCents" | "price" | "currency" | "isDigital" | "condition" | "stock" | "sellerId" | "createdAt" | "updatedAt" | "status" | "categoryId" | "subCategoryId" | "extraDetails" | "rejectionNote", ExtArgs["result"]["listing"]>
+export type ListingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "priceCents" | "price" | "currency" | "isDigital" | "condition" | "stock" | "sellerId" | "createdAt" | "updatedAt" | "status" | "categoryId" | "subCategoryId" | "extraDetails" | "rejectionNote" | "isRenderedService", ExtArgs["result"]["listing"]>
 export type ListingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   media?: boolean | Prisma.Listing$mediaArgs<ExtArgs>
@@ -2175,7 +2240,7 @@ export type $ListingPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     title: string
     description: string
     priceCents: number
-    price: number
+    price: runtime.Decimal
     currency: string
     isDigital: boolean
     condition: string | null
@@ -2188,6 +2253,7 @@ export type $ListingPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     subCategoryId: string | null
     extraDetails: runtime.JsonValue | null
     rejectionNote: string | null
+    isRenderedService: boolean
   }, ExtArgs["result"]["listing"]>
   composites: {}
 }
@@ -2623,7 +2689,7 @@ export interface ListingFieldRefs {
   readonly title: Prisma.FieldRef<"Listing", 'String'>
   readonly description: Prisma.FieldRef<"Listing", 'String'>
   readonly priceCents: Prisma.FieldRef<"Listing", 'Int'>
-  readonly price: Prisma.FieldRef<"Listing", 'Float'>
+  readonly price: Prisma.FieldRef<"Listing", 'Decimal'>
   readonly currency: Prisma.FieldRef<"Listing", 'String'>
   readonly isDigital: Prisma.FieldRef<"Listing", 'Boolean'>
   readonly condition: Prisma.FieldRef<"Listing", 'String'>
@@ -2636,6 +2702,7 @@ export interface ListingFieldRefs {
   readonly subCategoryId: Prisma.FieldRef<"Listing", 'String'>
   readonly extraDetails: Prisma.FieldRef<"Listing", 'Json'>
   readonly rejectionNote: Prisma.FieldRef<"Listing", 'String'>
+  readonly isRenderedService: Prisma.FieldRef<"Listing", 'Boolean'>
 }
     
 

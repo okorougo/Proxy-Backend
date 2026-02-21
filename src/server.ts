@@ -29,6 +29,7 @@ import cors from "cors"
 import { haversineDistance } from './utils/distanceCalcu';
 import axios from 'axios';
 import cron from "node-cron";
+import { scheduleEscrowRelease } from "./cron/escrowRelease";
 
 
 
@@ -37,7 +38,7 @@ const PORT = process.env.PORT || 4321;
 const server = http.createServer(app);
 
 app.use(passport.initialize());
-
+scheduleEscrowRelease();
 export const io = new Server(server);
 const allowedOrigins = [
   "http://localhost:5173", // local dev
@@ -505,7 +506,7 @@ cron.schedule("*/10 * * * *", async () => {
     console.error("Error hitting the server:", error.message);
   }
 });
-
+  
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

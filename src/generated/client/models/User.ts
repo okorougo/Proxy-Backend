@@ -285,6 +285,7 @@ export type UserWhereInput = {
   vendorApplication?: Prisma.XOR<Prisma.VendorApplicationNullableScalarRelationFilter, Prisma.VendorApplicationWhereInput> | null
   order?: Prisma.OrderListRelationFilter
   rider?: Prisma.XOR<Prisma.RiderNullableScalarRelationFilter, Prisma.RiderWhereInput> | null
+  customerWallet?: Prisma.XOR<Prisma.CustomerWalletNullableScalarRelationFilter, Prisma.CustomerWalletWhereInput> | null
 }
 
 export type UserOrderByWithRelationInput = {
@@ -319,6 +320,7 @@ export type UserOrderByWithRelationInput = {
   vendorApplication?: Prisma.VendorApplicationOrderByWithRelationInput
   order?: Prisma.OrderOrderByRelationAggregateInput
   rider?: Prisma.RiderOrderByWithRelationInput
+  customerWallet?: Prisma.CustomerWalletOrderByWithRelationInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -356,6 +358,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   vendorApplication?: Prisma.XOR<Prisma.VendorApplicationNullableScalarRelationFilter, Prisma.VendorApplicationWhereInput> | null
   order?: Prisma.OrderListRelationFilter
   rider?: Prisma.XOR<Prisma.RiderNullableScalarRelationFilter, Prisma.RiderWhereInput> | null
+  customerWallet?: Prisma.XOR<Prisma.CustomerWalletNullableScalarRelationFilter, Prisma.CustomerWalletWhereInput> | null
 }, "id" | "email" | "phone">
 
 export type UserOrderByWithAggregationInput = {
@@ -434,6 +437,7 @@ export type UserCreateInput = {
   vendorApplication?: Prisma.VendorApplicationCreateNestedOneWithoutUserInput
   order?: Prisma.OrderCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -468,6 +472,7 @@ export type UserUncheckedCreateInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedCreateNestedOneWithoutUserInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderUncheckedCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -502,6 +507,7 @@ export type UserUpdateInput = {
   vendorApplication?: Prisma.VendorApplicationUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -536,6 +542,7 @@ export type UserUncheckedUpdateInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUncheckedUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -882,6 +889,20 @@ export type UserUpdateOneRequiredWithoutReceivedReviewsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReceivedReviewsInput, Prisma.UserUpdateWithoutReceivedReviewsInput>, Prisma.UserUncheckedUpdateWithoutReceivedReviewsInput>
 }
 
+export type UserCreateNestedOneWithoutCustomerWalletInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCustomerWalletInput, Prisma.UserUncheckedCreateWithoutCustomerWalletInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCustomerWalletInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutCustomerWalletNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCustomerWalletInput, Prisma.UserUncheckedCreateWithoutCustomerWalletInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCustomerWalletInput
+  upsert?: Prisma.UserUpsertWithoutCustomerWalletInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCustomerWalletInput, Prisma.UserUpdateWithoutCustomerWalletInput>, Prisma.UserUncheckedUpdateWithoutCustomerWalletInput>
+}
+
 export type UserCreateNestedOneWithoutRiderInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutRiderInput, Prisma.UserUncheckedCreateWithoutRiderInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutRiderInput
@@ -927,6 +948,7 @@ export type UserCreateWithoutVendorApplicationInput = {
   Session?: Prisma.SessionCreateNestedManyWithoutUserInput
   order?: Prisma.OrderCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutVendorApplicationInput = {
@@ -960,6 +982,7 @@ export type UserUncheckedCreateWithoutVendorApplicationInput = {
   Session?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderUncheckedCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutVendorApplicationInput = {
@@ -1009,6 +1032,7 @@ export type UserUpdateWithoutVendorApplicationInput = {
   Session?: Prisma.SessionUpdateManyWithoutUserNestedInput
   order?: Prisma.OrderUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVendorApplicationInput = {
@@ -1042,6 +1066,7 @@ export type UserUncheckedUpdateWithoutVendorApplicationInput = {
   Session?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUncheckedUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutKycDocumentInput = {
@@ -1075,6 +1100,7 @@ export type UserCreateWithoutKycDocumentInput = {
   vendorApplication?: Prisma.VendorApplicationCreateNestedOneWithoutUserInput
   order?: Prisma.OrderCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutKycDocumentInput = {
@@ -1108,6 +1134,7 @@ export type UserUncheckedCreateWithoutKycDocumentInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedCreateNestedOneWithoutUserInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderUncheckedCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutKycDocumentInput = {
@@ -1157,6 +1184,7 @@ export type UserUpdateWithoutKycDocumentInput = {
   vendorApplication?: Prisma.VendorApplicationUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutKycDocumentInput = {
@@ -1190,6 +1218,7 @@ export type UserUncheckedUpdateWithoutKycDocumentInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUncheckedUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutListingsInput = {
@@ -1223,6 +1252,7 @@ export type UserCreateWithoutListingsInput = {
   vendorApplication?: Prisma.VendorApplicationCreateNestedOneWithoutUserInput
   order?: Prisma.OrderCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutListingsInput = {
@@ -1256,6 +1286,7 @@ export type UserUncheckedCreateWithoutListingsInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedCreateNestedOneWithoutUserInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderUncheckedCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutListingsInput = {
@@ -1305,6 +1336,7 @@ export type UserUpdateWithoutListingsInput = {
   vendorApplication?: Prisma.VendorApplicationUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutListingsInput = {
@@ -1338,6 +1370,7 @@ export type UserUncheckedUpdateWithoutListingsInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUncheckedUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMediaInput = {
@@ -1371,6 +1404,7 @@ export type UserCreateWithoutMediaInput = {
   vendorApplication?: Prisma.VendorApplicationCreateNestedOneWithoutUserInput
   order?: Prisma.OrderCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMediaInput = {
@@ -1404,6 +1438,7 @@ export type UserUncheckedCreateWithoutMediaInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedCreateNestedOneWithoutUserInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderUncheckedCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMediaInput = {
@@ -1453,6 +1488,7 @@ export type UserUpdateWithoutMediaInput = {
   vendorApplication?: Prisma.VendorApplicationUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMediaInput = {
@@ -1486,6 +1522,7 @@ export type UserUncheckedUpdateWithoutMediaInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUncheckedUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutOrderInput = {
@@ -1519,6 +1556,7 @@ export type UserCreateWithoutOrderInput = {
   Session?: Prisma.SessionCreateNestedManyWithoutUserInput
   vendorApplication?: Prisma.VendorApplicationCreateNestedOneWithoutUserInput
   rider?: Prisma.RiderCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutOrderInput = {
@@ -1552,6 +1590,7 @@ export type UserUncheckedCreateWithoutOrderInput = {
   Session?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   vendorApplication?: Prisma.VendorApplicationUncheckedCreateNestedOneWithoutUserInput
   rider?: Prisma.RiderUncheckedCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutOrderInput = {
@@ -1601,6 +1640,7 @@ export type UserUpdateWithoutOrderInput = {
   Session?: Prisma.SessionUpdateManyWithoutUserNestedInput
   vendorApplication?: Prisma.VendorApplicationUpdateOneWithoutUserNestedInput
   rider?: Prisma.RiderUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOrderInput = {
@@ -1634,6 +1674,7 @@ export type UserUncheckedUpdateWithoutOrderInput = {
   Session?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   vendorApplication?: Prisma.VendorApplicationUncheckedUpdateOneWithoutUserNestedInput
   rider?: Prisma.RiderUncheckedUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMessagesSentInput = {
@@ -1667,6 +1708,7 @@ export type UserCreateWithoutMessagesSentInput = {
   vendorApplication?: Prisma.VendorApplicationCreateNestedOneWithoutUserInput
   order?: Prisma.OrderCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMessagesSentInput = {
@@ -1700,6 +1742,7 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedCreateNestedOneWithoutUserInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderUncheckedCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMessagesSentInput = {
@@ -1738,6 +1781,7 @@ export type UserCreateWithoutMessagesRecvInput = {
   vendorApplication?: Prisma.VendorApplicationCreateNestedOneWithoutUserInput
   order?: Prisma.OrderCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMessagesRecvInput = {
@@ -1771,6 +1815,7 @@ export type UserUncheckedCreateWithoutMessagesRecvInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedCreateNestedOneWithoutUserInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderUncheckedCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMessagesRecvInput = {
@@ -1820,6 +1865,7 @@ export type UserUpdateWithoutMessagesSentInput = {
   vendorApplication?: Prisma.VendorApplicationUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessagesSentInput = {
@@ -1853,6 +1899,7 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUncheckedUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutMessagesRecvInput = {
@@ -1897,6 +1944,7 @@ export type UserUpdateWithoutMessagesRecvInput = {
   vendorApplication?: Prisma.VendorApplicationUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessagesRecvInput = {
@@ -1930,6 +1978,7 @@ export type UserUncheckedUpdateWithoutMessagesRecvInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUncheckedUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReportsMadeInput = {
@@ -1963,6 +2012,7 @@ export type UserCreateWithoutReportsMadeInput = {
   vendorApplication?: Prisma.VendorApplicationCreateNestedOneWithoutUserInput
   order?: Prisma.OrderCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReportsMadeInput = {
@@ -1996,6 +2046,7 @@ export type UserUncheckedCreateWithoutReportsMadeInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedCreateNestedOneWithoutUserInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderUncheckedCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReportsMadeInput = {
@@ -2034,6 +2085,7 @@ export type UserCreateWithoutReportsReviewedInput = {
   vendorApplication?: Prisma.VendorApplicationCreateNestedOneWithoutUserInput
   order?: Prisma.OrderCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReportsReviewedInput = {
@@ -2067,6 +2119,7 @@ export type UserUncheckedCreateWithoutReportsReviewedInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedCreateNestedOneWithoutUserInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderUncheckedCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReportsReviewedInput = {
@@ -2116,6 +2169,7 @@ export type UserUpdateWithoutReportsMadeInput = {
   vendorApplication?: Prisma.VendorApplicationUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReportsMadeInput = {
@@ -2149,6 +2203,7 @@ export type UserUncheckedUpdateWithoutReportsMadeInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUncheckedUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutReportsReviewedInput = {
@@ -2193,6 +2248,7 @@ export type UserUpdateWithoutReportsReviewedInput = {
   vendorApplication?: Prisma.VendorApplicationUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReportsReviewedInput = {
@@ -2226,6 +2282,7 @@ export type UserUncheckedUpdateWithoutReportsReviewedInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUncheckedUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuditLogsInput = {
@@ -2259,6 +2316,7 @@ export type UserCreateWithoutAuditLogsInput = {
   vendorApplication?: Prisma.VendorApplicationCreateNestedOneWithoutUserInput
   order?: Prisma.OrderCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuditLogsInput = {
@@ -2292,6 +2350,7 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedCreateNestedOneWithoutUserInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderUncheckedCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuditLogsInput = {
@@ -2341,6 +2400,7 @@ export type UserUpdateWithoutAuditLogsInput = {
   vendorApplication?: Prisma.VendorApplicationUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuditLogsInput = {
@@ -2374,6 +2434,7 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUncheckedUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBuyerTransactionsInput = {
@@ -2407,6 +2468,7 @@ export type UserCreateWithoutBuyerTransactionsInput = {
   vendorApplication?: Prisma.VendorApplicationCreateNestedOneWithoutUserInput
   order?: Prisma.OrderCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBuyerTransactionsInput = {
@@ -2440,6 +2502,7 @@ export type UserUncheckedCreateWithoutBuyerTransactionsInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedCreateNestedOneWithoutUserInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderUncheckedCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBuyerTransactionsInput = {
@@ -2489,6 +2552,7 @@ export type UserUpdateWithoutBuyerTransactionsInput = {
   vendorApplication?: Prisma.VendorApplicationUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBuyerTransactionsInput = {
@@ -2522,6 +2586,7 @@ export type UserUncheckedUpdateWithoutBuyerTransactionsInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUncheckedUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSessionInput = {
@@ -2555,6 +2620,7 @@ export type UserCreateWithoutSessionInput = {
   vendorApplication?: Prisma.VendorApplicationCreateNestedOneWithoutUserInput
   order?: Prisma.OrderCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionInput = {
@@ -2588,6 +2654,7 @@ export type UserUncheckedCreateWithoutSessionInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedCreateNestedOneWithoutUserInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderUncheckedCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionInput = {
@@ -2637,6 +2704,7 @@ export type UserUpdateWithoutSessionInput = {
   vendorApplication?: Prisma.VendorApplicationUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionInput = {
@@ -2670,6 +2738,7 @@ export type UserUncheckedUpdateWithoutSessionInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUncheckedUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutGivenReviewsInput = {
@@ -2703,6 +2772,7 @@ export type UserCreateWithoutGivenReviewsInput = {
   vendorApplication?: Prisma.VendorApplicationCreateNestedOneWithoutUserInput
   order?: Prisma.OrderCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutGivenReviewsInput = {
@@ -2736,6 +2806,7 @@ export type UserUncheckedCreateWithoutGivenReviewsInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedCreateNestedOneWithoutUserInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderUncheckedCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutGivenReviewsInput = {
@@ -2774,6 +2845,7 @@ export type UserCreateWithoutReceivedReviewsInput = {
   vendorApplication?: Prisma.VendorApplicationCreateNestedOneWithoutUserInput
   order?: Prisma.OrderCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReceivedReviewsInput = {
@@ -2807,6 +2879,7 @@ export type UserUncheckedCreateWithoutReceivedReviewsInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedCreateNestedOneWithoutUserInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   rider?: Prisma.RiderUncheckedCreateNestedOneWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReceivedReviewsInput = {
@@ -2856,6 +2929,7 @@ export type UserUpdateWithoutGivenReviewsInput = {
   vendorApplication?: Prisma.VendorApplicationUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutGivenReviewsInput = {
@@ -2889,6 +2963,7 @@ export type UserUncheckedUpdateWithoutGivenReviewsInput = {
   vendorApplication?: Prisma.VendorApplicationUncheckedUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUncheckedUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutReceivedReviewsInput = {
@@ -2933,6 +3008,7 @@ export type UserUpdateWithoutReceivedReviewsInput = {
   vendorApplication?: Prisma.VendorApplicationUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUpdateManyWithoutUserNestedInput
   rider?: Prisma.RiderUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReceivedReviewsInput = {
@@ -2962,6 +3038,159 @@ export type UserUncheckedUpdateWithoutReceivedReviewsInput = {
   messagesRecv?: Prisma.MessageUncheckedUpdateManyWithoutRecipientNestedInput
   kycDocument?: Prisma.KycVerificationUncheckedUpdateOneWithoutUserNestedInput
   givenReviews?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerNestedInput
+  Session?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  vendorApplication?: Prisma.VendorApplicationUncheckedUpdateOneWithoutUserNestedInput
+  order?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  rider?: Prisma.RiderUncheckedUpdateOneWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUncheckedUpdateOneWithoutUserNestedInput
+}
+
+export type UserCreateWithoutCustomerWalletInput = {
+  id?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  name?: string | null
+  role?: string
+  createdAt?: Date | string
+  isEmailVerified?: boolean
+  isKycVerified?: boolean
+  kycDocumentId?: string | null
+  isBanned?: boolean
+  otpCode?: string | null
+  otpExpiresAt?: Date | string | null
+  riderId?: string | null
+  provider?: string | null
+  providerId?: string | null
+  listings?: Prisma.ListingCreateNestedManyWithoutSellerInput
+  media?: Prisma.MediaCreateNestedManyWithoutUserInput
+  reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportsReviewed?: Prisma.ReportCreateNestedManyWithoutReviewedByInput
+  buyerTransactions?: Prisma.TransactionCreateNestedManyWithoutBuyerInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  messagesRecv?: Prisma.MessageCreateNestedManyWithoutRecipientInput
+  kycDocument?: Prisma.KycVerificationCreateNestedOneWithoutUserInput
+  givenReviews?: Prisma.ReviewCreateNestedManyWithoutReviewerInput
+  receivedReviews?: Prisma.ReviewCreateNestedManyWithoutRevieweeInput
+  Session?: Prisma.SessionCreateNestedManyWithoutUserInput
+  vendorApplication?: Prisma.VendorApplicationCreateNestedOneWithoutUserInput
+  order?: Prisma.OrderCreateNestedManyWithoutUserInput
+  rider?: Prisma.RiderCreateNestedOneWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutCustomerWalletInput = {
+  id?: string
+  email: string
+  password?: string | null
+  phone?: string | null
+  name?: string | null
+  role?: string
+  createdAt?: Date | string
+  isEmailVerified?: boolean
+  isKycVerified?: boolean
+  kycDocumentId?: string | null
+  isBanned?: boolean
+  otpCode?: string | null
+  otpExpiresAt?: Date | string | null
+  riderId?: string | null
+  provider?: string | null
+  providerId?: string | null
+  listings?: Prisma.ListingUncheckedCreateNestedManyWithoutSellerInput
+  media?: Prisma.MediaUncheckedCreateNestedManyWithoutUserInput
+  reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportsReviewed?: Prisma.ReportUncheckedCreateNestedManyWithoutReviewedByInput
+  buyerTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutBuyerInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  messagesRecv?: Prisma.MessageUncheckedCreateNestedManyWithoutRecipientInput
+  kycDocument?: Prisma.KycVerificationUncheckedCreateNestedOneWithoutUserInput
+  givenReviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerInput
+  receivedReviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutRevieweeInput
+  Session?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  vendorApplication?: Prisma.VendorApplicationUncheckedCreateNestedOneWithoutUserInput
+  order?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  rider?: Prisma.RiderUncheckedCreateNestedOneWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutCustomerWalletInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCustomerWalletInput, Prisma.UserUncheckedCreateWithoutCustomerWalletInput>
+}
+
+export type UserUpsertWithoutCustomerWalletInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCustomerWalletInput, Prisma.UserUncheckedUpdateWithoutCustomerWalletInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCustomerWalletInput, Prisma.UserUncheckedCreateWithoutCustomerWalletInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCustomerWalletInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCustomerWalletInput, Prisma.UserUncheckedUpdateWithoutCustomerWalletInput>
+}
+
+export type UserUpdateWithoutCustomerWalletInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isKycVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kycDocumentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isBanned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  otpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  otpExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  riderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  listings?: Prisma.ListingUpdateManyWithoutSellerNestedInput
+  media?: Prisma.MediaUpdateManyWithoutUserNestedInput
+  reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportsReviewed?: Prisma.ReportUpdateManyWithoutReviewedByNestedInput
+  buyerTransactions?: Prisma.TransactionUpdateManyWithoutBuyerNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  messagesRecv?: Prisma.MessageUpdateManyWithoutRecipientNestedInput
+  kycDocument?: Prisma.KycVerificationUpdateOneWithoutUserNestedInput
+  givenReviews?: Prisma.ReviewUpdateManyWithoutReviewerNestedInput
+  receivedReviews?: Prisma.ReviewUpdateManyWithoutRevieweeNestedInput
+  Session?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  vendorApplication?: Prisma.VendorApplicationUpdateOneWithoutUserNestedInput
+  order?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  rider?: Prisma.RiderUpdateOneWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCustomerWalletInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isKycVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kycDocumentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isBanned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  otpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  otpExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  riderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  listings?: Prisma.ListingUncheckedUpdateManyWithoutSellerNestedInput
+  media?: Prisma.MediaUncheckedUpdateManyWithoutUserNestedInput
+  reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportsReviewed?: Prisma.ReportUncheckedUpdateManyWithoutReviewedByNestedInput
+  buyerTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutBuyerNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  messagesRecv?: Prisma.MessageUncheckedUpdateManyWithoutRecipientNestedInput
+  kycDocument?: Prisma.KycVerificationUncheckedUpdateOneWithoutUserNestedInput
+  givenReviews?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerNestedInput
+  receivedReviews?: Prisma.ReviewUncheckedUpdateManyWithoutRevieweeNestedInput
   Session?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   vendorApplication?: Prisma.VendorApplicationUncheckedUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -2999,6 +3228,7 @@ export type UserCreateWithoutRiderInput = {
   Session?: Prisma.SessionCreateNestedManyWithoutUserInput
   vendorApplication?: Prisma.VendorApplicationCreateNestedOneWithoutUserInput
   order?: Prisma.OrderCreateNestedManyWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRiderInput = {
@@ -3032,6 +3262,7 @@ export type UserUncheckedCreateWithoutRiderInput = {
   Session?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   vendorApplication?: Prisma.VendorApplicationUncheckedCreateNestedOneWithoutUserInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  customerWallet?: Prisma.CustomerWalletUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRiderInput = {
@@ -3081,6 +3312,7 @@ export type UserUpdateWithoutRiderInput = {
   Session?: Prisma.SessionUpdateManyWithoutUserNestedInput
   vendorApplication?: Prisma.VendorApplicationUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRiderInput = {
@@ -3114,6 +3346,7 @@ export type UserUncheckedUpdateWithoutRiderInput = {
   Session?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   vendorApplication?: Prisma.VendorApplicationUncheckedUpdateOneWithoutUserNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  customerWallet?: Prisma.CustomerWalletUncheckedUpdateOneWithoutUserNestedInput
 }
 
 
@@ -3278,6 +3511,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   vendorApplication?: boolean | Prisma.User$vendorApplicationArgs<ExtArgs>
   order?: boolean | Prisma.User$orderArgs<ExtArgs>
   rider?: boolean | Prisma.User$riderArgs<ExtArgs>
+  customerWallet?: boolean | Prisma.User$customerWalletArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -3355,6 +3589,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   vendorApplication?: boolean | Prisma.User$vendorApplicationArgs<ExtArgs>
   order?: boolean | Prisma.User$orderArgs<ExtArgs>
   rider?: boolean | Prisma.User$riderArgs<ExtArgs>
+  customerWallet?: boolean | Prisma.User$customerWalletArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -3378,6 +3613,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     vendorApplication: Prisma.$VendorApplicationPayload<ExtArgs> | null
     order: Prisma.$OrderPayload<ExtArgs>[]
     rider: Prisma.$RiderPayload<ExtArgs> | null
+    customerWallet: Prisma.$CustomerWalletPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -3805,6 +4041,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   vendorApplication<T extends Prisma.User$vendorApplicationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$vendorApplicationArgs<ExtArgs>>): Prisma.Prisma__VendorApplicationClient<runtime.Types.Result.GetResult<Prisma.$VendorApplicationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   order<T extends Prisma.User$orderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$orderArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   rider<T extends Prisma.User$riderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$riderArgs<ExtArgs>>): Prisma.Prisma__RiderClient<runtime.Types.Result.GetResult<Prisma.$RiderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  customerWallet<T extends Prisma.User$customerWalletArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$customerWalletArgs<ExtArgs>>): Prisma.Prisma__CustomerWalletClient<runtime.Types.Result.GetResult<Prisma.$CustomerWalletPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4580,6 +4817,25 @@ export type User$riderArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    */
   include?: Prisma.RiderInclude<ExtArgs> | null
   where?: Prisma.RiderWhereInput
+}
+
+/**
+ * User.customerWallet
+ */
+export type User$customerWalletArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CustomerWallet
+   */
+  select?: Prisma.CustomerWalletSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CustomerWallet
+   */
+  omit?: Prisma.CustomerWalletOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CustomerWalletInclude<ExtArgs> | null
+  where?: Prisma.CustomerWalletWhereInput
 }
 
 /**

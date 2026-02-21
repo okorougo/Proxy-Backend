@@ -33,7 +33,9 @@ export type DeliveryAvgAggregateOutputType = {
   dropoffLng: number | null
   distanceKm: number | null
   etaMinutes: number | null
-  fareAmount: number | null
+  fareAmount: runtime.Decimal | null
+  vendorLat: number | null
+  vendorLng: number | null
   riderLat: number | null
   riderLng: number | null
 }
@@ -45,7 +47,9 @@ export type DeliverySumAggregateOutputType = {
   dropoffLng: number | null
   distanceKm: number | null
   etaMinutes: number | null
-  fareAmount: number | null
+  fareAmount: runtime.Decimal | null
+  vendorLat: number | null
+  vendorLng: number | null
   riderLat: number | null
   riderLng: number | null
 }
@@ -62,11 +66,15 @@ export type DeliveryMinAggregateOutputType = {
   dropoffLng: number | null
   pickupAddress: string | null
   dropoffAddress: string | null
+  isSelfDelivery: boolean | null
   status: $Enums.DeliveryStatus | null
   distanceKm: number | null
   etaMinutes: number | null
-  fareAmount: number | null
+  fareAmount: runtime.Decimal | null
   isDigital: boolean | null
+  vendorLat: number | null
+  vendorLng: number | null
+  vendorStartedAt: Date | null
   riderArrivedAt: Date | null
   riderLat: number | null
   riderLng: number | null
@@ -88,11 +96,15 @@ export type DeliveryMaxAggregateOutputType = {
   dropoffLng: number | null
   pickupAddress: string | null
   dropoffAddress: string | null
+  isSelfDelivery: boolean | null
   status: $Enums.DeliveryStatus | null
   distanceKm: number | null
   etaMinutes: number | null
-  fareAmount: number | null
+  fareAmount: runtime.Decimal | null
   isDigital: boolean | null
+  vendorLat: number | null
+  vendorLng: number | null
+  vendorStartedAt: Date | null
   riderArrivedAt: Date | null
   riderLat: number | null
   riderLng: number | null
@@ -114,12 +126,16 @@ export type DeliveryCountAggregateOutputType = {
   dropoffLng: number
   pickupAddress: number
   dropoffAddress: number
+  isSelfDelivery: number
   status: number
   distanceKm: number
   etaMinutes: number
   fareAmount: number
   isDigital: number
   digitalFiles: number
+  vendorLat: number
+  vendorLng: number
+  vendorStartedAt: number
   riderArrivedAt: number
   riderLat: number
   riderLng: number
@@ -139,6 +155,8 @@ export type DeliveryAvgAggregateInputType = {
   distanceKm?: true
   etaMinutes?: true
   fareAmount?: true
+  vendorLat?: true
+  vendorLng?: true
   riderLat?: true
   riderLng?: true
 }
@@ -151,6 +169,8 @@ export type DeliverySumAggregateInputType = {
   distanceKm?: true
   etaMinutes?: true
   fareAmount?: true
+  vendorLat?: true
+  vendorLng?: true
   riderLat?: true
   riderLng?: true
 }
@@ -167,11 +187,15 @@ export type DeliveryMinAggregateInputType = {
   dropoffLng?: true
   pickupAddress?: true
   dropoffAddress?: true
+  isSelfDelivery?: true
   status?: true
   distanceKm?: true
   etaMinutes?: true
   fareAmount?: true
   isDigital?: true
+  vendorLat?: true
+  vendorLng?: true
+  vendorStartedAt?: true
   riderArrivedAt?: true
   riderLat?: true
   riderLng?: true
@@ -193,11 +217,15 @@ export type DeliveryMaxAggregateInputType = {
   dropoffLng?: true
   pickupAddress?: true
   dropoffAddress?: true
+  isSelfDelivery?: true
   status?: true
   distanceKm?: true
   etaMinutes?: true
   fareAmount?: true
   isDigital?: true
+  vendorLat?: true
+  vendorLng?: true
+  vendorStartedAt?: true
   riderArrivedAt?: true
   riderLat?: true
   riderLng?: true
@@ -219,12 +247,16 @@ export type DeliveryCountAggregateInputType = {
   dropoffLng?: true
   pickupAddress?: true
   dropoffAddress?: true
+  isSelfDelivery?: true
   status?: true
   distanceKm?: true
   etaMinutes?: true
   fareAmount?: true
   isDigital?: true
   digitalFiles?: true
+  vendorLat?: true
+  vendorLng?: true
+  vendorStartedAt?: true
   riderArrivedAt?: true
   riderLat?: true
   riderLng?: true
@@ -333,12 +365,16 @@ export type DeliveryGroupByOutputType = {
   dropoffLng: number
   pickupAddress: string
   dropoffAddress: string
+  isSelfDelivery: boolean
   status: $Enums.DeliveryStatus
   distanceKm: number | null
   etaMinutes: number | null
-  fareAmount: number | null
+  fareAmount: runtime.Decimal | null
   isDigital: boolean
   digitalFiles: runtime.JsonValue | null
+  vendorLat: number | null
+  vendorLng: number | null
+  vendorStartedAt: Date | null
   riderArrivedAt: Date | null
   riderLat: number | null
   riderLng: number | null
@@ -383,12 +419,16 @@ export type DeliveryWhereInput = {
   dropoffLng?: Prisma.FloatFilter<"Delivery"> | number
   pickupAddress?: Prisma.StringFilter<"Delivery"> | string
   dropoffAddress?: Prisma.StringFilter<"Delivery"> | string
+  isSelfDelivery?: Prisma.BoolFilter<"Delivery"> | boolean
   status?: Prisma.EnumDeliveryStatusFilter<"Delivery"> | $Enums.DeliveryStatus
   distanceKm?: Prisma.FloatNullableFilter<"Delivery"> | number | null
   etaMinutes?: Prisma.IntNullableFilter<"Delivery"> | number | null
-  fareAmount?: Prisma.FloatNullableFilter<"Delivery"> | number | null
+  fareAmount?: Prisma.DecimalNullableFilter<"Delivery"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: Prisma.BoolFilter<"Delivery"> | boolean
   digitalFiles?: Prisma.JsonNullableFilter<"Delivery">
+  vendorLat?: Prisma.FloatNullableFilter<"Delivery"> | number | null
+  vendorLng?: Prisma.FloatNullableFilter<"Delivery"> | number | null
+  vendorStartedAt?: Prisma.DateTimeNullableFilter<"Delivery"> | Date | string | null
   riderArrivedAt?: Prisma.DateTimeNullableFilter<"Delivery"> | Date | string | null
   riderLat?: Prisma.FloatNullableFilter<"Delivery"> | number | null
   riderLng?: Prisma.FloatNullableFilter<"Delivery"> | number | null
@@ -413,12 +453,16 @@ export type DeliveryOrderByWithRelationInput = {
   dropoffLng?: Prisma.SortOrder
   pickupAddress?: Prisma.SortOrder
   dropoffAddress?: Prisma.SortOrder
+  isSelfDelivery?: Prisma.SortOrder
   status?: Prisma.SortOrder
   distanceKm?: Prisma.SortOrderInput | Prisma.SortOrder
   etaMinutes?: Prisma.SortOrderInput | Prisma.SortOrder
   fareAmount?: Prisma.SortOrderInput | Prisma.SortOrder
   isDigital?: Prisma.SortOrder
   digitalFiles?: Prisma.SortOrderInput | Prisma.SortOrder
+  vendorLat?: Prisma.SortOrderInput | Prisma.SortOrder
+  vendorLng?: Prisma.SortOrderInput | Prisma.SortOrder
+  vendorStartedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   riderArrivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   riderLat?: Prisma.SortOrderInput | Prisma.SortOrder
   riderLng?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -446,12 +490,16 @@ export type DeliveryWhereUniqueInput = Prisma.AtLeast<{
   dropoffLng?: Prisma.FloatFilter<"Delivery"> | number
   pickupAddress?: Prisma.StringFilter<"Delivery"> | string
   dropoffAddress?: Prisma.StringFilter<"Delivery"> | string
+  isSelfDelivery?: Prisma.BoolFilter<"Delivery"> | boolean
   status?: Prisma.EnumDeliveryStatusFilter<"Delivery"> | $Enums.DeliveryStatus
   distanceKm?: Prisma.FloatNullableFilter<"Delivery"> | number | null
   etaMinutes?: Prisma.IntNullableFilter<"Delivery"> | number | null
-  fareAmount?: Prisma.FloatNullableFilter<"Delivery"> | number | null
+  fareAmount?: Prisma.DecimalNullableFilter<"Delivery"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: Prisma.BoolFilter<"Delivery"> | boolean
   digitalFiles?: Prisma.JsonNullableFilter<"Delivery">
+  vendorLat?: Prisma.FloatNullableFilter<"Delivery"> | number | null
+  vendorLng?: Prisma.FloatNullableFilter<"Delivery"> | number | null
+  vendorStartedAt?: Prisma.DateTimeNullableFilter<"Delivery"> | Date | string | null
   riderArrivedAt?: Prisma.DateTimeNullableFilter<"Delivery"> | Date | string | null
   riderLat?: Prisma.FloatNullableFilter<"Delivery"> | number | null
   riderLng?: Prisma.FloatNullableFilter<"Delivery"> | number | null
@@ -476,12 +524,16 @@ export type DeliveryOrderByWithAggregationInput = {
   dropoffLng?: Prisma.SortOrder
   pickupAddress?: Prisma.SortOrder
   dropoffAddress?: Prisma.SortOrder
+  isSelfDelivery?: Prisma.SortOrder
   status?: Prisma.SortOrder
   distanceKm?: Prisma.SortOrderInput | Prisma.SortOrder
   etaMinutes?: Prisma.SortOrderInput | Prisma.SortOrder
   fareAmount?: Prisma.SortOrderInput | Prisma.SortOrder
   isDigital?: Prisma.SortOrder
   digitalFiles?: Prisma.SortOrderInput | Prisma.SortOrder
+  vendorLat?: Prisma.SortOrderInput | Prisma.SortOrder
+  vendorLng?: Prisma.SortOrderInput | Prisma.SortOrder
+  vendorStartedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   riderArrivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   riderLat?: Prisma.SortOrderInput | Prisma.SortOrder
   riderLng?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -511,12 +563,16 @@ export type DeliveryScalarWhereWithAggregatesInput = {
   dropoffLng?: Prisma.FloatWithAggregatesFilter<"Delivery"> | number
   pickupAddress?: Prisma.StringWithAggregatesFilter<"Delivery"> | string
   dropoffAddress?: Prisma.StringWithAggregatesFilter<"Delivery"> | string
+  isSelfDelivery?: Prisma.BoolWithAggregatesFilter<"Delivery"> | boolean
   status?: Prisma.EnumDeliveryStatusWithAggregatesFilter<"Delivery"> | $Enums.DeliveryStatus
   distanceKm?: Prisma.FloatNullableWithAggregatesFilter<"Delivery"> | number | null
   etaMinutes?: Prisma.IntNullableWithAggregatesFilter<"Delivery"> | number | null
-  fareAmount?: Prisma.FloatNullableWithAggregatesFilter<"Delivery"> | number | null
+  fareAmount?: Prisma.DecimalNullableWithAggregatesFilter<"Delivery"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: Prisma.BoolWithAggregatesFilter<"Delivery"> | boolean
   digitalFiles?: Prisma.JsonNullableWithAggregatesFilter<"Delivery">
+  vendorLat?: Prisma.FloatNullableWithAggregatesFilter<"Delivery"> | number | null
+  vendorLng?: Prisma.FloatNullableWithAggregatesFilter<"Delivery"> | number | null
+  vendorStartedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Delivery"> | Date | string | null
   riderArrivedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Delivery"> | Date | string | null
   riderLat?: Prisma.FloatNullableWithAggregatesFilter<"Delivery"> | number | null
   riderLng?: Prisma.FloatNullableWithAggregatesFilter<"Delivery"> | number | null
@@ -535,12 +591,16 @@ export type DeliveryCreateInput = {
   dropoffLng: number
   pickupAddress: string
   dropoffAddress: string
+  isSelfDelivery?: boolean
   status?: $Enums.DeliveryStatus
   distanceKm?: number | null
   etaMinutes?: number | null
-  fareAmount?: number | null
+  fareAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: boolean
   digitalFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  vendorLat?: number | null
+  vendorLng?: number | null
+  vendorStartedAt?: Date | string | null
   riderArrivedAt?: Date | string | null
   riderLat?: number | null
   riderLng?: number | null
@@ -565,12 +625,16 @@ export type DeliveryUncheckedCreateInput = {
   dropoffLng: number
   pickupAddress: string
   dropoffAddress: string
+  isSelfDelivery?: boolean
   status?: $Enums.DeliveryStatus
   distanceKm?: number | null
   etaMinutes?: number | null
-  fareAmount?: number | null
+  fareAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: boolean
   digitalFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  vendorLat?: number | null
+  vendorLng?: number | null
+  vendorStartedAt?: Date | string | null
   riderArrivedAt?: Date | string | null
   riderLat?: number | null
   riderLng?: number | null
@@ -589,12 +653,16 @@ export type DeliveryUpdateInput = {
   dropoffLng?: Prisma.FloatFieldUpdateOperationsInput | number
   pickupAddress?: Prisma.StringFieldUpdateOperationsInput | string
   dropoffAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  isSelfDelivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
   distanceKm?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   etaMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  fareAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fareAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   digitalFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  vendorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vendorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vendorStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riderArrivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riderLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   riderLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -619,12 +687,16 @@ export type DeliveryUncheckedUpdateInput = {
   dropoffLng?: Prisma.FloatFieldUpdateOperationsInput | number
   pickupAddress?: Prisma.StringFieldUpdateOperationsInput | string
   dropoffAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  isSelfDelivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
   distanceKm?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   etaMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  fareAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fareAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   digitalFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  vendorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vendorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vendorStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riderArrivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riderLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   riderLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -646,12 +718,16 @@ export type DeliveryCreateManyInput = {
   dropoffLng: number
   pickupAddress: string
   dropoffAddress: string
+  isSelfDelivery?: boolean
   status?: $Enums.DeliveryStatus
   distanceKm?: number | null
   etaMinutes?: number | null
-  fareAmount?: number | null
+  fareAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: boolean
   digitalFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  vendorLat?: number | null
+  vendorLng?: number | null
+  vendorStartedAt?: Date | string | null
   riderArrivedAt?: Date | string | null
   riderLat?: number | null
   riderLng?: number | null
@@ -670,12 +746,16 @@ export type DeliveryUpdateManyMutationInput = {
   dropoffLng?: Prisma.FloatFieldUpdateOperationsInput | number
   pickupAddress?: Prisma.StringFieldUpdateOperationsInput | string
   dropoffAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  isSelfDelivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
   distanceKm?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   etaMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  fareAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fareAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   digitalFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  vendorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vendorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vendorStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riderArrivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riderLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   riderLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -697,12 +777,16 @@ export type DeliveryUncheckedUpdateManyInput = {
   dropoffLng?: Prisma.FloatFieldUpdateOperationsInput | number
   pickupAddress?: Prisma.StringFieldUpdateOperationsInput | string
   dropoffAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  isSelfDelivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
   distanceKm?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   etaMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  fareAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fareAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   digitalFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  vendorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vendorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vendorStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riderArrivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riderLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   riderLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -739,12 +823,16 @@ export type DeliveryCountOrderByAggregateInput = {
   dropoffLng?: Prisma.SortOrder
   pickupAddress?: Prisma.SortOrder
   dropoffAddress?: Prisma.SortOrder
+  isSelfDelivery?: Prisma.SortOrder
   status?: Prisma.SortOrder
   distanceKm?: Prisma.SortOrder
   etaMinutes?: Prisma.SortOrder
   fareAmount?: Prisma.SortOrder
   isDigital?: Prisma.SortOrder
   digitalFiles?: Prisma.SortOrder
+  vendorLat?: Prisma.SortOrder
+  vendorLng?: Prisma.SortOrder
+  vendorStartedAt?: Prisma.SortOrder
   riderArrivedAt?: Prisma.SortOrder
   riderLat?: Prisma.SortOrder
   riderLng?: Prisma.SortOrder
@@ -762,6 +850,8 @@ export type DeliveryAvgOrderByAggregateInput = {
   distanceKm?: Prisma.SortOrder
   etaMinutes?: Prisma.SortOrder
   fareAmount?: Prisma.SortOrder
+  vendorLat?: Prisma.SortOrder
+  vendorLng?: Prisma.SortOrder
   riderLat?: Prisma.SortOrder
   riderLng?: Prisma.SortOrder
 }
@@ -778,11 +868,15 @@ export type DeliveryMaxOrderByAggregateInput = {
   dropoffLng?: Prisma.SortOrder
   pickupAddress?: Prisma.SortOrder
   dropoffAddress?: Prisma.SortOrder
+  isSelfDelivery?: Prisma.SortOrder
   status?: Prisma.SortOrder
   distanceKm?: Prisma.SortOrder
   etaMinutes?: Prisma.SortOrder
   fareAmount?: Prisma.SortOrder
   isDigital?: Prisma.SortOrder
+  vendorLat?: Prisma.SortOrder
+  vendorLng?: Prisma.SortOrder
+  vendorStartedAt?: Prisma.SortOrder
   riderArrivedAt?: Prisma.SortOrder
   riderLat?: Prisma.SortOrder
   riderLng?: Prisma.SortOrder
@@ -804,11 +898,15 @@ export type DeliveryMinOrderByAggregateInput = {
   dropoffLng?: Prisma.SortOrder
   pickupAddress?: Prisma.SortOrder
   dropoffAddress?: Prisma.SortOrder
+  isSelfDelivery?: Prisma.SortOrder
   status?: Prisma.SortOrder
   distanceKm?: Prisma.SortOrder
   etaMinutes?: Prisma.SortOrder
   fareAmount?: Prisma.SortOrder
   isDigital?: Prisma.SortOrder
+  vendorLat?: Prisma.SortOrder
+  vendorLng?: Prisma.SortOrder
+  vendorStartedAt?: Prisma.SortOrder
   riderArrivedAt?: Prisma.SortOrder
   riderLat?: Prisma.SortOrder
   riderLng?: Prisma.SortOrder
@@ -826,6 +924,8 @@ export type DeliverySumOrderByAggregateInput = {
   distanceKm?: Prisma.SortOrder
   etaMinutes?: Prisma.SortOrder
   fareAmount?: Prisma.SortOrder
+  vendorLat?: Prisma.SortOrder
+  vendorLng?: Prisma.SortOrder
   riderLat?: Prisma.SortOrder
   riderLng?: Prisma.SortOrder
 }
@@ -959,12 +1059,16 @@ export type DeliveryCreateWithoutOrderInput = {
   dropoffLng: number
   pickupAddress: string
   dropoffAddress: string
+  isSelfDelivery?: boolean
   status?: $Enums.DeliveryStatus
   distanceKm?: number | null
   etaMinutes?: number | null
-  fareAmount?: number | null
+  fareAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: boolean
   digitalFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  vendorLat?: number | null
+  vendorLng?: number | null
+  vendorStartedAt?: Date | string | null
   riderArrivedAt?: Date | string | null
   riderLat?: number | null
   riderLng?: number | null
@@ -987,12 +1091,16 @@ export type DeliveryUncheckedCreateWithoutOrderInput = {
   dropoffLng: number
   pickupAddress: string
   dropoffAddress: string
+  isSelfDelivery?: boolean
   status?: $Enums.DeliveryStatus
   distanceKm?: number | null
   etaMinutes?: number | null
-  fareAmount?: number | null
+  fareAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: boolean
   digitalFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  vendorLat?: number | null
+  vendorLng?: number | null
+  vendorStartedAt?: Date | string | null
   riderArrivedAt?: Date | string | null
   riderLat?: number | null
   riderLng?: number | null
@@ -1027,12 +1135,16 @@ export type DeliveryUpdateWithoutOrderInput = {
   dropoffLng?: Prisma.FloatFieldUpdateOperationsInput | number
   pickupAddress?: Prisma.StringFieldUpdateOperationsInput | string
   dropoffAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  isSelfDelivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
   distanceKm?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   etaMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  fareAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fareAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   digitalFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  vendorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vendorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vendorStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riderArrivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riderLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   riderLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1055,12 +1167,16 @@ export type DeliveryUncheckedUpdateWithoutOrderInput = {
   dropoffLng?: Prisma.FloatFieldUpdateOperationsInput | number
   pickupAddress?: Prisma.StringFieldUpdateOperationsInput | string
   dropoffAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  isSelfDelivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
   distanceKm?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   etaMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  fareAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fareAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   digitalFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  vendorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vendorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vendorStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riderArrivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riderLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   riderLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1079,12 +1195,16 @@ export type DeliveryCreateWithoutTransactionInput = {
   dropoffLng: number
   pickupAddress: string
   dropoffAddress: string
+  isSelfDelivery?: boolean
   status?: $Enums.DeliveryStatus
   distanceKm?: number | null
   etaMinutes?: number | null
-  fareAmount?: number | null
+  fareAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: boolean
   digitalFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  vendorLat?: number | null
+  vendorLng?: number | null
+  vendorStartedAt?: Date | string | null
   riderArrivedAt?: Date | string | null
   riderLat?: number | null
   riderLng?: number | null
@@ -1107,12 +1227,16 @@ export type DeliveryUncheckedCreateWithoutTransactionInput = {
   dropoffLng: number
   pickupAddress: string
   dropoffAddress: string
+  isSelfDelivery?: boolean
   status?: $Enums.DeliveryStatus
   distanceKm?: number | null
   etaMinutes?: number | null
-  fareAmount?: number | null
+  fareAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: boolean
   digitalFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  vendorLat?: number | null
+  vendorLng?: number | null
+  vendorStartedAt?: Date | string | null
   riderArrivedAt?: Date | string | null
   riderLat?: number | null
   riderLng?: number | null
@@ -1163,12 +1287,16 @@ export type DeliveryScalarWhereInput = {
   dropoffLng?: Prisma.FloatFilter<"Delivery"> | number
   pickupAddress?: Prisma.StringFilter<"Delivery"> | string
   dropoffAddress?: Prisma.StringFilter<"Delivery"> | string
+  isSelfDelivery?: Prisma.BoolFilter<"Delivery"> | boolean
   status?: Prisma.EnumDeliveryStatusFilter<"Delivery"> | $Enums.DeliveryStatus
   distanceKm?: Prisma.FloatNullableFilter<"Delivery"> | number | null
   etaMinutes?: Prisma.IntNullableFilter<"Delivery"> | number | null
-  fareAmount?: Prisma.FloatNullableFilter<"Delivery"> | number | null
+  fareAmount?: Prisma.DecimalNullableFilter<"Delivery"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: Prisma.BoolFilter<"Delivery"> | boolean
   digitalFiles?: Prisma.JsonNullableFilter<"Delivery">
+  vendorLat?: Prisma.FloatNullableFilter<"Delivery"> | number | null
+  vendorLng?: Prisma.FloatNullableFilter<"Delivery"> | number | null
+  vendorStartedAt?: Prisma.DateTimeNullableFilter<"Delivery"> | Date | string | null
   riderArrivedAt?: Prisma.DateTimeNullableFilter<"Delivery"> | Date | string | null
   riderLat?: Prisma.FloatNullableFilter<"Delivery"> | number | null
   riderLng?: Prisma.FloatNullableFilter<"Delivery"> | number | null
@@ -1187,12 +1315,16 @@ export type DeliveryCreateWithoutRiderInput = {
   dropoffLng: number
   pickupAddress: string
   dropoffAddress: string
+  isSelfDelivery?: boolean
   status?: $Enums.DeliveryStatus
   distanceKm?: number | null
   etaMinutes?: number | null
-  fareAmount?: number | null
+  fareAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: boolean
   digitalFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  vendorLat?: number | null
+  vendorLng?: number | null
+  vendorStartedAt?: Date | string | null
   riderArrivedAt?: Date | string | null
   riderLat?: number | null
   riderLng?: number | null
@@ -1215,12 +1347,16 @@ export type DeliveryUncheckedCreateWithoutRiderInput = {
   dropoffLng: number
   pickupAddress: string
   dropoffAddress: string
+  isSelfDelivery?: boolean
   status?: $Enums.DeliveryStatus
   distanceKm?: number | null
   etaMinutes?: number | null
-  fareAmount?: number | null
+  fareAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: boolean
   digitalFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  vendorLat?: number | null
+  vendorLng?: number | null
+  vendorStartedAt?: Date | string | null
   riderArrivedAt?: Date | string | null
   riderLat?: number | null
   riderLng?: number | null
@@ -1267,12 +1403,16 @@ export type DeliveryCreateManyTransactionInput = {
   dropoffLng: number
   pickupAddress: string
   dropoffAddress: string
+  isSelfDelivery?: boolean
   status?: $Enums.DeliveryStatus
   distanceKm?: number | null
   etaMinutes?: number | null
-  fareAmount?: number | null
+  fareAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: boolean
   digitalFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  vendorLat?: number | null
+  vendorLng?: number | null
+  vendorStartedAt?: Date | string | null
   riderArrivedAt?: Date | string | null
   riderLat?: number | null
   riderLng?: number | null
@@ -1291,12 +1431,16 @@ export type DeliveryUpdateWithoutTransactionInput = {
   dropoffLng?: Prisma.FloatFieldUpdateOperationsInput | number
   pickupAddress?: Prisma.StringFieldUpdateOperationsInput | string
   dropoffAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  isSelfDelivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
   distanceKm?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   etaMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  fareAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fareAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   digitalFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  vendorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vendorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vendorStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riderArrivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riderLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   riderLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1319,12 +1463,16 @@ export type DeliveryUncheckedUpdateWithoutTransactionInput = {
   dropoffLng?: Prisma.FloatFieldUpdateOperationsInput | number
   pickupAddress?: Prisma.StringFieldUpdateOperationsInput | string
   dropoffAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  isSelfDelivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
   distanceKm?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   etaMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  fareAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fareAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   digitalFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  vendorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vendorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vendorStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riderArrivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riderLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   riderLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1345,12 +1493,16 @@ export type DeliveryUncheckedUpdateManyWithoutTransactionInput = {
   dropoffLng?: Prisma.FloatFieldUpdateOperationsInput | number
   pickupAddress?: Prisma.StringFieldUpdateOperationsInput | string
   dropoffAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  isSelfDelivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
   distanceKm?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   etaMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  fareAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fareAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   digitalFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  vendorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vendorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vendorStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riderArrivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riderLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   riderLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1371,12 +1523,16 @@ export type DeliveryCreateManyRiderInput = {
   dropoffLng: number
   pickupAddress: string
   dropoffAddress: string
+  isSelfDelivery?: boolean
   status?: $Enums.DeliveryStatus
   distanceKm?: number | null
   etaMinutes?: number | null
-  fareAmount?: number | null
+  fareAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: boolean
   digitalFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  vendorLat?: number | null
+  vendorLng?: number | null
+  vendorStartedAt?: Date | string | null
   riderArrivedAt?: Date | string | null
   riderLat?: number | null
   riderLng?: number | null
@@ -1395,12 +1551,16 @@ export type DeliveryUpdateWithoutRiderInput = {
   dropoffLng?: Prisma.FloatFieldUpdateOperationsInput | number
   pickupAddress?: Prisma.StringFieldUpdateOperationsInput | string
   dropoffAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  isSelfDelivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
   distanceKm?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   etaMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  fareAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fareAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   digitalFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  vendorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vendorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vendorStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riderArrivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riderLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   riderLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1423,12 +1583,16 @@ export type DeliveryUncheckedUpdateWithoutRiderInput = {
   dropoffLng?: Prisma.FloatFieldUpdateOperationsInput | number
   pickupAddress?: Prisma.StringFieldUpdateOperationsInput | string
   dropoffAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  isSelfDelivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
   distanceKm?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   etaMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  fareAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fareAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   digitalFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  vendorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vendorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vendorStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riderArrivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riderLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   riderLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1449,12 +1613,16 @@ export type DeliveryUncheckedUpdateManyWithoutRiderInput = {
   dropoffLng?: Prisma.FloatFieldUpdateOperationsInput | number
   pickupAddress?: Prisma.StringFieldUpdateOperationsInput | string
   dropoffAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  isSelfDelivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
   distanceKm?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   etaMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  fareAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fareAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
   digitalFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  vendorLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vendorLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vendorStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riderArrivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riderLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   riderLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1478,12 +1646,16 @@ export type DeliverySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   dropoffLng?: boolean
   pickupAddress?: boolean
   dropoffAddress?: boolean
+  isSelfDelivery?: boolean
   status?: boolean
   distanceKm?: boolean
   etaMinutes?: boolean
   fareAmount?: boolean
   isDigital?: boolean
   digitalFiles?: boolean
+  vendorLat?: boolean
+  vendorLng?: boolean
+  vendorStartedAt?: boolean
   riderArrivedAt?: boolean
   riderLat?: boolean
   riderLng?: boolean
@@ -1508,12 +1680,16 @@ export type DeliverySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   dropoffLng?: boolean
   pickupAddress?: boolean
   dropoffAddress?: boolean
+  isSelfDelivery?: boolean
   status?: boolean
   distanceKm?: boolean
   etaMinutes?: boolean
   fareAmount?: boolean
   isDigital?: boolean
   digitalFiles?: boolean
+  vendorLat?: boolean
+  vendorLng?: boolean
+  vendorStartedAt?: boolean
   riderArrivedAt?: boolean
   riderLat?: boolean
   riderLng?: boolean
@@ -1538,12 +1714,16 @@ export type DeliverySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   dropoffLng?: boolean
   pickupAddress?: boolean
   dropoffAddress?: boolean
+  isSelfDelivery?: boolean
   status?: boolean
   distanceKm?: boolean
   etaMinutes?: boolean
   fareAmount?: boolean
   isDigital?: boolean
   digitalFiles?: boolean
+  vendorLat?: boolean
+  vendorLng?: boolean
+  vendorStartedAt?: boolean
   riderArrivedAt?: boolean
   riderLat?: boolean
   riderLng?: boolean
@@ -1568,12 +1748,16 @@ export type DeliverySelectScalar = {
   dropoffLng?: boolean
   pickupAddress?: boolean
   dropoffAddress?: boolean
+  isSelfDelivery?: boolean
   status?: boolean
   distanceKm?: boolean
   etaMinutes?: boolean
   fareAmount?: boolean
   isDigital?: boolean
   digitalFiles?: boolean
+  vendorLat?: boolean
+  vendorLng?: boolean
+  vendorStartedAt?: boolean
   riderArrivedAt?: boolean
   riderLat?: boolean
   riderLng?: boolean
@@ -1583,7 +1767,7 @@ export type DeliverySelectScalar = {
   updatedAt?: boolean
 }
 
-export type DeliveryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "transactionId" | "OTP" | "riderId" | "orderId" | "pickupLat" | "pickupLng" | "dropoffLat" | "dropoffLng" | "pickupAddress" | "dropoffAddress" | "status" | "distanceKm" | "etaMinutes" | "fareAmount" | "isDigital" | "digitalFiles" | "riderArrivedAt" | "riderLat" | "riderLng" | "startedAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["delivery"]>
+export type DeliveryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "transactionId" | "OTP" | "riderId" | "orderId" | "pickupLat" | "pickupLng" | "dropoffLat" | "dropoffLng" | "pickupAddress" | "dropoffAddress" | "isSelfDelivery" | "status" | "distanceKm" | "etaMinutes" | "fareAmount" | "isDigital" | "digitalFiles" | "vendorLat" | "vendorLng" | "vendorStartedAt" | "riderArrivedAt" | "riderLat" | "riderLng" | "startedAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["delivery"]>
 export type DeliveryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   transaction?: boolean | Prisma.TransactionDefaultArgs<ExtArgs>
   rider?: boolean | Prisma.Delivery$riderArgs<ExtArgs>
@@ -1619,12 +1803,16 @@ export type $DeliveryPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     dropoffLng: number
     pickupAddress: string
     dropoffAddress: string
+    isSelfDelivery: boolean
     status: $Enums.DeliveryStatus
     distanceKm: number | null
     etaMinutes: number | null
-    fareAmount: number | null
+    fareAmount: runtime.Decimal | null
     isDigital: boolean
     digitalFiles: runtime.JsonValue | null
+    vendorLat: number | null
+    vendorLng: number | null
+    vendorStartedAt: Date | null
     riderArrivedAt: Date | null
     riderLat: number | null
     riderLng: number | null
@@ -2069,12 +2257,16 @@ export interface DeliveryFieldRefs {
   readonly dropoffLng: Prisma.FieldRef<"Delivery", 'Float'>
   readonly pickupAddress: Prisma.FieldRef<"Delivery", 'String'>
   readonly dropoffAddress: Prisma.FieldRef<"Delivery", 'String'>
+  readonly isSelfDelivery: Prisma.FieldRef<"Delivery", 'Boolean'>
   readonly status: Prisma.FieldRef<"Delivery", 'DeliveryStatus'>
   readonly distanceKm: Prisma.FieldRef<"Delivery", 'Float'>
   readonly etaMinutes: Prisma.FieldRef<"Delivery", 'Int'>
-  readonly fareAmount: Prisma.FieldRef<"Delivery", 'Float'>
+  readonly fareAmount: Prisma.FieldRef<"Delivery", 'Decimal'>
   readonly isDigital: Prisma.FieldRef<"Delivery", 'Boolean'>
   readonly digitalFiles: Prisma.FieldRef<"Delivery", 'Json'>
+  readonly vendorLat: Prisma.FieldRef<"Delivery", 'Float'>
+  readonly vendorLng: Prisma.FieldRef<"Delivery", 'Float'>
+  readonly vendorStartedAt: Prisma.FieldRef<"Delivery", 'DateTime'>
   readonly riderArrivedAt: Prisma.FieldRef<"Delivery", 'DateTime'>
   readonly riderLat: Prisma.FieldRef<"Delivery", 'Float'>
   readonly riderLng: Prisma.FieldRef<"Delivery", 'Float'>

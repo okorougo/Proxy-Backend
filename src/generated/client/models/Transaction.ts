@@ -29,11 +29,17 @@ export type AggregateTransaction = {
 export type TransactionAvgAggregateOutputType = {
   amountCents: number | null
   amountPaid: number | null
+  commissionRate: runtime.Decimal | null
+  commissionAmount: runtime.Decimal | null
+  vendorAmount: runtime.Decimal | null
 }
 
 export type TransactionSumAggregateOutputType = {
   amountCents: number | null
   amountPaid: number | null
+  commissionRate: runtime.Decimal | null
+  commissionAmount: runtime.Decimal | null
+  vendorAmount: runtime.Decimal | null
 }
 
 export type TransactionMinAggregateOutputType = {
@@ -51,6 +57,11 @@ export type TransactionMinAggregateOutputType = {
   updatedAt: Date | null
   amountPaid: number | null
   paystackRef: string | null
+  escrowStatus: $Enums.EscrowStatus | null
+  commissionRate: runtime.Decimal | null
+  releaseAt: Date | null
+  commissionAmount: runtime.Decimal | null
+  vendorAmount: runtime.Decimal | null
 }
 
 export type TransactionMaxAggregateOutputType = {
@@ -68,6 +79,11 @@ export type TransactionMaxAggregateOutputType = {
   updatedAt: Date | null
   amountPaid: number | null
   paystackRef: string | null
+  escrowStatus: $Enums.EscrowStatus | null
+  commissionRate: runtime.Decimal | null
+  releaseAt: Date | null
+  commissionAmount: runtime.Decimal | null
+  vendorAmount: runtime.Decimal | null
 }
 
 export type TransactionCountAggregateOutputType = {
@@ -85,6 +101,11 @@ export type TransactionCountAggregateOutputType = {
   updatedAt: number
   amountPaid: number
   paystackRef: number
+  escrowStatus: number
+  commissionRate: number
+  releaseAt: number
+  commissionAmount: number
+  vendorAmount: number
   _all: number
 }
 
@@ -92,11 +113,17 @@ export type TransactionCountAggregateOutputType = {
 export type TransactionAvgAggregateInputType = {
   amountCents?: true
   amountPaid?: true
+  commissionRate?: true
+  commissionAmount?: true
+  vendorAmount?: true
 }
 
 export type TransactionSumAggregateInputType = {
   amountCents?: true
   amountPaid?: true
+  commissionRate?: true
+  commissionAmount?: true
+  vendorAmount?: true
 }
 
 export type TransactionMinAggregateInputType = {
@@ -114,6 +141,11 @@ export type TransactionMinAggregateInputType = {
   updatedAt?: true
   amountPaid?: true
   paystackRef?: true
+  escrowStatus?: true
+  commissionRate?: true
+  releaseAt?: true
+  commissionAmount?: true
+  vendorAmount?: true
 }
 
 export type TransactionMaxAggregateInputType = {
@@ -131,6 +163,11 @@ export type TransactionMaxAggregateInputType = {
   updatedAt?: true
   amountPaid?: true
   paystackRef?: true
+  escrowStatus?: true
+  commissionRate?: true
+  releaseAt?: true
+  commissionAmount?: true
+  vendorAmount?: true
 }
 
 export type TransactionCountAggregateInputType = {
@@ -148,6 +185,11 @@ export type TransactionCountAggregateInputType = {
   updatedAt?: true
   amountPaid?: true
   paystackRef?: true
+  escrowStatus?: true
+  commissionRate?: true
+  releaseAt?: true
+  commissionAmount?: true
+  vendorAmount?: true
   _all?: true
 }
 
@@ -252,6 +294,11 @@ export type TransactionGroupByOutputType = {
   updatedAt: Date
   amountPaid: number | null
   paystackRef: string | null
+  escrowStatus: $Enums.EscrowStatus
+  commissionRate: runtime.Decimal | null
+  releaseAt: Date | null
+  commissionAmount: runtime.Decimal | null
+  vendorAmount: runtime.Decimal | null
   _count: TransactionCountAggregateOutputType | null
   _avg: TransactionAvgAggregateOutputType | null
   _sum: TransactionSumAggregateOutputType | null
@@ -292,6 +339,11 @@ export type TransactionWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Transaction"> | Date | string
   amountPaid?: Prisma.FloatNullableFilter<"Transaction"> | number | null
   paystackRef?: Prisma.StringNullableFilter<"Transaction"> | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusFilter<"Transaction"> | $Enums.EscrowStatus
+  commissionRate?: Prisma.DecimalNullableFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.DateTimeNullableFilter<"Transaction"> | Date | string | null
+  commissionAmount?: Prisma.DecimalNullableFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.DecimalNullableFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.XOR<Prisma.ListingNullableScalarRelationFilter, Prisma.ListingWhereInput> | null
   buyer?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   seller?: Prisma.XOR<Prisma.VendorApplicationScalarRelationFilter, Prisma.VendorApplicationWhereInput>
@@ -316,6 +368,11 @@ export type TransactionOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   amountPaid?: Prisma.SortOrderInput | Prisma.SortOrder
   paystackRef?: Prisma.SortOrderInput | Prisma.SortOrder
+  escrowStatus?: Prisma.SortOrder
+  commissionRate?: Prisma.SortOrderInput | Prisma.SortOrder
+  releaseAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  commissionAmount?: Prisma.SortOrderInput | Prisma.SortOrder
+  vendorAmount?: Prisma.SortOrderInput | Prisma.SortOrder
   listing?: Prisma.ListingOrderByWithRelationInput
   buyer?: Prisma.UserOrderByWithRelationInput
   seller?: Prisma.VendorApplicationOrderByWithRelationInput
@@ -343,6 +400,11 @@ export type TransactionWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Transaction"> | Date | string
   amountPaid?: Prisma.FloatNullableFilter<"Transaction"> | number | null
   paystackRef?: Prisma.StringNullableFilter<"Transaction"> | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusFilter<"Transaction"> | $Enums.EscrowStatus
+  commissionRate?: Prisma.DecimalNullableFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.DateTimeNullableFilter<"Transaction"> | Date | string | null
+  commissionAmount?: Prisma.DecimalNullableFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.DecimalNullableFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.XOR<Prisma.ListingNullableScalarRelationFilter, Prisma.ListingWhereInput> | null
   buyer?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   seller?: Prisma.XOR<Prisma.VendorApplicationScalarRelationFilter, Prisma.VendorApplicationWhereInput>
@@ -367,6 +429,11 @@ export type TransactionOrderByWithAggregationInput = {
   updatedAt?: Prisma.SortOrder
   amountPaid?: Prisma.SortOrderInput | Prisma.SortOrder
   paystackRef?: Prisma.SortOrderInput | Prisma.SortOrder
+  escrowStatus?: Prisma.SortOrder
+  commissionRate?: Prisma.SortOrderInput | Prisma.SortOrder
+  releaseAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  commissionAmount?: Prisma.SortOrderInput | Prisma.SortOrder
+  vendorAmount?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.TransactionCountOrderByAggregateInput
   _avg?: Prisma.TransactionAvgOrderByAggregateInput
   _max?: Prisma.TransactionMaxOrderByAggregateInput
@@ -392,6 +459,11 @@ export type TransactionScalarWhereWithAggregatesInput = {
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Transaction"> | Date | string
   amountPaid?: Prisma.FloatNullableWithAggregatesFilter<"Transaction"> | number | null
   paystackRef?: Prisma.StringNullableWithAggregatesFilter<"Transaction"> | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusWithAggregatesFilter<"Transaction"> | $Enums.EscrowStatus
+  commissionRate?: Prisma.DecimalNullableWithAggregatesFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Transaction"> | Date | string | null
+  commissionAmount?: Prisma.DecimalNullableWithAggregatesFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.DecimalNullableWithAggregatesFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type TransactionCreateInput = {
@@ -405,6 +477,11 @@ export type TransactionCreateInput = {
   updatedAt?: Date | string
   amountPaid?: number | null
   paystackRef?: string | null
+  escrowStatus?: $Enums.EscrowStatus
+  commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Date | string | null
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingCreateNestedOneWithoutTransactionsInput
   buyer: Prisma.UserCreateNestedOneWithoutBuyerTransactionsInput
   seller: Prisma.VendorApplicationCreateNestedOneWithoutSellerTransactionsInput
@@ -429,6 +506,11 @@ export type TransactionUncheckedCreateInput = {
   updatedAt?: Date | string
   amountPaid?: number | null
   paystackRef?: string | null
+  escrowStatus?: $Enums.EscrowStatus
+  commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Date | string | null
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutTransactionInput
   Delivery?: Prisma.DeliveryUncheckedCreateNestedManyWithoutTransactionInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutTransactionInput
@@ -445,6 +527,11 @@ export type TransactionUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   amountPaid?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paystackRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusFieldUpdateOperationsInput | $Enums.EscrowStatus
+  commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingUpdateOneWithoutTransactionsNestedInput
   buyer?: Prisma.UserUpdateOneRequiredWithoutBuyerTransactionsNestedInput
   seller?: Prisma.VendorApplicationUpdateOneRequiredWithoutSellerTransactionsNestedInput
@@ -469,6 +556,11 @@ export type TransactionUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   amountPaid?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paystackRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusFieldUpdateOperationsInput | $Enums.EscrowStatus
+  commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedUpdateManyWithoutTransactionNestedInput
   Delivery?: Prisma.DeliveryUncheckedUpdateManyWithoutTransactionNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutTransactionNestedInput
@@ -489,6 +581,11 @@ export type TransactionCreateManyInput = {
   updatedAt?: Date | string
   amountPaid?: number | null
   paystackRef?: string | null
+  escrowStatus?: $Enums.EscrowStatus
+  commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Date | string | null
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type TransactionUpdateManyMutationInput = {
@@ -502,6 +599,11 @@ export type TransactionUpdateManyMutationInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   amountPaid?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paystackRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusFieldUpdateOperationsInput | $Enums.EscrowStatus
+  commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type TransactionUncheckedUpdateManyInput = {
@@ -519,6 +621,11 @@ export type TransactionUncheckedUpdateManyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   amountPaid?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paystackRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusFieldUpdateOperationsInput | $Enums.EscrowStatus
+  commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type TransactionListRelationFilter = {
@@ -551,11 +658,19 @@ export type TransactionCountOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   amountPaid?: Prisma.SortOrder
   paystackRef?: Prisma.SortOrder
+  escrowStatus?: Prisma.SortOrder
+  commissionRate?: Prisma.SortOrder
+  releaseAt?: Prisma.SortOrder
+  commissionAmount?: Prisma.SortOrder
+  vendorAmount?: Prisma.SortOrder
 }
 
 export type TransactionAvgOrderByAggregateInput = {
   amountCents?: Prisma.SortOrder
   amountPaid?: Prisma.SortOrder
+  commissionRate?: Prisma.SortOrder
+  commissionAmount?: Prisma.SortOrder
+  vendorAmount?: Prisma.SortOrder
 }
 
 export type TransactionMaxOrderByAggregateInput = {
@@ -573,6 +688,11 @@ export type TransactionMaxOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   amountPaid?: Prisma.SortOrder
   paystackRef?: Prisma.SortOrder
+  escrowStatus?: Prisma.SortOrder
+  commissionRate?: Prisma.SortOrder
+  releaseAt?: Prisma.SortOrder
+  commissionAmount?: Prisma.SortOrder
+  vendorAmount?: Prisma.SortOrder
 }
 
 export type TransactionMinOrderByAggregateInput = {
@@ -590,11 +710,19 @@ export type TransactionMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   amountPaid?: Prisma.SortOrder
   paystackRef?: Prisma.SortOrder
+  escrowStatus?: Prisma.SortOrder
+  commissionRate?: Prisma.SortOrder
+  releaseAt?: Prisma.SortOrder
+  commissionAmount?: Prisma.SortOrder
+  vendorAmount?: Prisma.SortOrder
 }
 
 export type TransactionSumOrderByAggregateInput = {
   amountCents?: Prisma.SortOrder
   amountPaid?: Prisma.SortOrder
+  commissionRate?: Prisma.SortOrder
+  commissionAmount?: Prisma.SortOrder
+  vendorAmount?: Prisma.SortOrder
 }
 
 export type TransactionScalarRelationFilter = {
@@ -792,6 +920,18 @@ export type NullableFloatFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type EnumEscrowStatusFieldUpdateOperationsInput = {
+  set?: $Enums.EscrowStatus
+}
+
+export type NullableDecimalFieldUpdateOperationsInput = {
+  set?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
 export type TransactionCreateNestedOneWithoutReviewInput = {
   create?: Prisma.XOR<Prisma.TransactionCreateWithoutReviewInput, Prisma.TransactionUncheckedCreateWithoutReviewInput>
   connectOrCreate?: Prisma.TransactionCreateOrConnectWithoutReviewInput
@@ -831,6 +971,11 @@ export type TransactionCreateWithoutBuyerInput = {
   updatedAt?: Date | string
   amountPaid?: number | null
   paystackRef?: string | null
+  escrowStatus?: $Enums.EscrowStatus
+  commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Date | string | null
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingCreateNestedOneWithoutTransactionsInput
   seller: Prisma.VendorApplicationCreateNestedOneWithoutSellerTransactionsInput
   review?: Prisma.ReviewCreateNestedManyWithoutTransactionInput
@@ -853,6 +998,11 @@ export type TransactionUncheckedCreateWithoutBuyerInput = {
   updatedAt?: Date | string
   amountPaid?: number | null
   paystackRef?: string | null
+  escrowStatus?: $Enums.EscrowStatus
+  commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Date | string | null
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutTransactionInput
   Delivery?: Prisma.DeliveryUncheckedCreateNestedManyWithoutTransactionInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutTransactionInput
@@ -902,6 +1052,11 @@ export type TransactionScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Transaction"> | Date | string
   amountPaid?: Prisma.FloatNullableFilter<"Transaction"> | number | null
   paystackRef?: Prisma.StringNullableFilter<"Transaction"> | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusFilter<"Transaction"> | $Enums.EscrowStatus
+  commissionRate?: Prisma.DecimalNullableFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.DateTimeNullableFilter<"Transaction"> | Date | string | null
+  commissionAmount?: Prisma.DecimalNullableFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.DecimalNullableFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type TransactionCreateWithoutSellerInput = {
@@ -915,6 +1070,11 @@ export type TransactionCreateWithoutSellerInput = {
   updatedAt?: Date | string
   amountPaid?: number | null
   paystackRef?: string | null
+  escrowStatus?: $Enums.EscrowStatus
+  commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Date | string | null
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingCreateNestedOneWithoutTransactionsInput
   buyer: Prisma.UserCreateNestedOneWithoutBuyerTransactionsInput
   review?: Prisma.ReviewCreateNestedManyWithoutTransactionInput
@@ -937,6 +1097,11 @@ export type TransactionUncheckedCreateWithoutSellerInput = {
   updatedAt?: Date | string
   amountPaid?: number | null
   paystackRef?: string | null
+  escrowStatus?: $Enums.EscrowStatus
+  commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Date | string | null
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutTransactionInput
   Delivery?: Prisma.DeliveryUncheckedCreateNestedManyWithoutTransactionInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutTransactionInput
@@ -979,6 +1144,11 @@ export type TransactionCreateWithoutListingInput = {
   updatedAt?: Date | string
   amountPaid?: number | null
   paystackRef?: string | null
+  escrowStatus?: $Enums.EscrowStatus
+  commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Date | string | null
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyer: Prisma.UserCreateNestedOneWithoutBuyerTransactionsInput
   seller: Prisma.VendorApplicationCreateNestedOneWithoutSellerTransactionsInput
   review?: Prisma.ReviewCreateNestedManyWithoutTransactionInput
@@ -1001,6 +1171,11 @@ export type TransactionUncheckedCreateWithoutListingInput = {
   updatedAt?: Date | string
   amountPaid?: number | null
   paystackRef?: string | null
+  escrowStatus?: $Enums.EscrowStatus
+  commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Date | string | null
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutTransactionInput
   Delivery?: Prisma.DeliveryUncheckedCreateNestedManyWithoutTransactionInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutTransactionInput
@@ -1043,6 +1218,11 @@ export type TransactionCreateWithoutOrderInput = {
   updatedAt?: Date | string
   amountPaid?: number | null
   paystackRef?: string | null
+  escrowStatus?: $Enums.EscrowStatus
+  commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Date | string | null
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingCreateNestedOneWithoutTransactionsInput
   buyer: Prisma.UserCreateNestedOneWithoutBuyerTransactionsInput
   seller: Prisma.VendorApplicationCreateNestedOneWithoutSellerTransactionsInput
@@ -1065,6 +1245,11 @@ export type TransactionUncheckedCreateWithoutOrderInput = {
   updatedAt?: Date | string
   amountPaid?: number | null
   paystackRef?: string | null
+  escrowStatus?: $Enums.EscrowStatus
+  commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Date | string | null
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutTransactionInput
   Delivery?: Prisma.DeliveryUncheckedCreateNestedManyWithoutTransactionInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutTransactionInput
@@ -1097,6 +1282,11 @@ export type TransactionUpdateWithoutOrderInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   amountPaid?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paystackRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusFieldUpdateOperationsInput | $Enums.EscrowStatus
+  commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingUpdateOneWithoutTransactionsNestedInput
   buyer?: Prisma.UserUpdateOneRequiredWithoutBuyerTransactionsNestedInput
   seller?: Prisma.VendorApplicationUpdateOneRequiredWithoutSellerTransactionsNestedInput
@@ -1119,6 +1309,11 @@ export type TransactionUncheckedUpdateWithoutOrderInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   amountPaid?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paystackRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusFieldUpdateOperationsInput | $Enums.EscrowStatus
+  commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedUpdateManyWithoutTransactionNestedInput
   Delivery?: Prisma.DeliveryUncheckedUpdateManyWithoutTransactionNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutTransactionNestedInput
@@ -1135,6 +1330,11 @@ export type TransactionCreateWithoutOrderItemsInput = {
   updatedAt?: Date | string
   amountPaid?: number | null
   paystackRef?: string | null
+  escrowStatus?: $Enums.EscrowStatus
+  commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Date | string | null
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingCreateNestedOneWithoutTransactionsInput
   buyer: Prisma.UserCreateNestedOneWithoutBuyerTransactionsInput
   seller: Prisma.VendorApplicationCreateNestedOneWithoutSellerTransactionsInput
@@ -1158,6 +1358,11 @@ export type TransactionUncheckedCreateWithoutOrderItemsInput = {
   updatedAt?: Date | string
   amountPaid?: number | null
   paystackRef?: string | null
+  escrowStatus?: $Enums.EscrowStatus
+  commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Date | string | null
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutTransactionInput
   Delivery?: Prisma.DeliveryUncheckedCreateNestedManyWithoutTransactionInput
 }
@@ -1189,6 +1394,11 @@ export type TransactionUpdateWithoutOrderItemsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   amountPaid?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paystackRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusFieldUpdateOperationsInput | $Enums.EscrowStatus
+  commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingUpdateOneWithoutTransactionsNestedInput
   buyer?: Prisma.UserUpdateOneRequiredWithoutBuyerTransactionsNestedInput
   seller?: Prisma.VendorApplicationUpdateOneRequiredWithoutSellerTransactionsNestedInput
@@ -1212,6 +1422,11 @@ export type TransactionUncheckedUpdateWithoutOrderItemsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   amountPaid?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paystackRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusFieldUpdateOperationsInput | $Enums.EscrowStatus
+  commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedUpdateManyWithoutTransactionNestedInput
   Delivery?: Prisma.DeliveryUncheckedUpdateManyWithoutTransactionNestedInput
 }
@@ -1227,6 +1442,11 @@ export type TransactionCreateWithoutReviewInput = {
   updatedAt?: Date | string
   amountPaid?: number | null
   paystackRef?: string | null
+  escrowStatus?: $Enums.EscrowStatus
+  commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Date | string | null
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingCreateNestedOneWithoutTransactionsInput
   buyer: Prisma.UserCreateNestedOneWithoutBuyerTransactionsInput
   seller: Prisma.VendorApplicationCreateNestedOneWithoutSellerTransactionsInput
@@ -1250,6 +1470,11 @@ export type TransactionUncheckedCreateWithoutReviewInput = {
   updatedAt?: Date | string
   amountPaid?: number | null
   paystackRef?: string | null
+  escrowStatus?: $Enums.EscrowStatus
+  commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Date | string | null
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   Delivery?: Prisma.DeliveryUncheckedCreateNestedManyWithoutTransactionInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutTransactionInput
 }
@@ -1281,6 +1506,11 @@ export type TransactionUpdateWithoutReviewInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   amountPaid?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paystackRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusFieldUpdateOperationsInput | $Enums.EscrowStatus
+  commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingUpdateOneWithoutTransactionsNestedInput
   buyer?: Prisma.UserUpdateOneRequiredWithoutBuyerTransactionsNestedInput
   seller?: Prisma.VendorApplicationUpdateOneRequiredWithoutSellerTransactionsNestedInput
@@ -1304,6 +1534,11 @@ export type TransactionUncheckedUpdateWithoutReviewInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   amountPaid?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paystackRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusFieldUpdateOperationsInput | $Enums.EscrowStatus
+  commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   Delivery?: Prisma.DeliveryUncheckedUpdateManyWithoutTransactionNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutTransactionNestedInput
 }
@@ -1319,6 +1554,11 @@ export type TransactionCreateWithoutDeliveryInput = {
   updatedAt?: Date | string
   amountPaid?: number | null
   paystackRef?: string | null
+  escrowStatus?: $Enums.EscrowStatus
+  commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Date | string | null
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingCreateNestedOneWithoutTransactionsInput
   buyer: Prisma.UserCreateNestedOneWithoutBuyerTransactionsInput
   seller: Prisma.VendorApplicationCreateNestedOneWithoutSellerTransactionsInput
@@ -1342,6 +1582,11 @@ export type TransactionUncheckedCreateWithoutDeliveryInput = {
   updatedAt?: Date | string
   amountPaid?: number | null
   paystackRef?: string | null
+  escrowStatus?: $Enums.EscrowStatus
+  commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Date | string | null
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutTransactionInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutTransactionInput
 }
@@ -1373,6 +1618,11 @@ export type TransactionUpdateWithoutDeliveryInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   amountPaid?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paystackRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusFieldUpdateOperationsInput | $Enums.EscrowStatus
+  commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingUpdateOneWithoutTransactionsNestedInput
   buyer?: Prisma.UserUpdateOneRequiredWithoutBuyerTransactionsNestedInput
   seller?: Prisma.VendorApplicationUpdateOneRequiredWithoutSellerTransactionsNestedInput
@@ -1396,6 +1646,11 @@ export type TransactionUncheckedUpdateWithoutDeliveryInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   amountPaid?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paystackRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusFieldUpdateOperationsInput | $Enums.EscrowStatus
+  commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedUpdateManyWithoutTransactionNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutTransactionNestedInput
 }
@@ -1414,6 +1669,11 @@ export type TransactionCreateManyBuyerInput = {
   updatedAt?: Date | string
   amountPaid?: number | null
   paystackRef?: string | null
+  escrowStatus?: $Enums.EscrowStatus
+  commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Date | string | null
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type TransactionUpdateWithoutBuyerInput = {
@@ -1427,6 +1687,11 @@ export type TransactionUpdateWithoutBuyerInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   amountPaid?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paystackRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusFieldUpdateOperationsInput | $Enums.EscrowStatus
+  commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingUpdateOneWithoutTransactionsNestedInput
   seller?: Prisma.VendorApplicationUpdateOneRequiredWithoutSellerTransactionsNestedInput
   review?: Prisma.ReviewUpdateManyWithoutTransactionNestedInput
@@ -1449,6 +1714,11 @@ export type TransactionUncheckedUpdateWithoutBuyerInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   amountPaid?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paystackRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusFieldUpdateOperationsInput | $Enums.EscrowStatus
+  commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedUpdateManyWithoutTransactionNestedInput
   Delivery?: Prisma.DeliveryUncheckedUpdateManyWithoutTransactionNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutTransactionNestedInput
@@ -1468,6 +1738,11 @@ export type TransactionUncheckedUpdateManyWithoutBuyerInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   amountPaid?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paystackRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusFieldUpdateOperationsInput | $Enums.EscrowStatus
+  commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type TransactionCreateManySellerInput = {
@@ -1484,6 +1759,11 @@ export type TransactionCreateManySellerInput = {
   updatedAt?: Date | string
   amountPaid?: number | null
   paystackRef?: string | null
+  escrowStatus?: $Enums.EscrowStatus
+  commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Date | string | null
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type TransactionUpdateWithoutSellerInput = {
@@ -1497,6 +1777,11 @@ export type TransactionUpdateWithoutSellerInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   amountPaid?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paystackRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusFieldUpdateOperationsInput | $Enums.EscrowStatus
+  commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingUpdateOneWithoutTransactionsNestedInput
   buyer?: Prisma.UserUpdateOneRequiredWithoutBuyerTransactionsNestedInput
   review?: Prisma.ReviewUpdateManyWithoutTransactionNestedInput
@@ -1519,6 +1804,11 @@ export type TransactionUncheckedUpdateWithoutSellerInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   amountPaid?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paystackRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusFieldUpdateOperationsInput | $Enums.EscrowStatus
+  commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedUpdateManyWithoutTransactionNestedInput
   Delivery?: Prisma.DeliveryUncheckedUpdateManyWithoutTransactionNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutTransactionNestedInput
@@ -1538,6 +1828,11 @@ export type TransactionUncheckedUpdateManyWithoutSellerInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   amountPaid?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paystackRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusFieldUpdateOperationsInput | $Enums.EscrowStatus
+  commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type TransactionCreateManyListingInput = {
@@ -1554,6 +1849,11 @@ export type TransactionCreateManyListingInput = {
   updatedAt?: Date | string
   amountPaid?: number | null
   paystackRef?: string | null
+  escrowStatus?: $Enums.EscrowStatus
+  commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Date | string | null
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type TransactionUpdateWithoutListingInput = {
@@ -1567,6 +1867,11 @@ export type TransactionUpdateWithoutListingInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   amountPaid?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paystackRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusFieldUpdateOperationsInput | $Enums.EscrowStatus
+  commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyer?: Prisma.UserUpdateOneRequiredWithoutBuyerTransactionsNestedInput
   seller?: Prisma.VendorApplicationUpdateOneRequiredWithoutSellerTransactionsNestedInput
   review?: Prisma.ReviewUpdateManyWithoutTransactionNestedInput
@@ -1589,6 +1894,11 @@ export type TransactionUncheckedUpdateWithoutListingInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   amountPaid?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paystackRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusFieldUpdateOperationsInput | $Enums.EscrowStatus
+  commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedUpdateManyWithoutTransactionNestedInput
   Delivery?: Prisma.DeliveryUncheckedUpdateManyWithoutTransactionNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutTransactionNestedInput
@@ -1608,6 +1918,11 @@ export type TransactionUncheckedUpdateManyWithoutListingInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   amountPaid?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   paystackRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  escrowStatus?: Prisma.EnumEscrowStatusFieldUpdateOperationsInput | $Enums.EscrowStatus
+  commissionRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 
@@ -1674,6 +1989,11 @@ export type TransactionSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   updatedAt?: boolean
   amountPaid?: boolean
   paystackRef?: boolean
+  escrowStatus?: boolean
+  commissionRate?: boolean
+  releaseAt?: boolean
+  commissionAmount?: boolean
+  vendorAmount?: boolean
   listing?: boolean | Prisma.Transaction$listingArgs<ExtArgs>
   buyer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   seller?: boolean | Prisma.VendorApplicationDefaultArgs<ExtArgs>
@@ -1699,6 +2019,11 @@ export type TransactionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   updatedAt?: boolean
   amountPaid?: boolean
   paystackRef?: boolean
+  escrowStatus?: boolean
+  commissionRate?: boolean
+  releaseAt?: boolean
+  commissionAmount?: boolean
+  vendorAmount?: boolean
   listing?: boolean | Prisma.Transaction$listingArgs<ExtArgs>
   buyer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   seller?: boolean | Prisma.VendorApplicationDefaultArgs<ExtArgs>
@@ -1720,6 +2045,11 @@ export type TransactionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   updatedAt?: boolean
   amountPaid?: boolean
   paystackRef?: boolean
+  escrowStatus?: boolean
+  commissionRate?: boolean
+  releaseAt?: boolean
+  commissionAmount?: boolean
+  vendorAmount?: boolean
   listing?: boolean | Prisma.Transaction$listingArgs<ExtArgs>
   buyer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   seller?: boolean | Prisma.VendorApplicationDefaultArgs<ExtArgs>
@@ -1741,9 +2071,14 @@ export type TransactionSelectScalar = {
   updatedAt?: boolean
   amountPaid?: boolean
   paystackRef?: boolean
+  escrowStatus?: boolean
+  commissionRate?: boolean
+  releaseAt?: boolean
+  commissionAmount?: boolean
+  vendorAmount?: boolean
 }
 
-export type TransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "listingId" | "orderId" | "buyerId" | "sellerId" | "amountCents" | "currency" | "method" | "status" | "receiptUrl" | "createdAt" | "updatedAt" | "amountPaid" | "paystackRef", ExtArgs["result"]["transaction"]>
+export type TransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "listingId" | "orderId" | "buyerId" | "sellerId" | "amountCents" | "currency" | "method" | "status" | "receiptUrl" | "createdAt" | "updatedAt" | "amountPaid" | "paystackRef" | "escrowStatus" | "commissionRate" | "releaseAt" | "commissionAmount" | "vendorAmount", ExtArgs["result"]["transaction"]>
 export type TransactionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   listing?: boolean | Prisma.Transaction$listingArgs<ExtArgs>
   buyer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1793,6 +2128,11 @@ export type $TransactionPayload<ExtArgs extends runtime.Types.Extensions.Interna
     updatedAt: Date
     amountPaid: number | null
     paystackRef: string | null
+    escrowStatus: $Enums.EscrowStatus
+    commissionRate: runtime.Decimal | null
+    releaseAt: Date | null
+    commissionAmount: runtime.Decimal | null
+    vendorAmount: runtime.Decimal | null
   }, ExtArgs["result"]["transaction"]>
   composites: {}
 }
@@ -2237,6 +2577,11 @@ export interface TransactionFieldRefs {
   readonly updatedAt: Prisma.FieldRef<"Transaction", 'DateTime'>
   readonly amountPaid: Prisma.FieldRef<"Transaction", 'Float'>
   readonly paystackRef: Prisma.FieldRef<"Transaction", 'String'>
+  readonly escrowStatus: Prisma.FieldRef<"Transaction", 'EscrowStatus'>
+  readonly commissionRate: Prisma.FieldRef<"Transaction", 'Decimal'>
+  readonly releaseAt: Prisma.FieldRef<"Transaction", 'DateTime'>
+  readonly commissionAmount: Prisma.FieldRef<"Transaction", 'Decimal'>
+  readonly vendorAmount: Prisma.FieldRef<"Transaction", 'Decimal'>
 }
     
 

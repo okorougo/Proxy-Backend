@@ -52,6 +52,7 @@ model User {
   order             Order[]
   riderId           String?
   rider             Rider?
+  customerWallet    CustomerWallet?
 
   // Social auth
   provider   String? // "google" | "apple"
@@ -59,29 +60,31 @@ model User {
 }
 
 model Category {
-  id          String    @id @default(uuid())
-  name        String    @unique
-  description String?
-  imageUrl    String?
-  iconLib     String?
-  iconName    String?
-  listings    Listing[]
-  subCategories SubCategory[] 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id            String        @id @default(uuid())
+  name          String        @unique
+  description   String?
+  imageUrl      String?
+  iconLib       String?
+  iconName      String?
+  listings      Listing[]
+  subCategories SubCategory[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }
+
 model SubCategory {
   id          String    @id @default(uuid())
   name        String
   description String?
   category    Category  @relation(fields: [categoryId], references: [id])
   categoryId  String
-  listings    Listing[]  // optional: listings can belong to a sub-category
+  listings    Listing[] // optional: listings can belong to a sub-category
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-    @@unique([name, categoryId])
+  @@unique([name, categoryId])
 }
+
 model VendorApplication {
   id     String @id @default(uuid())
   user   User   @relation(fields: [userId], references: [id])
@@ -128,7 +131,7 @@ model Listing {
   title         String
   description   String
   priceCents    Int
-  price         Float
+  price       Decimal @db.Decimal(18,2)
   currency      String        @default("NGN")
   isDigital     Boolean       @default(false)
   condition     String? // e.g. "new", "used", "refurbished"
@@ -149,6 +152,8 @@ model Listing {
   category      Category      @relation(fields: [categoryId], references: [id])
   OrderItem     OrderItem[]
   rejectionNote String?
+  isRenderedService Boolean @default(false) // for service listings that require booking
+  
 }
 
 model DigitalFile {
@@ -191,19 +196,39 @@ model Media {
   createdAt DateTime @default(now())
 }
 
+enum ServiceStatus {
+  BOOKED
+  IN_PROGRESS
+  COMPLETED
+  CONFIRMED
+  CANCELLED
+}
+enum OrderStatus {
+  PENDING
+  PAID
+  PROCESSING
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
 model Order {
-  id          String            @id @default(uuid())
-  userId      String
-  vendorId    String
-  totalAmount Float
-  status      String            @default("PENDING")
-  createdAt   DateTime          @default(now())
-  listings    OrderItem[]
-  isDigital   Boolean           @default(false)
-  delivery    Delivery?
-  transaction Transaction?
-  user        User              @relation(fields: [userId], references: [id])
-  vendor      VendorApplication @relation(fields: [vendorId], references: [id])
+  id            String            @id @default(uuid())
+  userId        String
+  vendorId      String
+  totalAmount Decimal @db.Decimal(18,2)
+  status        OrderStatus            @default(PENDING)
+  createdAt     DateTime          @default(now())
+  listings      OrderItem[]
+  isDigital     Boolean           @default(false)
+  delivery      Delivery?
+  transaction   Transaction?
+  user          User              @relation(fields: [userId], references: [id])
+  vendor        VendorApplication @relation(fields: [vendorId], references: [id])
+  serviceStatus ServiceStatus     @default(BOOKED)
+  completedAt   DateTime?
+  confirmedAt   DateTime?
+  disputed      Boolean           @default(false)
 }
 
 model OrderItem {
@@ -277,27 +302,32 @@ model AuditLog {
 }
 
 model Transaction {
-  id          String            @id @default(uuid())
-  listingId   String? // keep for single-listing cases
-  listing     Listing?          @relation(fields: [listingId], references: [id])
-  orderId     String            @unique
-  buyer       User              @relation("buyerTransactions", fields: [buyerId], references: [id])
-  buyerId     String
-  seller      VendorApplication @relation("sellerTransactions", fields: [sellerId], references: [id])
-  sellerId    String
-  amountCents Int
-  currency    String            @default("NGN")
-  method      PaymentMethod
-  status      PaymentStatus     @default(PENDING)
-  receiptUrl  String? // Optional proof (image uploaded to Cloudinary)
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-  review      Review[]
-  Delivery    Delivery[]
-  order       Order             @relation(fields: [orderId], references: [id])
-  orderItems  OrderItem[]
-  amountPaid  Float?
-  paystackRef String?
+  id               String            @id @default(uuid())
+  listingId        String? // keep for single-listing cases
+  listing          Listing?          @relation(fields: [listingId], references: [id])
+  orderId          String            @unique
+  buyer            User              @relation("buyerTransactions", fields: [buyerId], references: [id])
+  buyerId          String
+  seller           VendorApplication @relation("sellerTransactions", fields: [sellerId], references: [id])
+  sellerId         String
+  amountCents      Int
+  currency         String            @default("NGN")
+  method           PaymentMethod
+  status           PaymentStatus     @default(PENDING)
+  receiptUrl       String? // Optional proof (image uploaded to Cloudinary)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  review           Review[]
+  Delivery         Delivery[]
+  order            Order             @relation(fields: [orderId], references: [id])
+  orderItems       OrderItem[]
+  amountPaid       Float?
+  paystackRef      String?
+  escrowStatus     EscrowStatus      @default(PENDING)
+  commissionRate   Decimal?          @db.Decimal(5, 2)
+  releaseAt        DateTime?
+  commissionAmount Decimal?          @db.Decimal(18, 2)
+  vendorAmount     Decimal?          @db.Decimal(18, 2)
 }
 
 model Session {
@@ -338,6 +368,13 @@ enum ListingStatus {
   REMOVED
 }
 
+enum EscrowStatus {
+  PENDING
+  HELD
+  RELEASED
+  REFUNDED
+}
+
 enum PaymentMethod {
   CASH
   TRANSFER
@@ -358,7 +395,7 @@ model Delivery {
   transaction   Transaction @relation(fields: [transactionId], references: [id])
   transactionId String
 
-  OTP       String? @unique
+  OTP String? @unique
 
   rider   Rider?  @relation(fields: [riderId], references: [id])
   riderId String?
@@ -371,13 +408,17 @@ model Delivery {
   pickupAddress  String
   dropoffAddress String
 
+  isSelfDelivery Boolean @default(false)
+
   status       DeliveryStatus @default(PENDING)
   distanceKm   Float?
   etaMinutes   Int?
-  fareAmount   Float?
+  fareAmount  Decimal?
   isDigital    Boolean        @default(false)
   digitalFiles Json? // JSON array of signed download URLs
-
+  vendorLat      Float?    // current vendor location (if self-delivery)
+  vendorLng      Float?
+  vendorStartedAt DateTime? // when vendor started coming
   riderArrivedAt DateTime?
   riderLat       Float?
   riderLng       Float?
@@ -392,9 +433,9 @@ model Delivery {
 model VendorWallet {
   id          String   @id @default(uuid())
   vendorId    String   @unique
-  balance     Float    @default(0) // available for withdrawal
-  totalEarned Float    @default(0)
-  withdrawn   Float    @default(0)
+  balance     Decimal @db.Decimal(18,2)    @default(0.00) // available for withdrawal
+  totalEarned Decimal @db.Decimal(18,2)    @default(0.00)
+  withdrawn   Decimal @db.Decimal(18,2)    @default(0.00)
   currency    String   @default("NGN")
   updatedAt   DateTime @updatedAt
   createdAt   DateTime @default(now())
@@ -404,10 +445,17 @@ model VendorWallet {
   walletTransaction WalletTransaction[]
 }
 
+model CommissionConfig {
+  id         String   @id @default(uuid())
+  percentage Decimal  @db.Decimal(5, 2)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+}
+
 model WithdrawalRequest {
   id            String           @id @default(uuid())
   vendorId      String
-  amount        Float
+  amount      Decimal @db.Decimal(18,2)
   bankName      String
   accountName   String
   accountNumber String
@@ -429,10 +477,61 @@ enum WithdrawalStatus {
   COMPLETED
 }
 
+model CustomerWallet {
+  id       String  @id @default(uuid())
+  userId   String  @unique
+  balance  Decimal @default(0.00) @db.Decimal(18, 2)
+  currency String  @default("NGN")
+
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactions CustomerWalletTransaction[]
+}
+model CustomerWalletTransaction {
+  id        String   @id @default(uuid())
+  walletId  String
+  amount    Decimal  @db.Decimal(18,2)
+  type      WalletTxType
+  reference String?
+  createdAt DateTime @default(now())
+
+  wallet CustomerWallet @relation(fields: [walletId], references: [id])
+}
+model PlatformWallet {
+  id      String             @id @default(uuid())
+  type    PlatformWalletType
+  balance Decimal            @default(0.00) @db.Decimal(18, 2)
+
+  createdAt    DateTime                   @default(now())
+  updatedAt    DateTime                   @updatedAt
+  transactions PlatformWalletTransaction[]
+}
+
+enum PlatformWalletType {
+  ESCROW
+  REVENUE
+}
+model PlatformWalletTransaction {
+  id        String   @id @default(uuid())
+  walletId  String
+  amount    Decimal  @db.Decimal(18,2)
+  type      WalletTxType
+  reference String?
+  createdAt DateTime @default(now())
+
+  wallet PlatformWallet @relation(fields: [walletId], references: [id])
+}
+
+enum WalletTxType {
+  CREDIT
+  DEBIT
+}
 model WalletTransaction {
   id        String   @id @default(uuid())
   vendorId  String
-  amount    Float
+  amount    Decimal  @db.Decimal(18, 2)
   type      String // "CREDIT" or "DEBIT"
   remark    String?
   createdAt DateTime @default(now())

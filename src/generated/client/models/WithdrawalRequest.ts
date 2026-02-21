@@ -27,17 +27,17 @@ export type AggregateWithdrawalRequest = {
 }
 
 export type WithdrawalRequestAvgAggregateOutputType = {
-  amount: number | null
+  amount: runtime.Decimal | null
 }
 
 export type WithdrawalRequestSumAggregateOutputType = {
-  amount: number | null
+  amount: runtime.Decimal | null
 }
 
 export type WithdrawalRequestMinAggregateOutputType = {
   id: string | null
   vendorId: string | null
-  amount: number | null
+  amount: runtime.Decimal | null
   bankName: string | null
   accountName: string | null
   accountNumber: string | null
@@ -51,7 +51,7 @@ export type WithdrawalRequestMinAggregateOutputType = {
 export type WithdrawalRequestMaxAggregateOutputType = {
   id: string | null
   vendorId: string | null
-  amount: number | null
+  amount: runtime.Decimal | null
   bankName: string | null
   accountName: string | null
   accountNumber: string | null
@@ -218,7 +218,7 @@ export type WithdrawalRequestGroupByArgs<ExtArgs extends runtime.Types.Extension
 export type WithdrawalRequestGroupByOutputType = {
   id: string
   vendorId: string
-  amount: number
+  amount: runtime.Decimal
   bankName: string
   accountName: string
   accountNumber: string
@@ -255,7 +255,7 @@ export type WithdrawalRequestWhereInput = {
   NOT?: Prisma.WithdrawalRequestWhereInput | Prisma.WithdrawalRequestWhereInput[]
   id?: Prisma.StringFilter<"WithdrawalRequest"> | string
   vendorId?: Prisma.StringFilter<"WithdrawalRequest"> | string
-  amount?: Prisma.FloatFilter<"WithdrawalRequest"> | number
+  amount?: Prisma.DecimalFilter<"WithdrawalRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   bankName?: Prisma.StringFilter<"WithdrawalRequest"> | string
   accountName?: Prisma.StringFilter<"WithdrawalRequest"> | string
   accountNumber?: Prisma.StringFilter<"WithdrawalRequest"> | string
@@ -290,7 +290,7 @@ export type WithdrawalRequestWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.WithdrawalRequestWhereInput[]
   NOT?: Prisma.WithdrawalRequestWhereInput | Prisma.WithdrawalRequestWhereInput[]
   vendorId?: Prisma.StringFilter<"WithdrawalRequest"> | string
-  amount?: Prisma.FloatFilter<"WithdrawalRequest"> | number
+  amount?: Prisma.DecimalFilter<"WithdrawalRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   bankName?: Prisma.StringFilter<"WithdrawalRequest"> | string
   accountName?: Prisma.StringFilter<"WithdrawalRequest"> | string
   accountNumber?: Prisma.StringFilter<"WithdrawalRequest"> | string
@@ -328,7 +328,7 @@ export type WithdrawalRequestScalarWhereWithAggregatesInput = {
   NOT?: Prisma.WithdrawalRequestScalarWhereWithAggregatesInput | Prisma.WithdrawalRequestScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"WithdrawalRequest"> | string
   vendorId?: Prisma.StringWithAggregatesFilter<"WithdrawalRequest"> | string
-  amount?: Prisma.FloatWithAggregatesFilter<"WithdrawalRequest"> | number
+  amount?: Prisma.DecimalWithAggregatesFilter<"WithdrawalRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   bankName?: Prisma.StringWithAggregatesFilter<"WithdrawalRequest"> | string
   accountName?: Prisma.StringWithAggregatesFilter<"WithdrawalRequest"> | string
   accountNumber?: Prisma.StringWithAggregatesFilter<"WithdrawalRequest"> | string
@@ -341,7 +341,7 @@ export type WithdrawalRequestScalarWhereWithAggregatesInput = {
 
 export type WithdrawalRequestCreateInput = {
   id?: string
-  amount: number
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   bankName: string
   accountName: string
   accountNumber: string
@@ -356,7 +356,7 @@ export type WithdrawalRequestCreateInput = {
 export type WithdrawalRequestUncheckedCreateInput = {
   id?: string
   vendorId: string
-  amount: number
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   bankName: string
   accountName: string
   accountNumber: string
@@ -369,7 +369,7 @@ export type WithdrawalRequestUncheckedCreateInput = {
 
 export type WithdrawalRequestUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   bankName?: Prisma.StringFieldUpdateOperationsInput | string
   accountName?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
@@ -384,7 +384,7 @@ export type WithdrawalRequestUpdateInput = {
 export type WithdrawalRequestUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   vendorId?: Prisma.StringFieldUpdateOperationsInput | string
-  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   bankName?: Prisma.StringFieldUpdateOperationsInput | string
   accountName?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
@@ -398,7 +398,7 @@ export type WithdrawalRequestUncheckedUpdateInput = {
 export type WithdrawalRequestCreateManyInput = {
   id?: string
   vendorId: string
-  amount: number
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   bankName: string
   accountName: string
   accountNumber: string
@@ -411,7 +411,7 @@ export type WithdrawalRequestCreateManyInput = {
 
 export type WithdrawalRequestUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   bankName?: Prisma.StringFieldUpdateOperationsInput | string
   accountName?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
@@ -424,7 +424,7 @@ export type WithdrawalRequestUpdateManyMutationInput = {
 export type WithdrawalRequestUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   vendorId?: Prisma.StringFieldUpdateOperationsInput | string
-  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   bankName?: Prisma.StringFieldUpdateOperationsInput | string
   accountName?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
@@ -585,7 +585,7 @@ export type EnumWithdrawalStatusFieldUpdateOperationsInput = {
 
 export type WithdrawalRequestCreateWithoutVendorInput = {
   id?: string
-  amount: number
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   bankName: string
   accountName: string
   accountNumber: string
@@ -598,7 +598,7 @@ export type WithdrawalRequestCreateWithoutVendorInput = {
 
 export type WithdrawalRequestUncheckedCreateWithoutVendorInput = {
   id?: string
-  amount: number
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   bankName: string
   accountName: string
   accountNumber: string
@@ -641,7 +641,7 @@ export type WithdrawalRequestScalarWhereInput = {
   NOT?: Prisma.WithdrawalRequestScalarWhereInput | Prisma.WithdrawalRequestScalarWhereInput[]
   id?: Prisma.StringFilter<"WithdrawalRequest"> | string
   vendorId?: Prisma.StringFilter<"WithdrawalRequest"> | string
-  amount?: Prisma.FloatFilter<"WithdrawalRequest"> | number
+  amount?: Prisma.DecimalFilter<"WithdrawalRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   bankName?: Prisma.StringFilter<"WithdrawalRequest"> | string
   accountName?: Prisma.StringFilter<"WithdrawalRequest"> | string
   accountNumber?: Prisma.StringFilter<"WithdrawalRequest"> | string
@@ -654,7 +654,7 @@ export type WithdrawalRequestScalarWhereInput = {
 
 export type WithdrawalRequestCreateWithoutVendorWalletInput = {
   id?: string
-  amount: number
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   bankName: string
   accountName: string
   accountNumber: string
@@ -668,7 +668,7 @@ export type WithdrawalRequestCreateWithoutVendorWalletInput = {
 export type WithdrawalRequestUncheckedCreateWithoutVendorWalletInput = {
   id?: string
   vendorId: string
-  amount: number
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   bankName: string
   accountName: string
   accountNumber: string
@@ -706,7 +706,7 @@ export type WithdrawalRequestUpdateManyWithWhereWithoutVendorWalletInput = {
 
 export type WithdrawalRequestCreateManyVendorInput = {
   id?: string
-  amount: number
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   bankName: string
   accountName: string
   accountNumber: string
@@ -719,7 +719,7 @@ export type WithdrawalRequestCreateManyVendorInput = {
 
 export type WithdrawalRequestUpdateWithoutVendorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   bankName?: Prisma.StringFieldUpdateOperationsInput | string
   accountName?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
@@ -732,7 +732,7 @@ export type WithdrawalRequestUpdateWithoutVendorInput = {
 
 export type WithdrawalRequestUncheckedUpdateWithoutVendorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   bankName?: Prisma.StringFieldUpdateOperationsInput | string
   accountName?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
@@ -745,7 +745,7 @@ export type WithdrawalRequestUncheckedUpdateWithoutVendorInput = {
 
 export type WithdrawalRequestUncheckedUpdateManyWithoutVendorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   bankName?: Prisma.StringFieldUpdateOperationsInput | string
   accountName?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
@@ -759,7 +759,7 @@ export type WithdrawalRequestUncheckedUpdateManyWithoutVendorInput = {
 export type WithdrawalRequestCreateManyVendorWalletInput = {
   id?: string
   vendorId: string
-  amount: number
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   bankName: string
   accountName: string
   accountNumber: string
@@ -771,7 +771,7 @@ export type WithdrawalRequestCreateManyVendorWalletInput = {
 
 export type WithdrawalRequestUpdateWithoutVendorWalletInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   bankName?: Prisma.StringFieldUpdateOperationsInput | string
   accountName?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
@@ -785,7 +785,7 @@ export type WithdrawalRequestUpdateWithoutVendorWalletInput = {
 export type WithdrawalRequestUncheckedUpdateWithoutVendorWalletInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   vendorId?: Prisma.StringFieldUpdateOperationsInput | string
-  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   bankName?: Prisma.StringFieldUpdateOperationsInput | string
   accountName?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
@@ -798,7 +798,7 @@ export type WithdrawalRequestUncheckedUpdateWithoutVendorWalletInput = {
 export type WithdrawalRequestUncheckedUpdateManyWithoutVendorWalletInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   vendorId?: Prisma.StringFieldUpdateOperationsInput | string
-  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   bankName?: Prisma.StringFieldUpdateOperationsInput | string
   accountName?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
@@ -895,7 +895,7 @@ export type $WithdrawalRequestPayload<ExtArgs extends runtime.Types.Extensions.I
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     vendorId: string
-    amount: number
+    amount: runtime.Decimal
     bankName: string
     accountName: string
     accountNumber: string
@@ -1331,7 +1331,7 @@ export interface Prisma__WithdrawalRequestClient<T, Null = never, ExtArgs extend
 export interface WithdrawalRequestFieldRefs {
   readonly id: Prisma.FieldRef<"WithdrawalRequest", 'String'>
   readonly vendorId: Prisma.FieldRef<"WithdrawalRequest", 'String'>
-  readonly amount: Prisma.FieldRef<"WithdrawalRequest", 'Float'>
+  readonly amount: Prisma.FieldRef<"WithdrawalRequest", 'Decimal'>
   readonly bankName: Prisma.FieldRef<"WithdrawalRequest", 'String'>
   readonly accountName: Prisma.FieldRef<"WithdrawalRequest", 'String'>
   readonly accountNumber: Prisma.FieldRef<"WithdrawalRequest", 'String'>

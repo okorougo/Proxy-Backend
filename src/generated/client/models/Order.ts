@@ -27,31 +27,39 @@ export type AggregateOrder = {
 }
 
 export type OrderAvgAggregateOutputType = {
-  totalAmount: number | null
+  totalAmount: runtime.Decimal | null
 }
 
 export type OrderSumAggregateOutputType = {
-  totalAmount: number | null
+  totalAmount: runtime.Decimal | null
 }
 
 export type OrderMinAggregateOutputType = {
   id: string | null
   userId: string | null
   vendorId: string | null
-  totalAmount: number | null
-  status: string | null
+  totalAmount: runtime.Decimal | null
+  status: $Enums.OrderStatus | null
   createdAt: Date | null
   isDigital: boolean | null
+  serviceStatus: $Enums.ServiceStatus | null
+  completedAt: Date | null
+  confirmedAt: Date | null
+  disputed: boolean | null
 }
 
 export type OrderMaxAggregateOutputType = {
   id: string | null
   userId: string | null
   vendorId: string | null
-  totalAmount: number | null
-  status: string | null
+  totalAmount: runtime.Decimal | null
+  status: $Enums.OrderStatus | null
   createdAt: Date | null
   isDigital: boolean | null
+  serviceStatus: $Enums.ServiceStatus | null
+  completedAt: Date | null
+  confirmedAt: Date | null
+  disputed: boolean | null
 }
 
 export type OrderCountAggregateOutputType = {
@@ -62,6 +70,10 @@ export type OrderCountAggregateOutputType = {
   status: number
   createdAt: number
   isDigital: number
+  serviceStatus: number
+  completedAt: number
+  confirmedAt: number
+  disputed: number
   _all: number
 }
 
@@ -82,6 +94,10 @@ export type OrderMinAggregateInputType = {
   status?: true
   createdAt?: true
   isDigital?: true
+  serviceStatus?: true
+  completedAt?: true
+  confirmedAt?: true
+  disputed?: true
 }
 
 export type OrderMaxAggregateInputType = {
@@ -92,6 +108,10 @@ export type OrderMaxAggregateInputType = {
   status?: true
   createdAt?: true
   isDigital?: true
+  serviceStatus?: true
+  completedAt?: true
+  confirmedAt?: true
+  disputed?: true
 }
 
 export type OrderCountAggregateInputType = {
@@ -102,6 +122,10 @@ export type OrderCountAggregateInputType = {
   status?: true
   createdAt?: true
   isDigital?: true
+  serviceStatus?: true
+  completedAt?: true
+  confirmedAt?: true
+  disputed?: true
   _all?: true
 }
 
@@ -195,10 +219,14 @@ export type OrderGroupByOutputType = {
   id: string
   userId: string
   vendorId: string
-  totalAmount: number
-  status: string
+  totalAmount: runtime.Decimal
+  status: $Enums.OrderStatus
   createdAt: Date
   isDigital: boolean
+  serviceStatus: $Enums.ServiceStatus
+  completedAt: Date | null
+  confirmedAt: Date | null
+  disputed: boolean
   _count: OrderCountAggregateOutputType | null
   _avg: OrderAvgAggregateOutputType | null
   _sum: OrderSumAggregateOutputType | null
@@ -228,10 +256,14 @@ export type OrderWhereInput = {
   id?: Prisma.StringFilter<"Order"> | string
   userId?: Prisma.StringFilter<"Order"> | string
   vendorId?: Prisma.StringFilter<"Order"> | string
-  totalAmount?: Prisma.FloatFilter<"Order"> | number
-  status?: Prisma.StringFilter<"Order"> | string
+  totalAmount?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus
   createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   isDigital?: Prisma.BoolFilter<"Order"> | boolean
+  serviceStatus?: Prisma.EnumServiceStatusFilter<"Order"> | $Enums.ServiceStatus
+  completedAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
+  confirmedAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
+  disputed?: Prisma.BoolFilter<"Order"> | boolean
   listings?: Prisma.OrderItemListRelationFilter
   delivery?: Prisma.XOR<Prisma.DeliveryNullableScalarRelationFilter, Prisma.DeliveryWhereInput> | null
   transaction?: Prisma.XOR<Prisma.TransactionNullableScalarRelationFilter, Prisma.TransactionWhereInput> | null
@@ -247,6 +279,10 @@ export type OrderOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   isDigital?: Prisma.SortOrder
+  serviceStatus?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  confirmedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  disputed?: Prisma.SortOrder
   listings?: Prisma.OrderItemOrderByRelationAggregateInput
   delivery?: Prisma.DeliveryOrderByWithRelationInput
   transaction?: Prisma.TransactionOrderByWithRelationInput
@@ -261,10 +297,14 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.OrderWhereInput | Prisma.OrderWhereInput[]
   userId?: Prisma.StringFilter<"Order"> | string
   vendorId?: Prisma.StringFilter<"Order"> | string
-  totalAmount?: Prisma.FloatFilter<"Order"> | number
-  status?: Prisma.StringFilter<"Order"> | string
+  totalAmount?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus
   createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   isDigital?: Prisma.BoolFilter<"Order"> | boolean
+  serviceStatus?: Prisma.EnumServiceStatusFilter<"Order"> | $Enums.ServiceStatus
+  completedAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
+  confirmedAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
+  disputed?: Prisma.BoolFilter<"Order"> | boolean
   listings?: Prisma.OrderItemListRelationFilter
   delivery?: Prisma.XOR<Prisma.DeliveryNullableScalarRelationFilter, Prisma.DeliveryWhereInput> | null
   transaction?: Prisma.XOR<Prisma.TransactionNullableScalarRelationFilter, Prisma.TransactionWhereInput> | null
@@ -280,6 +320,10 @@ export type OrderOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   isDigital?: Prisma.SortOrder
+  serviceStatus?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  confirmedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  disputed?: Prisma.SortOrder
   _count?: Prisma.OrderCountOrderByAggregateInput
   _avg?: Prisma.OrderAvgOrderByAggregateInput
   _max?: Prisma.OrderMaxOrderByAggregateInput
@@ -294,18 +338,26 @@ export type OrderScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Order"> | string
   userId?: Prisma.StringWithAggregatesFilter<"Order"> | string
   vendorId?: Prisma.StringWithAggregatesFilter<"Order"> | string
-  totalAmount?: Prisma.FloatWithAggregatesFilter<"Order"> | number
-  status?: Prisma.StringWithAggregatesFilter<"Order"> | string
+  totalAmount?: Prisma.DecimalWithAggregatesFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumOrderStatusWithAggregatesFilter<"Order"> | $Enums.OrderStatus
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Order"> | Date | string
   isDigital?: Prisma.BoolWithAggregatesFilter<"Order"> | boolean
+  serviceStatus?: Prisma.EnumServiceStatusWithAggregatesFilter<"Order"> | $Enums.ServiceStatus
+  completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null
+  confirmedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null
+  disputed?: Prisma.BoolWithAggregatesFilter<"Order"> | boolean
 }
 
 export type OrderCreateInput = {
   id?: string
-  totalAmount: number
-  status?: string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.OrderStatus
   createdAt?: Date | string
   isDigital?: boolean
+  serviceStatus?: $Enums.ServiceStatus
+  completedAt?: Date | string | null
+  confirmedAt?: Date | string | null
+  disputed?: boolean
   listings?: Prisma.OrderItemCreateNestedManyWithoutOrderInput
   delivery?: Prisma.DeliveryCreateNestedOneWithoutOrderInput
   transaction?: Prisma.TransactionCreateNestedOneWithoutOrderInput
@@ -317,10 +369,14 @@ export type OrderUncheckedCreateInput = {
   id?: string
   userId: string
   vendorId: string
-  totalAmount: number
-  status?: string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.OrderStatus
   createdAt?: Date | string
   isDigital?: boolean
+  serviceStatus?: $Enums.ServiceStatus
+  completedAt?: Date | string | null
+  confirmedAt?: Date | string | null
+  disputed?: boolean
   listings?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
   delivery?: Prisma.DeliveryUncheckedCreateNestedOneWithoutOrderInput
   transaction?: Prisma.TransactionUncheckedCreateNestedOneWithoutOrderInput
@@ -328,10 +384,14 @@ export type OrderUncheckedCreateInput = {
 
 export type OrderUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  serviceStatus?: Prisma.EnumServiceStatusFieldUpdateOperationsInput | $Enums.ServiceStatus
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disputed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   listings?: Prisma.OrderItemUpdateManyWithoutOrderNestedInput
   delivery?: Prisma.DeliveryUpdateOneWithoutOrderNestedInput
   transaction?: Prisma.TransactionUpdateOneWithoutOrderNestedInput
@@ -343,10 +403,14 @@ export type OrderUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   vendorId?: Prisma.StringFieldUpdateOperationsInput | string
-  totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  serviceStatus?: Prisma.EnumServiceStatusFieldUpdateOperationsInput | $Enums.ServiceStatus
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disputed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   listings?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
   delivery?: Prisma.DeliveryUncheckedUpdateOneWithoutOrderNestedInput
   transaction?: Prisma.TransactionUncheckedUpdateOneWithoutOrderNestedInput
@@ -356,28 +420,40 @@ export type OrderCreateManyInput = {
   id?: string
   userId: string
   vendorId: string
-  totalAmount: number
-  status?: string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.OrderStatus
   createdAt?: Date | string
   isDigital?: boolean
+  serviceStatus?: $Enums.ServiceStatus
+  completedAt?: Date | string | null
+  confirmedAt?: Date | string | null
+  disputed?: boolean
 }
 
 export type OrderUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  serviceStatus?: Prisma.EnumServiceStatusFieldUpdateOperationsInput | $Enums.ServiceStatus
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disputed?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type OrderUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   vendorId?: Prisma.StringFieldUpdateOperationsInput | string
-  totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  serviceStatus?: Prisma.EnumServiceStatusFieldUpdateOperationsInput | $Enums.ServiceStatus
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disputed?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type OrderListRelationFilter = {
@@ -398,6 +474,10 @@ export type OrderCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   isDigital?: Prisma.SortOrder
+  serviceStatus?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
+  confirmedAt?: Prisma.SortOrder
+  disputed?: Prisma.SortOrder
 }
 
 export type OrderAvgOrderByAggregateInput = {
@@ -412,6 +492,10 @@ export type OrderMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   isDigital?: Prisma.SortOrder
+  serviceStatus?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
+  confirmedAt?: Prisma.SortOrder
+  disputed?: Prisma.SortOrder
 }
 
 export type OrderMinOrderByAggregateInput = {
@@ -422,6 +506,10 @@ export type OrderMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   isDigital?: Prisma.SortOrder
+  serviceStatus?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
+  confirmedAt?: Prisma.SortOrder
+  disputed?: Prisma.SortOrder
 }
 
 export type OrderSumOrderByAggregateInput = {
@@ -517,6 +605,14 @@ export type OrderUncheckedUpdateManyWithoutVendorNestedInput = {
   deleteMany?: Prisma.OrderScalarWhereInput | Prisma.OrderScalarWhereInput[]
 }
 
+export type EnumOrderStatusFieldUpdateOperationsInput = {
+  set?: $Enums.OrderStatus
+}
+
+export type EnumServiceStatusFieldUpdateOperationsInput = {
+  set?: $Enums.ServiceStatus
+}
+
 export type OrderCreateNestedOneWithoutListingsInput = {
   create?: Prisma.XOR<Prisma.OrderCreateWithoutListingsInput, Prisma.OrderUncheckedCreateWithoutListingsInput>
   connectOrCreate?: Prisma.OrderCreateOrConnectWithoutListingsInput
@@ -561,10 +657,14 @@ export type OrderUpdateOneRequiredWithoutDeliveryNestedInput = {
 
 export type OrderCreateWithoutUserInput = {
   id?: string
-  totalAmount: number
-  status?: string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.OrderStatus
   createdAt?: Date | string
   isDigital?: boolean
+  serviceStatus?: $Enums.ServiceStatus
+  completedAt?: Date | string | null
+  confirmedAt?: Date | string | null
+  disputed?: boolean
   listings?: Prisma.OrderItemCreateNestedManyWithoutOrderInput
   delivery?: Prisma.DeliveryCreateNestedOneWithoutOrderInput
   transaction?: Prisma.TransactionCreateNestedOneWithoutOrderInput
@@ -574,10 +674,14 @@ export type OrderCreateWithoutUserInput = {
 export type OrderUncheckedCreateWithoutUserInput = {
   id?: string
   vendorId: string
-  totalAmount: number
-  status?: string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.OrderStatus
   createdAt?: Date | string
   isDigital?: boolean
+  serviceStatus?: $Enums.ServiceStatus
+  completedAt?: Date | string | null
+  confirmedAt?: Date | string | null
+  disputed?: boolean
   listings?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
   delivery?: Prisma.DeliveryUncheckedCreateNestedOneWithoutOrderInput
   transaction?: Prisma.TransactionUncheckedCreateNestedOneWithoutOrderInput
@@ -616,18 +720,26 @@ export type OrderScalarWhereInput = {
   id?: Prisma.StringFilter<"Order"> | string
   userId?: Prisma.StringFilter<"Order"> | string
   vendorId?: Prisma.StringFilter<"Order"> | string
-  totalAmount?: Prisma.FloatFilter<"Order"> | number
-  status?: Prisma.StringFilter<"Order"> | string
+  totalAmount?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus
   createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   isDigital?: Prisma.BoolFilter<"Order"> | boolean
+  serviceStatus?: Prisma.EnumServiceStatusFilter<"Order"> | $Enums.ServiceStatus
+  completedAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
+  confirmedAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
+  disputed?: Prisma.BoolFilter<"Order"> | boolean
 }
 
 export type OrderCreateWithoutVendorInput = {
   id?: string
-  totalAmount: number
-  status?: string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.OrderStatus
   createdAt?: Date | string
   isDigital?: boolean
+  serviceStatus?: $Enums.ServiceStatus
+  completedAt?: Date | string | null
+  confirmedAt?: Date | string | null
+  disputed?: boolean
   listings?: Prisma.OrderItemCreateNestedManyWithoutOrderInput
   delivery?: Prisma.DeliveryCreateNestedOneWithoutOrderInput
   transaction?: Prisma.TransactionCreateNestedOneWithoutOrderInput
@@ -637,10 +749,14 @@ export type OrderCreateWithoutVendorInput = {
 export type OrderUncheckedCreateWithoutVendorInput = {
   id?: string
   userId: string
-  totalAmount: number
-  status?: string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.OrderStatus
   createdAt?: Date | string
   isDigital?: boolean
+  serviceStatus?: $Enums.ServiceStatus
+  completedAt?: Date | string | null
+  confirmedAt?: Date | string | null
+  disputed?: boolean
   listings?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
   delivery?: Prisma.DeliveryUncheckedCreateNestedOneWithoutOrderInput
   transaction?: Prisma.TransactionUncheckedCreateNestedOneWithoutOrderInput
@@ -674,10 +790,14 @@ export type OrderUpdateManyWithWhereWithoutVendorInput = {
 
 export type OrderCreateWithoutListingsInput = {
   id?: string
-  totalAmount: number
-  status?: string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.OrderStatus
   createdAt?: Date | string
   isDigital?: boolean
+  serviceStatus?: $Enums.ServiceStatus
+  completedAt?: Date | string | null
+  confirmedAt?: Date | string | null
+  disputed?: boolean
   delivery?: Prisma.DeliveryCreateNestedOneWithoutOrderInput
   transaction?: Prisma.TransactionCreateNestedOneWithoutOrderInput
   user: Prisma.UserCreateNestedOneWithoutOrderInput
@@ -688,10 +808,14 @@ export type OrderUncheckedCreateWithoutListingsInput = {
   id?: string
   userId: string
   vendorId: string
-  totalAmount: number
-  status?: string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.OrderStatus
   createdAt?: Date | string
   isDigital?: boolean
+  serviceStatus?: $Enums.ServiceStatus
+  completedAt?: Date | string | null
+  confirmedAt?: Date | string | null
+  disputed?: boolean
   delivery?: Prisma.DeliveryUncheckedCreateNestedOneWithoutOrderInput
   transaction?: Prisma.TransactionUncheckedCreateNestedOneWithoutOrderInput
 }
@@ -714,10 +838,14 @@ export type OrderUpdateToOneWithWhereWithoutListingsInput = {
 
 export type OrderUpdateWithoutListingsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  serviceStatus?: Prisma.EnumServiceStatusFieldUpdateOperationsInput | $Enums.ServiceStatus
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disputed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   delivery?: Prisma.DeliveryUpdateOneWithoutOrderNestedInput
   transaction?: Prisma.TransactionUpdateOneWithoutOrderNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutOrderNestedInput
@@ -728,20 +856,28 @@ export type OrderUncheckedUpdateWithoutListingsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   vendorId?: Prisma.StringFieldUpdateOperationsInput | string
-  totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  serviceStatus?: Prisma.EnumServiceStatusFieldUpdateOperationsInput | $Enums.ServiceStatus
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disputed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   delivery?: Prisma.DeliveryUncheckedUpdateOneWithoutOrderNestedInput
   transaction?: Prisma.TransactionUncheckedUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderCreateWithoutTransactionInput = {
   id?: string
-  totalAmount: number
-  status?: string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.OrderStatus
   createdAt?: Date | string
   isDigital?: boolean
+  serviceStatus?: $Enums.ServiceStatus
+  completedAt?: Date | string | null
+  confirmedAt?: Date | string | null
+  disputed?: boolean
   listings?: Prisma.OrderItemCreateNestedManyWithoutOrderInput
   delivery?: Prisma.DeliveryCreateNestedOneWithoutOrderInput
   user: Prisma.UserCreateNestedOneWithoutOrderInput
@@ -752,10 +888,14 @@ export type OrderUncheckedCreateWithoutTransactionInput = {
   id?: string
   userId: string
   vendorId: string
-  totalAmount: number
-  status?: string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.OrderStatus
   createdAt?: Date | string
   isDigital?: boolean
+  serviceStatus?: $Enums.ServiceStatus
+  completedAt?: Date | string | null
+  confirmedAt?: Date | string | null
+  disputed?: boolean
   listings?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
   delivery?: Prisma.DeliveryUncheckedCreateNestedOneWithoutOrderInput
 }
@@ -778,10 +918,14 @@ export type OrderUpdateToOneWithWhereWithoutTransactionInput = {
 
 export type OrderUpdateWithoutTransactionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  serviceStatus?: Prisma.EnumServiceStatusFieldUpdateOperationsInput | $Enums.ServiceStatus
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disputed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   listings?: Prisma.OrderItemUpdateManyWithoutOrderNestedInput
   delivery?: Prisma.DeliveryUpdateOneWithoutOrderNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutOrderNestedInput
@@ -792,20 +936,28 @@ export type OrderUncheckedUpdateWithoutTransactionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   vendorId?: Prisma.StringFieldUpdateOperationsInput | string
-  totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  serviceStatus?: Prisma.EnumServiceStatusFieldUpdateOperationsInput | $Enums.ServiceStatus
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disputed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   listings?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
   delivery?: Prisma.DeliveryUncheckedUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderCreateWithoutDeliveryInput = {
   id?: string
-  totalAmount: number
-  status?: string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.OrderStatus
   createdAt?: Date | string
   isDigital?: boolean
+  serviceStatus?: $Enums.ServiceStatus
+  completedAt?: Date | string | null
+  confirmedAt?: Date | string | null
+  disputed?: boolean
   listings?: Prisma.OrderItemCreateNestedManyWithoutOrderInput
   transaction?: Prisma.TransactionCreateNestedOneWithoutOrderInput
   user: Prisma.UserCreateNestedOneWithoutOrderInput
@@ -816,10 +968,14 @@ export type OrderUncheckedCreateWithoutDeliveryInput = {
   id?: string
   userId: string
   vendorId: string
-  totalAmount: number
-  status?: string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.OrderStatus
   createdAt?: Date | string
   isDigital?: boolean
+  serviceStatus?: $Enums.ServiceStatus
+  completedAt?: Date | string | null
+  confirmedAt?: Date | string | null
+  disputed?: boolean
   listings?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
   transaction?: Prisma.TransactionUncheckedCreateNestedOneWithoutOrderInput
 }
@@ -842,10 +998,14 @@ export type OrderUpdateToOneWithWhereWithoutDeliveryInput = {
 
 export type OrderUpdateWithoutDeliveryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  serviceStatus?: Prisma.EnumServiceStatusFieldUpdateOperationsInput | $Enums.ServiceStatus
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disputed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   listings?: Prisma.OrderItemUpdateManyWithoutOrderNestedInput
   transaction?: Prisma.TransactionUpdateOneWithoutOrderNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutOrderNestedInput
@@ -856,10 +1016,14 @@ export type OrderUncheckedUpdateWithoutDeliveryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   vendorId?: Prisma.StringFieldUpdateOperationsInput | string
-  totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  serviceStatus?: Prisma.EnumServiceStatusFieldUpdateOperationsInput | $Enums.ServiceStatus
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disputed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   listings?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
   transaction?: Prisma.TransactionUncheckedUpdateOneWithoutOrderNestedInput
 }
@@ -867,18 +1031,26 @@ export type OrderUncheckedUpdateWithoutDeliveryInput = {
 export type OrderCreateManyUserInput = {
   id?: string
   vendorId: string
-  totalAmount: number
-  status?: string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.OrderStatus
   createdAt?: Date | string
   isDigital?: boolean
+  serviceStatus?: $Enums.ServiceStatus
+  completedAt?: Date | string | null
+  confirmedAt?: Date | string | null
+  disputed?: boolean
 }
 
 export type OrderUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  serviceStatus?: Prisma.EnumServiceStatusFieldUpdateOperationsInput | $Enums.ServiceStatus
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disputed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   listings?: Prisma.OrderItemUpdateManyWithoutOrderNestedInput
   delivery?: Prisma.DeliveryUpdateOneWithoutOrderNestedInput
   transaction?: Prisma.TransactionUpdateOneWithoutOrderNestedInput
@@ -888,10 +1060,14 @@ export type OrderUpdateWithoutUserInput = {
 export type OrderUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   vendorId?: Prisma.StringFieldUpdateOperationsInput | string
-  totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  serviceStatus?: Prisma.EnumServiceStatusFieldUpdateOperationsInput | $Enums.ServiceStatus
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disputed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   listings?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
   delivery?: Prisma.DeliveryUncheckedUpdateOneWithoutOrderNestedInput
   transaction?: Prisma.TransactionUncheckedUpdateOneWithoutOrderNestedInput
@@ -900,27 +1076,39 @@ export type OrderUncheckedUpdateWithoutUserInput = {
 export type OrderUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   vendorId?: Prisma.StringFieldUpdateOperationsInput | string
-  totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  serviceStatus?: Prisma.EnumServiceStatusFieldUpdateOperationsInput | $Enums.ServiceStatus
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disputed?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type OrderCreateManyVendorInput = {
   id?: string
   userId: string
-  totalAmount: number
-  status?: string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.OrderStatus
   createdAt?: Date | string
   isDigital?: boolean
+  serviceStatus?: $Enums.ServiceStatus
+  completedAt?: Date | string | null
+  confirmedAt?: Date | string | null
+  disputed?: boolean
 }
 
 export type OrderUpdateWithoutVendorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  serviceStatus?: Prisma.EnumServiceStatusFieldUpdateOperationsInput | $Enums.ServiceStatus
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disputed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   listings?: Prisma.OrderItemUpdateManyWithoutOrderNestedInput
   delivery?: Prisma.DeliveryUpdateOneWithoutOrderNestedInput
   transaction?: Prisma.TransactionUpdateOneWithoutOrderNestedInput
@@ -930,10 +1118,14 @@ export type OrderUpdateWithoutVendorInput = {
 export type OrderUncheckedUpdateWithoutVendorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  serviceStatus?: Prisma.EnumServiceStatusFieldUpdateOperationsInput | $Enums.ServiceStatus
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disputed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   listings?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
   delivery?: Prisma.DeliveryUncheckedUpdateOneWithoutOrderNestedInput
   transaction?: Prisma.TransactionUncheckedUpdateOneWithoutOrderNestedInput
@@ -942,10 +1134,14 @@ export type OrderUncheckedUpdateWithoutVendorInput = {
 export type OrderUncheckedUpdateManyWithoutVendorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDigital?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  serviceStatus?: Prisma.EnumServiceStatusFieldUpdateOperationsInput | $Enums.ServiceStatus
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disputed?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 
@@ -987,6 +1183,10 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   status?: boolean
   createdAt?: boolean
   isDigital?: boolean
+  serviceStatus?: boolean
+  completedAt?: boolean
+  confirmedAt?: boolean
+  disputed?: boolean
   listings?: boolean | Prisma.Order$listingsArgs<ExtArgs>
   delivery?: boolean | Prisma.Order$deliveryArgs<ExtArgs>
   transaction?: boolean | Prisma.Order$transactionArgs<ExtArgs>
@@ -1003,6 +1203,10 @@ export type OrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   status?: boolean
   createdAt?: boolean
   isDigital?: boolean
+  serviceStatus?: boolean
+  completedAt?: boolean
+  confirmedAt?: boolean
+  disputed?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   vendor?: boolean | Prisma.VendorApplicationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["order"]>
@@ -1015,6 +1219,10 @@ export type OrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   status?: boolean
   createdAt?: boolean
   isDigital?: boolean
+  serviceStatus?: boolean
+  completedAt?: boolean
+  confirmedAt?: boolean
+  disputed?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   vendor?: boolean | Prisma.VendorApplicationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["order"]>
@@ -1027,9 +1235,13 @@ export type OrderSelectScalar = {
   status?: boolean
   createdAt?: boolean
   isDigital?: boolean
+  serviceStatus?: boolean
+  completedAt?: boolean
+  confirmedAt?: boolean
+  disputed?: boolean
 }
 
-export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "vendorId" | "totalAmount" | "status" | "createdAt" | "isDigital", ExtArgs["result"]["order"]>
+export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "vendorId" | "totalAmount" | "status" | "createdAt" | "isDigital" | "serviceStatus" | "completedAt" | "confirmedAt" | "disputed", ExtArgs["result"]["order"]>
 export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   listings?: boolean | Prisma.Order$listingsArgs<ExtArgs>
   delivery?: boolean | Prisma.Order$deliveryArgs<ExtArgs>
@@ -1060,10 +1272,14 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     id: string
     userId: string
     vendorId: string
-    totalAmount: number
-    status: string
+    totalAmount: runtime.Decimal
+    status: $Enums.OrderStatus
     createdAt: Date
     isDigital: boolean
+    serviceStatus: $Enums.ServiceStatus
+    completedAt: Date | null
+    confirmedAt: Date | null
+    disputed: boolean
   }, ExtArgs["result"]["order"]>
   composites: {}
 }
@@ -1495,10 +1711,14 @@ export interface OrderFieldRefs {
   readonly id: Prisma.FieldRef<"Order", 'String'>
   readonly userId: Prisma.FieldRef<"Order", 'String'>
   readonly vendorId: Prisma.FieldRef<"Order", 'String'>
-  readonly totalAmount: Prisma.FieldRef<"Order", 'Float'>
-  readonly status: Prisma.FieldRef<"Order", 'String'>
+  readonly totalAmount: Prisma.FieldRef<"Order", 'Decimal'>
+  readonly status: Prisma.FieldRef<"Order", 'OrderStatus'>
   readonly createdAt: Prisma.FieldRef<"Order", 'DateTime'>
   readonly isDigital: Prisma.FieldRef<"Order", 'Boolean'>
+  readonly serviceStatus: Prisma.FieldRef<"Order", 'ServiceStatus'>
+  readonly completedAt: Prisma.FieldRef<"Order", 'DateTime'>
+  readonly confirmedAt: Prisma.FieldRef<"Order", 'DateTime'>
+  readonly disputed: Prisma.FieldRef<"Order", 'Boolean'>
 }
     
 

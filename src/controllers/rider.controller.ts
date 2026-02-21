@@ -378,12 +378,6 @@ export const acceptDelivery = async (req: Request, res: Response) => {
       },
     });
 
-    const order = await prisma.order.update({
-      where: { id: updated.orderId },
-      data: {
-        status: "",
-      },
-    });
 
     // broadcast to vendor + user
     io.to(delivery.order.userId).emit("rider_assigned", {

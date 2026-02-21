@@ -19,6 +19,8 @@ import {
   resolveAccount,
   getWallet,
   getVendorBanksDetails,
+  completeSelfDelivery,
+  vendorStartDelivery,
 } from "../controllers/vendor.controller";
 
 const router = Router();
@@ -45,4 +47,13 @@ router.post("/resolve-account", resolveAccount);
 router.get("/get-wallet", authMiddleware, getWallet);
 
 router.get("/get-vendor-bank-details", authMiddleware, getVendorBanksDetails);
+
+// ========== SELF-DELIVERY SERVICE ENDPOINTS ==========
+
+// Vendor starts delivery (rendered service)
+router.post("/delivery/start", authMiddleware, vendorStartDelivery);
+
+// Vendor completes delivery (rendered service)
+router.post("/delivery/complete", authMiddleware, completeSelfDelivery);
+
 export default router;

@@ -113,10 +113,35 @@ export type Delivery = Prisma.DeliveryModel
  */
 export type VendorWallet = Prisma.VendorWalletModel
 /**
+ * Model CommissionConfig
+ * 
+ */
+export type CommissionConfig = Prisma.CommissionConfigModel
+/**
  * Model WithdrawalRequest
  * 
  */
 export type WithdrawalRequest = Prisma.WithdrawalRequestModel
+/**
+ * Model CustomerWallet
+ * 
+ */
+export type CustomerWallet = Prisma.CustomerWalletModel
+/**
+ * Model CustomerWalletTransaction
+ * 
+ */
+export type CustomerWalletTransaction = Prisma.CustomerWalletTransactionModel
+/**
+ * Model PlatformWallet
+ * 
+ */
+export type PlatformWallet = Prisma.PlatformWalletModel
+/**
+ * Model PlatformWalletTransaction
+ * 
+ */
+export type PlatformWalletTransaction = Prisma.PlatformWalletTransactionModel
 /**
  * Model WalletTransaction
  * 

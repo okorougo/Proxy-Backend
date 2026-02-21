@@ -642,7 +642,7 @@ export const approveWithdrawal = async (req: AuthRequest, res: Response) => {
       "https://api.paystack.co/transfer",
       {
         source: "balance",
-        amount: withdrawal.amount * 100,
+        amount: Number(withdrawal.amount) * 100,
         recipient: {
           type: "nuban",
           name: withdrawal.accountName,

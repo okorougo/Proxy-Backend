@@ -403,7 +403,12 @@ export const ModelName = {
   Review: 'Review',
   Delivery: 'Delivery',
   VendorWallet: 'VendorWallet',
+  CommissionConfig: 'CommissionConfig',
   WithdrawalRequest: 'WithdrawalRequest',
+  CustomerWallet: 'CustomerWallet',
+  CustomerWalletTransaction: 'CustomerWalletTransaction',
+  PlatformWallet: 'PlatformWallet',
+  PlatformWalletTransaction: 'PlatformWalletTransaction',
   WalletTransaction: 'WalletTransaction',
   VendorBank: 'VendorBank',
   Rider: 'Rider',
@@ -424,7 +429,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "category" | "subCategory" | "vendorApplication" | "kycVerification" | "listing" | "digitalFile" | "location" | "media" | "order" | "orderItem" | "message" | "report" | "auditLog" | "transaction" | "session" | "review" | "delivery" | "vendorWallet" | "withdrawalRequest" | "walletTransaction" | "vendorBank" | "rider" | "riderKyc" | "riderVehicle"
+    modelProps: "user" | "category" | "subCategory" | "vendorApplication" | "kycVerification" | "listing" | "digitalFile" | "location" | "media" | "order" | "orderItem" | "message" | "report" | "auditLog" | "transaction" | "session" | "review" | "delivery" | "vendorWallet" | "commissionConfig" | "withdrawalRequest" | "customerWallet" | "customerWalletTransaction" | "platformWallet" | "platformWalletTransaction" | "walletTransaction" | "vendorBank" | "rider" | "riderKyc" | "riderVehicle"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1834,6 +1839,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    CommissionConfig: {
+      payload: Prisma.$CommissionConfigPayload<ExtArgs>
+      fields: Prisma.CommissionConfigFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CommissionConfigFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommissionConfigPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CommissionConfigFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommissionConfigPayload>
+        }
+        findFirst: {
+          args: Prisma.CommissionConfigFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommissionConfigPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CommissionConfigFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommissionConfigPayload>
+        }
+        findMany: {
+          args: Prisma.CommissionConfigFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommissionConfigPayload>[]
+        }
+        create: {
+          args: Prisma.CommissionConfigCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommissionConfigPayload>
+        }
+        createMany: {
+          args: Prisma.CommissionConfigCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CommissionConfigCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommissionConfigPayload>[]
+        }
+        delete: {
+          args: Prisma.CommissionConfigDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommissionConfigPayload>
+        }
+        update: {
+          args: Prisma.CommissionConfigUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommissionConfigPayload>
+        }
+        deleteMany: {
+          args: Prisma.CommissionConfigDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CommissionConfigUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CommissionConfigUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommissionConfigPayload>[]
+        }
+        upsert: {
+          args: Prisma.CommissionConfigUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommissionConfigPayload>
+        }
+        aggregate: {
+          args: Prisma.CommissionConfigAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCommissionConfig>
+        }
+        groupBy: {
+          args: Prisma.CommissionConfigGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CommissionConfigGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CommissionConfigCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CommissionConfigCountAggregateOutputType> | number
+        }
+      }
+    }
     WithdrawalRequest: {
       payload: Prisma.$WithdrawalRequestPayload<ExtArgs>
       fields: Prisma.WithdrawalRequestFieldRefs
@@ -1905,6 +1984,302 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.WithdrawalRequestCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.WithdrawalRequestCountAggregateOutputType> | number
+        }
+      }
+    }
+    CustomerWallet: {
+      payload: Prisma.$CustomerWalletPayload<ExtArgs>
+      fields: Prisma.CustomerWalletFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CustomerWalletFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerWalletPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CustomerWalletFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerWalletPayload>
+        }
+        findFirst: {
+          args: Prisma.CustomerWalletFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerWalletPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CustomerWalletFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerWalletPayload>
+        }
+        findMany: {
+          args: Prisma.CustomerWalletFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerWalletPayload>[]
+        }
+        create: {
+          args: Prisma.CustomerWalletCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerWalletPayload>
+        }
+        createMany: {
+          args: Prisma.CustomerWalletCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CustomerWalletCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerWalletPayload>[]
+        }
+        delete: {
+          args: Prisma.CustomerWalletDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerWalletPayload>
+        }
+        update: {
+          args: Prisma.CustomerWalletUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerWalletPayload>
+        }
+        deleteMany: {
+          args: Prisma.CustomerWalletDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CustomerWalletUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CustomerWalletUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerWalletPayload>[]
+        }
+        upsert: {
+          args: Prisma.CustomerWalletUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerWalletPayload>
+        }
+        aggregate: {
+          args: Prisma.CustomerWalletAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCustomerWallet>
+        }
+        groupBy: {
+          args: Prisma.CustomerWalletGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CustomerWalletGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CustomerWalletCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CustomerWalletCountAggregateOutputType> | number
+        }
+      }
+    }
+    CustomerWalletTransaction: {
+      payload: Prisma.$CustomerWalletTransactionPayload<ExtArgs>
+      fields: Prisma.CustomerWalletTransactionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CustomerWalletTransactionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerWalletTransactionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CustomerWalletTransactionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerWalletTransactionPayload>
+        }
+        findFirst: {
+          args: Prisma.CustomerWalletTransactionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerWalletTransactionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CustomerWalletTransactionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerWalletTransactionPayload>
+        }
+        findMany: {
+          args: Prisma.CustomerWalletTransactionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerWalletTransactionPayload>[]
+        }
+        create: {
+          args: Prisma.CustomerWalletTransactionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerWalletTransactionPayload>
+        }
+        createMany: {
+          args: Prisma.CustomerWalletTransactionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CustomerWalletTransactionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerWalletTransactionPayload>[]
+        }
+        delete: {
+          args: Prisma.CustomerWalletTransactionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerWalletTransactionPayload>
+        }
+        update: {
+          args: Prisma.CustomerWalletTransactionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerWalletTransactionPayload>
+        }
+        deleteMany: {
+          args: Prisma.CustomerWalletTransactionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CustomerWalletTransactionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CustomerWalletTransactionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerWalletTransactionPayload>[]
+        }
+        upsert: {
+          args: Prisma.CustomerWalletTransactionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerWalletTransactionPayload>
+        }
+        aggregate: {
+          args: Prisma.CustomerWalletTransactionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCustomerWalletTransaction>
+        }
+        groupBy: {
+          args: Prisma.CustomerWalletTransactionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CustomerWalletTransactionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CustomerWalletTransactionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CustomerWalletTransactionCountAggregateOutputType> | number
+        }
+      }
+    }
+    PlatformWallet: {
+      payload: Prisma.$PlatformWalletPayload<ExtArgs>
+      fields: Prisma.PlatformWalletFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PlatformWalletFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformWalletPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PlatformWalletFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformWalletPayload>
+        }
+        findFirst: {
+          args: Prisma.PlatformWalletFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformWalletPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PlatformWalletFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformWalletPayload>
+        }
+        findMany: {
+          args: Prisma.PlatformWalletFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformWalletPayload>[]
+        }
+        create: {
+          args: Prisma.PlatformWalletCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformWalletPayload>
+        }
+        createMany: {
+          args: Prisma.PlatformWalletCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PlatformWalletCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformWalletPayload>[]
+        }
+        delete: {
+          args: Prisma.PlatformWalletDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformWalletPayload>
+        }
+        update: {
+          args: Prisma.PlatformWalletUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformWalletPayload>
+        }
+        deleteMany: {
+          args: Prisma.PlatformWalletDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PlatformWalletUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PlatformWalletUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformWalletPayload>[]
+        }
+        upsert: {
+          args: Prisma.PlatformWalletUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformWalletPayload>
+        }
+        aggregate: {
+          args: Prisma.PlatformWalletAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePlatformWallet>
+        }
+        groupBy: {
+          args: Prisma.PlatformWalletGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlatformWalletGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PlatformWalletCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlatformWalletCountAggregateOutputType> | number
+        }
+      }
+    }
+    PlatformWalletTransaction: {
+      payload: Prisma.$PlatformWalletTransactionPayload<ExtArgs>
+      fields: Prisma.PlatformWalletTransactionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PlatformWalletTransactionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformWalletTransactionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PlatformWalletTransactionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformWalletTransactionPayload>
+        }
+        findFirst: {
+          args: Prisma.PlatformWalletTransactionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformWalletTransactionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PlatformWalletTransactionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformWalletTransactionPayload>
+        }
+        findMany: {
+          args: Prisma.PlatformWalletTransactionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformWalletTransactionPayload>[]
+        }
+        create: {
+          args: Prisma.PlatformWalletTransactionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformWalletTransactionPayload>
+        }
+        createMany: {
+          args: Prisma.PlatformWalletTransactionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PlatformWalletTransactionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformWalletTransactionPayload>[]
+        }
+        delete: {
+          args: Prisma.PlatformWalletTransactionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformWalletTransactionPayload>
+        }
+        update: {
+          args: Prisma.PlatformWalletTransactionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformWalletTransactionPayload>
+        }
+        deleteMany: {
+          args: Prisma.PlatformWalletTransactionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PlatformWalletTransactionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PlatformWalletTransactionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformWalletTransactionPayload>[]
+        }
+        upsert: {
+          args: Prisma.PlatformWalletTransactionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformWalletTransactionPayload>
+        }
+        aggregate: {
+          args: Prisma.PlatformWalletTransactionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePlatformWalletTransaction>
+        }
+        groupBy: {
+          args: Prisma.PlatformWalletTransactionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlatformWalletTransactionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PlatformWalletTransactionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlatformWalletTransactionCountAggregateOutputType> | number
         }
       }
     }
@@ -2410,7 +2785,8 @@ export const ListingScalarFieldEnum = {
   categoryId: 'categoryId',
   subCategoryId: 'subCategoryId',
   extraDetails: 'extraDetails',
-  rejectionNote: 'rejectionNote'
+  rejectionNote: 'rejectionNote',
+  isRenderedService: 'isRenderedService'
 } as const
 
 export type ListingScalarFieldEnum = (typeof ListingScalarFieldEnum)[keyof typeof ListingScalarFieldEnum]
@@ -2468,7 +2844,11 @@ export const OrderScalarFieldEnum = {
   totalAmount: 'totalAmount',
   status: 'status',
   createdAt: 'createdAt',
-  isDigital: 'isDigital'
+  isDigital: 'isDigital',
+  serviceStatus: 'serviceStatus',
+  completedAt: 'completedAt',
+  confirmedAt: 'confirmedAt',
+  disputed: 'disputed'
 } as const
 
 export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
@@ -2548,7 +2928,12 @@ export const TransactionScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   amountPaid: 'amountPaid',
-  paystackRef: 'paystackRef'
+  paystackRef: 'paystackRef',
+  escrowStatus: 'escrowStatus',
+  commissionRate: 'commissionRate',
+  releaseAt: 'releaseAt',
+  commissionAmount: 'commissionAmount',
+  vendorAmount: 'vendorAmount'
 } as const
 
 export type TransactionScalarFieldEnum = (typeof TransactionScalarFieldEnum)[keyof typeof TransactionScalarFieldEnum]
@@ -2596,12 +2981,16 @@ export const DeliveryScalarFieldEnum = {
   dropoffLng: 'dropoffLng',
   pickupAddress: 'pickupAddress',
   dropoffAddress: 'dropoffAddress',
+  isSelfDelivery: 'isSelfDelivery',
   status: 'status',
   distanceKm: 'distanceKm',
   etaMinutes: 'etaMinutes',
   fareAmount: 'fareAmount',
   isDigital: 'isDigital',
   digitalFiles: 'digitalFiles',
+  vendorLat: 'vendorLat',
+  vendorLng: 'vendorLng',
+  vendorStartedAt: 'vendorStartedAt',
   riderArrivedAt: 'riderArrivedAt',
   riderLat: 'riderLat',
   riderLng: 'riderLng',
@@ -2628,6 +3017,16 @@ export const VendorWalletScalarFieldEnum = {
 export type VendorWalletScalarFieldEnum = (typeof VendorWalletScalarFieldEnum)[keyof typeof VendorWalletScalarFieldEnum]
 
 
+export const CommissionConfigScalarFieldEnum = {
+  id: 'id',
+  percentage: 'percentage',
+  isActive: 'isActive',
+  createdAt: 'createdAt'
+} as const
+
+export type CommissionConfigScalarFieldEnum = (typeof CommissionConfigScalarFieldEnum)[keyof typeof CommissionConfigScalarFieldEnum]
+
+
 export const WithdrawalRequestScalarFieldEnum = {
   id: 'id',
   vendorId: 'vendorId',
@@ -2643,6 +3042,53 @@ export const WithdrawalRequestScalarFieldEnum = {
 } as const
 
 export type WithdrawalRequestScalarFieldEnum = (typeof WithdrawalRequestScalarFieldEnum)[keyof typeof WithdrawalRequestScalarFieldEnum]
+
+
+export const CustomerWalletScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  balance: 'balance',
+  currency: 'currency',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CustomerWalletScalarFieldEnum = (typeof CustomerWalletScalarFieldEnum)[keyof typeof CustomerWalletScalarFieldEnum]
+
+
+export const CustomerWalletTransactionScalarFieldEnum = {
+  id: 'id',
+  walletId: 'walletId',
+  amount: 'amount',
+  type: 'type',
+  reference: 'reference',
+  createdAt: 'createdAt'
+} as const
+
+export type CustomerWalletTransactionScalarFieldEnum = (typeof CustomerWalletTransactionScalarFieldEnum)[keyof typeof CustomerWalletTransactionScalarFieldEnum]
+
+
+export const PlatformWalletScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  balance: 'balance',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PlatformWalletScalarFieldEnum = (typeof PlatformWalletScalarFieldEnum)[keyof typeof PlatformWalletScalarFieldEnum]
+
+
+export const PlatformWalletTransactionScalarFieldEnum = {
+  id: 'id',
+  walletId: 'walletId',
+  amount: 'amount',
+  type: 'type',
+  reference: 'reference',
+  createdAt: 'createdAt'
+} as const
+
+export type PlatformWalletTransactionScalarFieldEnum = (typeof PlatformWalletTransactionScalarFieldEnum)[keyof typeof PlatformWalletTransactionScalarFieldEnum]
 
 
 export const WalletTransactionScalarFieldEnum = {
@@ -2848,16 +3294,16 @@ export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
- * Reference to a field of type 'Float'
+ * Reference to a field of type 'Decimal'
  */
-export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
     
 
 
 /**
- * Reference to a field of type 'Float[]'
+ * Reference to a field of type 'Decimal[]'
  */
-export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
     
 
 
@@ -2886,6 +3332,48 @@ export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'J
  * Reference to a field of type 'QueryMode'
  */
 export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+/**
+ * Reference to a field of type 'Float'
+ */
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+/**
+ * Reference to a field of type 'Float[]'
+ */
+export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
+
+/**
+ * Reference to a field of type 'OrderStatus'
+ */
+export type EnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'OrderStatus[]'
+ */
+export type ListEnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ServiceStatus'
+ */
+export type EnumServiceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ServiceStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ServiceStatus[]'
+ */
+export type ListEnumServiceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ServiceStatus[]'>
     
 
 
@@ -2946,6 +3434,20 @@ export type ListEnumPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType
 
 
 /**
+ * Reference to a field of type 'EscrowStatus'
+ */
+export type EnumEscrowStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EscrowStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'EscrowStatus[]'
+ */
+export type ListEnumEscrowStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EscrowStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'DeliveryStatus'
  */
 export type EnumDeliveryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DeliveryStatus'>
@@ -2970,6 +3472,34 @@ export type EnumWithdrawalStatusFieldRefInput<$PrismaModel> = FieldRefInputType<
  * Reference to a field of type 'WithdrawalStatus[]'
  */
 export type ListEnumWithdrawalStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WithdrawalStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'WalletTxType'
+ */
+export type EnumWalletTxTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WalletTxType'>
+    
+
+
+/**
+ * Reference to a field of type 'WalletTxType[]'
+ */
+export type ListEnumWalletTxTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WalletTxType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'PlatformWalletType'
+ */
+export type EnumPlatformWalletTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlatformWalletType'>
+    
+
+
+/**
+ * Reference to a field of type 'PlatformWalletType[]'
+ */
+export type ListEnumPlatformWalletTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlatformWalletType[]'>
     
 
 
@@ -3084,7 +3614,12 @@ export type GlobalOmitConfig = {
   review?: Prisma.ReviewOmit
   delivery?: Prisma.DeliveryOmit
   vendorWallet?: Prisma.VendorWalletOmit
+  commissionConfig?: Prisma.CommissionConfigOmit
   withdrawalRequest?: Prisma.WithdrawalRequestOmit
+  customerWallet?: Prisma.CustomerWalletOmit
+  customerWalletTransaction?: Prisma.CustomerWalletTransactionOmit
+  platformWallet?: Prisma.PlatformWalletOmit
+  platformWalletTransaction?: Prisma.PlatformWalletTransactionOmit
   walletTransaction?: Prisma.WalletTransactionOmit
   vendorBank?: Prisma.VendorBankOmit
   rider?: Prisma.RiderOmit

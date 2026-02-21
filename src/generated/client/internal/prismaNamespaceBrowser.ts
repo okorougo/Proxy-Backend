@@ -70,7 +70,12 @@ export const ModelName = {
   Review: 'Review',
   Delivery: 'Delivery',
   VendorWallet: 'VendorWallet',
+  CommissionConfig: 'CommissionConfig',
   WithdrawalRequest: 'WithdrawalRequest',
+  CustomerWallet: 'CustomerWallet',
+  CustomerWalletTransaction: 'CustomerWalletTransaction',
+  PlatformWallet: 'PlatformWallet',
+  PlatformWalletTransaction: 'PlatformWalletTransaction',
   WalletTransaction: 'WalletTransaction',
   VendorBank: 'VendorBank',
   Rider: 'Rider',
@@ -187,7 +192,8 @@ export const ListingScalarFieldEnum = {
   categoryId: 'categoryId',
   subCategoryId: 'subCategoryId',
   extraDetails: 'extraDetails',
-  rejectionNote: 'rejectionNote'
+  rejectionNote: 'rejectionNote',
+  isRenderedService: 'isRenderedService'
 } as const
 
 export type ListingScalarFieldEnum = (typeof ListingScalarFieldEnum)[keyof typeof ListingScalarFieldEnum]
@@ -245,7 +251,11 @@ export const OrderScalarFieldEnum = {
   totalAmount: 'totalAmount',
   status: 'status',
   createdAt: 'createdAt',
-  isDigital: 'isDigital'
+  isDigital: 'isDigital',
+  serviceStatus: 'serviceStatus',
+  completedAt: 'completedAt',
+  confirmedAt: 'confirmedAt',
+  disputed: 'disputed'
 } as const
 
 export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
@@ -325,7 +335,12 @@ export const TransactionScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   amountPaid: 'amountPaid',
-  paystackRef: 'paystackRef'
+  paystackRef: 'paystackRef',
+  escrowStatus: 'escrowStatus',
+  commissionRate: 'commissionRate',
+  releaseAt: 'releaseAt',
+  commissionAmount: 'commissionAmount',
+  vendorAmount: 'vendorAmount'
 } as const
 
 export type TransactionScalarFieldEnum = (typeof TransactionScalarFieldEnum)[keyof typeof TransactionScalarFieldEnum]
@@ -373,12 +388,16 @@ export const DeliveryScalarFieldEnum = {
   dropoffLng: 'dropoffLng',
   pickupAddress: 'pickupAddress',
   dropoffAddress: 'dropoffAddress',
+  isSelfDelivery: 'isSelfDelivery',
   status: 'status',
   distanceKm: 'distanceKm',
   etaMinutes: 'etaMinutes',
   fareAmount: 'fareAmount',
   isDigital: 'isDigital',
   digitalFiles: 'digitalFiles',
+  vendorLat: 'vendorLat',
+  vendorLng: 'vendorLng',
+  vendorStartedAt: 'vendorStartedAt',
   riderArrivedAt: 'riderArrivedAt',
   riderLat: 'riderLat',
   riderLng: 'riderLng',
@@ -405,6 +424,16 @@ export const VendorWalletScalarFieldEnum = {
 export type VendorWalletScalarFieldEnum = (typeof VendorWalletScalarFieldEnum)[keyof typeof VendorWalletScalarFieldEnum]
 
 
+export const CommissionConfigScalarFieldEnum = {
+  id: 'id',
+  percentage: 'percentage',
+  isActive: 'isActive',
+  createdAt: 'createdAt'
+} as const
+
+export type CommissionConfigScalarFieldEnum = (typeof CommissionConfigScalarFieldEnum)[keyof typeof CommissionConfigScalarFieldEnum]
+
+
 export const WithdrawalRequestScalarFieldEnum = {
   id: 'id',
   vendorId: 'vendorId',
@@ -420,6 +449,53 @@ export const WithdrawalRequestScalarFieldEnum = {
 } as const
 
 export type WithdrawalRequestScalarFieldEnum = (typeof WithdrawalRequestScalarFieldEnum)[keyof typeof WithdrawalRequestScalarFieldEnum]
+
+
+export const CustomerWalletScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  balance: 'balance',
+  currency: 'currency',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CustomerWalletScalarFieldEnum = (typeof CustomerWalletScalarFieldEnum)[keyof typeof CustomerWalletScalarFieldEnum]
+
+
+export const CustomerWalletTransactionScalarFieldEnum = {
+  id: 'id',
+  walletId: 'walletId',
+  amount: 'amount',
+  type: 'type',
+  reference: 'reference',
+  createdAt: 'createdAt'
+} as const
+
+export type CustomerWalletTransactionScalarFieldEnum = (typeof CustomerWalletTransactionScalarFieldEnum)[keyof typeof CustomerWalletTransactionScalarFieldEnum]
+
+
+export const PlatformWalletScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  balance: 'balance',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PlatformWalletScalarFieldEnum = (typeof PlatformWalletScalarFieldEnum)[keyof typeof PlatformWalletScalarFieldEnum]
+
+
+export const PlatformWalletTransactionScalarFieldEnum = {
+  id: 'id',
+  walletId: 'walletId',
+  amount: 'amount',
+  type: 'type',
+  reference: 'reference',
+  createdAt: 'createdAt'
+} as const
+
+export type PlatformWalletTransactionScalarFieldEnum = (typeof PlatformWalletTransactionScalarFieldEnum)[keyof typeof PlatformWalletTransactionScalarFieldEnum]
 
 
 export const WalletTransactionScalarFieldEnum = {
