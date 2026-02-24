@@ -755,9 +755,12 @@ export const getUserOrders = async (req: AuthRequest, res: Response) => {
               dropoffLat: order.delivery.dropoffLat,
               dropoffLng: order.delivery.dropoffLng,
               pickupAddress: order.delivery.pickupAddress,
+              vendorLat: order.vendor.location?.lat,
+              vendorLng: order.vendor.location?.lng,
               dropoffAddress: order.delivery.dropoffAddress,
               rider: order.delivery.rider,
               otp: order.delivery.OTP,
+              isSelfDelivery: order.delivery.isSelfDelivery,
             }
           : null,
         listings: order.listings.map((item) => ({

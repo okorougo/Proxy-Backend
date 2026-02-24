@@ -1492,6 +1492,7 @@ export const vendorStartDelivery = async (req: AuthRequest, res: Response) => {
       vendorStartedAt: new Date(),
       vendorLat: currentLat,
       vendorLng: currentLng,
+      isSelfDelivery: true, // mark as self-delivery since vendor is doing the delivery themselves
     },
   });
 
