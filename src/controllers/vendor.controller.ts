@@ -1471,7 +1471,10 @@ export const vendorStartDelivery = async (req: AuthRequest, res: Response) => {
     include: { order: true },
   });
 
-  if (!delivery || delivery.order.vendorId !== vendorId)
+  if (!delivery || !delivery.order)
+     return errorResponse(res, "Invalid delivery");
+
+  if (delivery.order.vendorId !== vendorId)
     return errorResponse(res, "Unauthorized");
 
   // Update delivery: vendor started coming
