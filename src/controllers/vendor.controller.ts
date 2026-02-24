@@ -1466,6 +1466,12 @@ export const vendorStartDelivery = async (req: AuthRequest, res: Response) => {
   const { deliveryId, currentLat, currentLng } = req.body;
   const vendorId = req.user?.id;
 
+
+  const vendor = await prisma.vendorApplication.findUnique({
+    where: { userId: vendorId },
+  });
+    if (!vendor)      return errorResponse(res, "Vendor not found", "NO_VENDOR", 404);
+
   const delivery = await prisma.delivery.findUnique({
     where: { id: deliveryId },
     include: { order: true },
@@ -1474,10 +1480,8 @@ export const vendorStartDelivery = async (req: AuthRequest, res: Response) => {
   if (!delivery || !delivery.order)
      return errorResponse(res, "Invalid delivery");
 
-    console.log("Delivery", delivery)
-    console.log("VendorId", vendorId)
 
-  if (delivery.order.vendorId !== vendorId)
+  if (delivery.order.vendorId !== vendor.id)
     return errorResponse(res, "Unauthorized");
 
   // Update delivery: vendor started coming
