@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import prisma from "../lib/prisma";
 import { sendEmail } from "../services/emailService";
 import { errorResponse, successResponse } from "../utils/response";
+import { io } from "../server";
 import { AuthRequest } from "../middleware/auth";
 import geohash from "ngeohash";
 import axios from "axios";
@@ -1427,7 +1428,6 @@ export const completeSelfDelivery = async (req: AuthRequest, res: Response) => {
   ]);
 
   // Notify customer
-  const io = req.app.get("io");
   try {
     io.to(delivery.order.userId).emit("delivery_completed", { deliveryId });
 
@@ -1496,7 +1496,6 @@ export const vendorStartDelivery = async (req: AuthRequest, res: Response) => {
   });
 
   // Notify customer: vendor is on the way
-  const io = req.app.get("io");
   io.to(delivery.order.userId).emit("delivery_vendor_on_the_way", {
     deliveryId,
     vendorLat: currentLat,
