@@ -1379,7 +1379,7 @@ export const getVendorBanksDetails = async (req:AuthRequest, res:Response) => {
   return res.json({ status: true, data: bank });
 };
 export const completeSelfDelivery = async (req: AuthRequest, res: Response) => {
-  const { deliveryId } = req.body;
+  const { deliveryId, otp } = req.body;
   const vendorId = req.user?.id;
 
   const delivery = await prisma.delivery.findUnique({
@@ -1390,10 +1390,16 @@ export const completeSelfDelivery = async (req: AuthRequest, res: Response) => {
   if (!delivery || delivery.order.vendorId !== vendorId)
     return errorResponse(res, "Unauthorized");
 
+  // If this delivery has an OTP (physical delivery), require vendor to provide it
+  if (delivery.OTP) {
+    if (!otp) return errorResponse(res, "OTP is required to complete delivery");
+    if (otp !== delivery.OTP) return errorResponse(res, "Invalid OTP provided");
+  }
+
   await prisma.$transaction([
     prisma.delivery.update({
       where: { id: deliveryId },
-      data: { status: "DELIVERED", completedAt: new Date() },
+      data: { status: "DELIVERED", completedAt: new Date(), OTP: null },
     }),
     prisma.order.update({
       where: { id: delivery.order.id },
@@ -1422,7 +1428,36 @@ export const completeSelfDelivery = async (req: AuthRequest, res: Response) => {
 
   // Notify customer
   const io = req.app.get("io");
-  io.to(delivery.order.userId).emit("delivery_completed", { deliveryId });
+  try {
+    io.to(delivery.order.userId).emit("delivery_completed", { deliveryId });
+
+    // Send push notification to customer if they have device token
+    const customer = await prisma.user.findUnique({
+      where: { id: delivery.order.userId },
+      include: { Session: true },
+    });
+    const sessionWithToken = customer?.Session?.find((s) => s.deviceToken);
+    if (sessionWithToken && sessionWithToken.deviceToken) {
+      const message = `Your order #${delivery.order.id.toString().slice(0,6)} has been delivered`;
+      if (sessionWithToken.devicePlatform === "expo") {
+        await sendExpo(
+          sessionWithToken.deviceToken,
+          "Order Delivered",
+          message,
+          { type: "ORDER", status: "DELIVERED", deliveryId }
+        );
+      } else {
+        await sendFcm(
+          sessionWithToken.deviceToken,
+          "Order Delivered",
+          message,
+          { type: "ORDER", status: "DELIVERED", deliveryId }
+        );
+      }
+    }
+  } catch (err) {
+    console.error("completeSelfDelivery notify error:", err);
+  }
 
   return successResponse(res, "Self-delivery completed and funds released");
 };
@@ -1458,6 +1493,37 @@ export const vendorStartDelivery = async (req: AuthRequest, res: Response) => {
     vendorLng: currentLng,
     status: "Vendor is on the way",
   });
+
+  // Also send push notification to customer if they have a device token
+  try {
+    const customer = await prisma.user.findUnique({
+      where: { id: delivery.order.userId },
+      include: { Session: true },
+    });
+
+    // Try to send push using the first session with a device token
+    const sessionWithToken = customer?.Session?.find((s) => s.deviceToken);
+    if (sessionWithToken && sessionWithToken.deviceToken) {
+      const message = `Your order is on the way`;
+      if (sessionWithToken.devicePlatform === "expo") {
+        await sendExpo(
+          sessionWithToken.deviceToken,
+          "Vendor on the way",
+          message,
+          { type: "vendor_on_the_way", deliveryId }
+        );
+      } else {
+        await sendFcm(
+          sessionWithToken.deviceToken,
+          "Vendor on the way",
+          message,
+          { type: "vendor_on_the_way", deliveryId }
+        );
+      }
+    }
+  } catch (err) {
+    console.error("vendorStartDelivery push error:", err);
+  }
 
   return successResponse(res, "Vendor started delivery", updated);
 };
