@@ -30,6 +30,7 @@ import { haversineDistance } from './utils/distanceCalcu';
 import axios from 'axios';
 import cron from "node-cron";
 import { scheduleEscrowRelease } from "./cron/escrowRelease";
+import { initializePlatformWallets } from "./lib/initPlatformWallets";
 
 
 
@@ -39,6 +40,10 @@ const server = http.createServer(app);
 
 app.use(passport.initialize());
 scheduleEscrowRelease();
+// Ensure platform wallets (ESCROW, REVENUE) and default commission exist
+initializePlatformWallets().catch((err) =>
+  console.error("Failed to initialize platform wallets:", err)
+);
 export const io = new Server(server);
 const allowedOrigins = [
   "http://localhost:5173", // local dev

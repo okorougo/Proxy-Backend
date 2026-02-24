@@ -3,10 +3,10 @@ import prisma from "../lib/prisma";
 import { AuthRequest } from "../middleware/auth";
 import { successResponse, errorResponse } from "../utils/response";
 import { uploadToCloudinary } from "../lib/cloudinary"; 
+import { initializePlatformWallets as libInitializePlatformWallets } from "../lib/initPlatformWallets";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import axios from "axios";
-
 // Dashboard overview (counts, stats)
 export const adminLogin = async (req: any, res: Response) => {
   try {
@@ -674,4 +674,18 @@ export const rejectWithdrawal = async (req: AuthRequest, res: Response) => {
   });
 
   return successResponse(res, "Withdrawal rejected", withdrawal);
+};
+
+export const initializePlatformWallets = async (req:AuthRequest, res:Response) => {
+  try {
+    if (req.user?.role !== "ADMIN") {
+      return errorResponse(res, "Forbidden", "FORBIDDEN", 403);
+    }
+
+    const result = await libInitializePlatformWallets();
+    return successResponse(res, "Platform wallets initialized", result, 200);
+  } catch (err) {
+    console.error("❌ Failed to initialize platform wallets:", err);
+    return errorResponse(res, "Failed to initialize platform wallets", "SERVER_ERROR", 500);
+  }
 };

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getDashboardStats, listKycRequests, updateKycStatus, listReports, resolveReport, listUsers, banUser, unbanUser, updateUserRole,listAllListings, approveListing, rejectListing, removeListing, createCategory, getCategories, updateCategory, deleteCategory, adminLogin, getRiderMonthlyStats, getSingleRider, getRiderDashboardStats, getAllRiders, getSingleUser, createSubCategory, updateSubCategory, deleteSubCategory, approveWithdrawal, rejectWithdrawal} from "../controllers/admin.controller";
+import { getDashboardStats, listKycRequests, updateKycStatus, listReports, resolveReport, listUsers, banUser, unbanUser, updateUserRole,listAllListings, approveListing, rejectListing, removeListing, createCategory, getCategories, updateCategory, deleteCategory, adminLogin, getRiderMonthlyStats, getSingleRider, getRiderDashboardStats, getAllRiders, getSingleUser, createSubCategory, updateSubCategory, deleteSubCategory, approveWithdrawal, rejectWithdrawal, initializePlatformWallets } from "../controllers/admin.controller";
 import multer from "multer";
 import { authMiddleware } from "../middleware/auth";
 import { adminOnly, modOrAdmin } from "../middleware/admin";
@@ -46,6 +46,9 @@ router.put("/edit-category/:id", authMiddleware, upload.single("image"), updateC
 router.put("/edit-sub-category/:id", authMiddleware, updateSubCategory);
 router.delete("/delete-category/:id", authMiddleware, deleteCategory);
 router.delete("/delete-sub-category/:id", authMiddleware, deleteSubCategory);
+
+// Admin: initialize platform wallets (ESCROW, REVENUE) and commission config
+router.post("/platform-wallets/init", authMiddleware, adminOnly, initializePlatformWallets);
 
 
 // Withdrawal requests

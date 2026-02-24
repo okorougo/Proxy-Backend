@@ -15,6 +15,10 @@ export const initializePlatformWallets = async () => {
       where: { type: "REVENUE" }
     });
 
+    let escrowCreated = false;
+    let revenueCreated = false;
+    let commissionCreated = false;
+
     if (!escrowWallet) {
       await prisma.platformWallet.create({
         data: {
@@ -22,6 +26,7 @@ export const initializePlatformWallets = async () => {
           balance: 0
         }
       });
+      escrowCreated = true;
       console.log("✅ ESCROW wallet created");
     } else {
       console.log("✅ ESCROW wallet already exists");
@@ -34,6 +39,7 @@ export const initializePlatformWallets = async () => {
           balance: 0
         }
       });
+      revenueCreated = true;
       console.log("✅ REVENUE wallet created");
     } else {
       console.log("✅ REVENUE wallet already exists");
@@ -51,12 +57,20 @@ export const initializePlatformWallets = async () => {
           isActive: true
         }
       });
+      commissionCreated = true;
       console.log("✅ Commission config (10%) created");
     } else {
       console.log("✅ Commission config already exists");
     }
 
     console.log("✅ Platform wallets initialized successfully");
+
+    return {
+      escrowCreated,
+      revenueCreated,
+      commissionCreated,
+      message: "Platform wallets initialization complete"
+    };
   } catch (err) {
     console.error("❌ Failed to initialize platform wallets:", err);
     throw err;
