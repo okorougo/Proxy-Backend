@@ -732,6 +732,7 @@ export const getUserOrders = async (req: AuthRequest, res: Response) => {
           id: order.vendor.id,
           name: order.vendor.user.name,
           email: order.vendor.user.email,
+          phone: order.vendor.user.phone,
           image: order.vendor.user.kycDocument || null,
         },
         totalAmount: order.totalAmount,

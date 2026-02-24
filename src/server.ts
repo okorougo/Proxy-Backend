@@ -434,6 +434,34 @@ io.on("connection", (socket) => {
   }
 });
 
+socket.on("vendor_update_location", async (data) => {
+  try {
+    const { vendorId, lat, lng } = data;
+    if (!vendorId || !lat || !lng) {
+      console.warn("🚫 Invalid vendor_update_location payload:", data);
+      return;
+    }
+    const vendor = await prisma.vendorApplication.findUnique({ where: { id: vendorId } });
+    if (!vendor) {
+      console.warn(`🚫 No vendor found for userId=${vendorId}`);
+      return;
+    } 
+    await prisma.location.update({
+      where: { vendorId: vendorId },
+      data: {
+        lat: parseFloat(lat),
+        lng: parseFloat(lng),
+      },
+    });
+    socket.broadcast.emit("vendor_location_update", {
+      vendorId,
+      lat: parseFloat(lat),
+      lng: parseFloat(lng),
+    });
+  } catch (error) {
+    console.error("vendor_update_location error:", error);
+  }});
+
 
   // ✅ Rider accepts delivery offer
 
