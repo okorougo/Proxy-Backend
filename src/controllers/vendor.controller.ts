@@ -1426,10 +1426,10 @@ export const completeSelfDelivery = async (req: AuthRequest, res: Response) => {
         totalEarned: { increment: Number(delivery.order.transaction.vendorAmount) },
         walletTransaction: {
           create: {
+            vendorId: vendor.id,
             amount: Number(delivery.order.transaction.vendorAmount),
             type: "CREDIT",
             remark: `Service completed for Order ${delivery.order.id}`,
-            vendorId,
           },
         },
       },
