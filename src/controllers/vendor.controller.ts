@@ -1420,7 +1420,7 @@ export const completeSelfDelivery = async (req: AuthRequest, res: Response) => {
       data: { escrowStatus: "RELEASED", releaseAt: new Date() },
     }),
     prisma.vendorWallet.update({
-      where: { vendorId },
+      where: { vendorId: vendor.id },
       data: {
         balance: { increment: Number(delivery.order.transaction.vendorAmount) },
         totalEarned: { increment: Number(delivery.order.transaction.vendorAmount) },
