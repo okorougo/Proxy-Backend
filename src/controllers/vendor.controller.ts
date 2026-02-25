@@ -1383,12 +1383,21 @@ export const completeSelfDelivery = async (req: AuthRequest, res: Response) => {
   const { deliveryId, otp } = req.body;
   const vendorId = req.user?.id;
 
+    const vendor = await prisma.vendorApplication.findUnique({
+    where: { userId: vendorId },
+  });
+    if (!vendor)      return errorResponse(res, "Vendor not found", "NO_VENDOR", 404);
+
   const delivery = await prisma.delivery.findUnique({
     where: { id: deliveryId },
     include: { order: { include: { transaction: true, vendor: { include: { wallet: true } }, user: true } } },
   });
 
-  if (!delivery || delivery.order.vendorId !== vendorId)
+  if (!delivery || !delivery.order)
+     return errorResponse(res, "Invalid delivery");
+
+
+  if (delivery.order.vendorId !== vendor.id)
     return errorResponse(res, "Unauthorized");
 
   // If this delivery has an OTP (physical delivery), require vendor to provide it
