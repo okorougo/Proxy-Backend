@@ -20,7 +20,11 @@ import {
   getVendorPaymentHistory,
   getVendorPaymentDetail,
   getCustomerTransactionHistory,
-  getCustomerOrderDetail
+  getCustomerOrderDetail,
+  // rider wallet functions
+  getRiderWalletBalance,
+  getRiderWalletHistory,
+  getRiderWalletTransactionDetail
 } from "../controllers/payment.controller";
 import { authMiddleware } from "../middleware/auth";
 
@@ -56,6 +60,11 @@ router.get("/wallet/balance", authMiddleware, getWalletBalance);
 
 // Get wallet transaction history
 router.get("/wallet/history", authMiddleware, getWalletTransactionHistory);
+
+// Rider-specific wallet endpoints
+router.get("/rider/wallet/balance", authMiddleware, getRiderWalletBalance);
+router.get("/rider/wallet/history", authMiddleware, getRiderWalletHistory);
+router.get("/rider/wallet/history/:transactionId", authMiddleware, getRiderWalletTransactionDetail);
 
 // ========== ESCROW ENDPOINTS ==========
 

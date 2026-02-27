@@ -297,3 +297,22 @@ export const getVendorWalletSummary = async (vendorId: string) => {
     updatedAt: wallet.updatedAt
   };
 };
+
+/**
+ * Get rider wallet summary
+ */
+export const getRiderWalletSummary = async (riderId: string) => {
+  let wallet = await prisma.riderWallet.findUnique({ where: { riderId } });
+  if (!wallet) {
+    wallet = await prisma.riderWallet.create({
+      data: { riderId, balance: 0, totalEarned: 0 }
+    });
+  }
+
+  return {
+    balance: wallet.balance,
+    totalEarned: wallet.totalEarned,
+    currency: wallet.currency,
+    updatedAt: wallet.updatedAt
+  };
+};

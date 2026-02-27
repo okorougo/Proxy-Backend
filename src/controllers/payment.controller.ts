@@ -1146,6 +1146,102 @@ export const getVendorPaymentDetail = async (req: AuthRequest, res: Response) =>
 };
 
 /**
+ * Rider wallet balance/summary
+ */
+export const getRiderWalletBalance = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
+
+    // find rider record
+    const rider = await prisma.rider.findUnique({ where: { userId } });
+    if (!rider) return errorResponse(res, "Rider not found", "NOT_FOUND", 404);
+
+    let wallet = await prisma.riderWallet.findUnique({ where: { riderId: rider.id } });
+    if (!wallet) {
+      wallet = await prisma.riderWallet.create({
+        data: { riderId: rider.id, balance: 0, totalEarned: 0 }
+      });
+    }
+
+    return successResponse(res, "Rider wallet fetched", {
+      walletId: wallet.id,
+      balance: wallet.balance,
+      totalEarned: wallet.totalEarned,
+      currency: wallet.currency,
+      updatedAt: wallet.updatedAt
+    });
+  } catch (err) {
+    console.error("getRiderWalletBalance error:", err);
+    return errorResponse(res, "Failed to fetch rider wallet balance");
+  }
+};
+
+/**
+ * Rider wallet transaction history
+ */
+export const getRiderWalletHistory = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const { limit = 20, skip = 0 } = req.query;
+
+    if (!userId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
+
+    const rider = await prisma.rider.findUnique({ where: { userId } });
+    if (!rider) return errorResponse(res, "Rider not found", "NOT_FOUND", 404);
+
+    const wallet = await prisma.riderWallet.findUnique({ where: { riderId: rider.id } });
+    if (!wallet) return errorResponse(res, "Wallet not found", "WALLET_NOT_FOUND", 404);
+
+    const transactions = await prisma.riderWalletTransaction.findMany({
+      where: { riderId: rider.id },
+      take: Number(limit),
+      skip: Number(skip),
+      orderBy: { createdAt: "desc" }
+    });
+
+    const total = await prisma.riderWalletTransaction.count({ where: { riderId: rider.id } });
+
+    return successResponse(res, "Rider wallet history fetched", {
+      transactions,
+      pagination: {
+        limit: Number(limit),
+        skip: Number(skip),
+        total,
+        hasMore: Number(skip) + Number(limit) < total
+      }
+    });
+  } catch (err) {
+    console.error("getRiderWalletHistory error:", err);
+    return errorResponse(res, "Failed to fetch rider wallet history");
+  }
+};
+
+/**
+ * Rider wallet transaction detail
+ */
+export const getRiderWalletTransactionDetail = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const { transactionId } = req.params;
+
+    if (!userId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
+
+    const rider = await prisma.rider.findUnique({ where: { userId } });
+    if (!rider) return errorResponse(res, "Rider not found", "NOT_FOUND", 404);
+
+    const tx = await prisma.riderWalletTransaction.findUnique({ where: { id: transactionId } });
+    if (!tx) return errorResponse(res, "Transaction not found", "TX_NOT_FOUND", 404);
+    if (tx.riderId !== rider.id) return errorResponse(res, "Not authorized", "NOT_AUTHORIZED", 403);
+
+    return successResponse(res, "Transaction detail fetched", tx);
+  } catch (err) {
+    console.error("getRiderWalletTransactionDetail error:", err);
+    return errorResponse(res, "Failed to fetch rider transaction detail");
+  }
+};
+
+/**
  * Get customer complete transaction history
  * Shows all orders, wallet transactions, payments in one unified view
  */
