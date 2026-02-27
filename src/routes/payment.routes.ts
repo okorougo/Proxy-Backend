@@ -15,7 +15,11 @@ import {
   requestWithdrawal,
   getWithdrawalRequests,
   approveWithdrawal,
-  rejectWithdrawal
+  rejectWithdrawal,
+  getVendorPaymentHistory,
+  getVendorPaymentDetail,
+  getCustomerTransactionHistory,
+  getCustomerOrderDetail
 } from "../controllers/payment.controller";
 import { authMiddleware } from "../middleware/auth";
 
@@ -76,5 +80,19 @@ router.post("/withdrawals/:withdrawalId/approve", authMiddleware, approveWithdra
 
 // Reject withdrawal (Admin only)
 router.post("/withdrawals/:withdrawalId/reject", authMiddleware, rejectWithdrawal);
+
+// ========== PAYMENT & TRANSACTION HISTORY ENDPOINTS ==========
+
+// Vendor payment history with commission breakdown
+router.get("/vendor/payments", authMiddleware, getVendorPaymentHistory);
+
+// Vendor single payment detail
+router.get("/vendor/payments/:transactionId", authMiddleware, getVendorPaymentDetail);
+
+// Customer complete transaction history (orders + wallet)
+router.get("/customer/transactions", authMiddleware, getCustomerTransactionHistory);
+
+// Customer order detail with payment breakdown
+router.get("/customer/orders/:orderId", authMiddleware, getCustomerOrderDetail);
 
 export default router;

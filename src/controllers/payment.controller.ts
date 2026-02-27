@@ -746,4 +746,565 @@ export const rejectWithdrawal = async (req: AuthRequest, res: Response) => {
   }
 };
 
+// ============================================
+// 📊 PAYMENT HISTORY & TRANSACTION REPORTS
+// ============================================
+
+/**
+ * Get vendor payment history with commission breakdown
+ * Shows all transactions from buyers to this vendor
+ */
+export const getVendorPaymentHistory = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const { limit = 20, skip = 0, status, startDate, endDate } = req.query;
+
+    if (!userId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
+
+    // Find vendor by user ID
+    const vendor = await prisma.vendorApplication.findUnique({
+      where: { userId }
+    });
+    if (!vendor) return errorResponse(res, "Vendor not found", "VENDOR_NOT_FOUND", 404);
+
+    // Build where clause for filtering
+    const whereClause: any = {
+      sellerId: vendor.id
+    };
+
+    if (status) {
+      whereClause.status = status;
+    }
+
+    // Date filtering
+    if (startDate || endDate) {
+      whereClause.createdAt = {};
+      if (startDate) {
+        whereClause.createdAt.gte = new Date(startDate as string);
+      }
+      if (endDate) {
+        whereClause.createdAt.lte = new Date(endDate as string);
+      }
+    }
+
+    // Fetch transactions
+    const transactions = await prisma.transaction.findMany({
+      where: whereClause,
+      include: {
+        buyer: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true
+          }
+        },
+        order: {
+          include: {
+            listings: {
+              include: {
+                listing: {
+                  select: {
+                    id: true,
+                    title: true,
+                    price: true
+                  }
+                }
+              }
+            },
+            delivery: {
+              select: {
+                fareAmount: true,
+                status: true,
+                etaMinutes: true,
+                pickupAddress: true,
+                dropoffAddress: true,
+                startedAt: true,
+                completedAt: true
+              }
+            }
+          }
+        }
+      },
+      take: Number(limit),
+      skip: Number(skip),
+      orderBy: { createdAt: "desc" }
+    });
+
+    // Calculate totals and format data
+    const paymentHistory = transactions.map((tx) => {
+      const totalAmount = Number(tx.amountCents) / 100;
+      const commission = tx.commissionAmount ? Number(tx.commissionAmount) : 0;
+      const netAmount = tx.vendorAmount ? Number(tx.vendorAmount) : totalAmount - commission;
+      const shippingFee = tx.order?.delivery?.fareAmount ? Number(tx.order.delivery.fareAmount) : 0;
+
+      return {
+        transactionId: tx.id,
+        orderId: tx.orderId,
+        buyerInfo: tx.buyer,
+        totalAmount,
+        shippingFee,
+        subtotal: totalAmount - shippingFee,
+        commission,
+        commissionRate: tx.commissionRate ? Number(tx.commissionRate) : 0,
+        netAmount,
+        currency: tx.currency,
+        paymentMethod: tx.method,
+        status: tx.status,
+        escrowStatus: tx.escrowStatus,
+        items: tx.order?.listings?.map((item) => ({
+          id: item.listing?.id,
+          title: item.listing?.title,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          totalPrice: item.unitPrice * item.quantity
+        })) || [],
+        delivery: {
+          shippingFee: shippingFee,
+          status: tx.order?.delivery?.status,
+          etaMinutes: tx.order?.delivery?.etaMinutes,
+          pickupAddress: tx.order?.delivery?.pickupAddress,
+          dropoffAddress: tx.order?.delivery?.dropoffAddress,
+          startedAt: tx.order?.delivery?.startedAt,
+          completedAt: tx.order?.delivery?.completedAt
+        },
+        receiptUrl: tx.receiptUrl,
+        createdAt: tx.createdAt,
+        updatedAt: tx.updatedAt,
+        releaseDate: tx.releaseAt
+      };
+    });
+
+    // Calculate summary stats
+    const totalCount = await prisma.transaction.count({ where: whereClause });
+    const totalRevenue = transactions.reduce((sum, tx) => sum + Number(tx.vendorAmount || 0), 0);
+    const totalCommission = transactions.reduce((sum, tx) => sum + Number(tx.commissionAmount || 0), 0);
+    const totalShipping = transactions.reduce((sum, tx) => sum + (tx.order?.delivery?.fareAmount ? Number(tx.order.delivery.fareAmount) : 0), 0);
+
+    return successResponse(res, "Vendor payment history fetched", {
+      payments: paymentHistory,
+      summary: {
+        totalTransactions: totalCount,
+        totalRevenue,
+        totalCommission,
+        totalShipping,
+        averageTransactionValue: totalCount > 0 ? totalRevenue / totalCount : 0
+      },
+      pagination: {
+        limit: Number(limit),
+        skip: Number(skip),
+        total: totalCount,
+        hasMore: Number(skip) + Number(limit) < totalCount
+      }
+    });
+  } catch (err: any) {
+    console.error("getVendorPaymentHistory error:", err);
+    return errorResponse(res, err.message || "Failed to fetch payment history");
+  }
+};
+
+/**
+ * Get vendor payment details - single transaction breakdown
+ */
+export const getVendorPaymentDetail = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const { transactionId } = req.params;
+
+    if (!userId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
+
+    const vendor = await prisma.vendorApplication.findUnique({
+      where: { userId }
+    });
+    if (!vendor) return errorResponse(res, "Vendor not found", "VENDOR_NOT_FOUND", 404);
+
+    const transaction = await prisma.transaction.findUnique({
+      where: { id: transactionId },
+      include: {
+        buyer: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true
+          }
+        },
+        order: {
+          include: {
+            listings: {
+              include: {
+                listing: true
+              }
+            },
+            delivery: true
+          }
+        },
+        review: true
+      }
+    });
+
+    if (!transaction) {
+      return errorResponse(res, "Transaction not found", "TRANSACTION_NOT_FOUND", 404);
+    }
+
+    // Verify authorization
+    if (transaction.sellerId !== vendor.id) {
+      return errorResponse(res, "Not authorized to view this transaction", "NOT_AUTHORIZED", 403);
+    }
+
+    const totalAmount = Number(transaction.amountCents) / 100;
+    const commission = transaction.commissionAmount ? Number(transaction.commissionAmount) : 0;
+    const netAmount = transaction.vendorAmount ? Number(transaction.vendorAmount) : totalAmount - commission;
+    const shippingFee = transaction.order?.delivery?.fareAmount ? Number(transaction.order.delivery.fareAmount) : 0;
+
+    return successResponse(res, "Transaction details fetched", {
+      transactionId: transaction.id,
+      orderId: transaction.orderId,
+      buyerInfo: transaction.buyer,
+      paymentBreakdown: {
+        subtotal: totalAmount - shippingFee,
+        shippingFee,
+        grossAmount: totalAmount,
+        platformCommission: {
+          amount: commission,
+          percentage: transaction.commissionRate ? Number(transaction.commissionRate) : 0
+        },
+        netEarnings: netAmount
+      },
+      items: transaction.order?.listings?.map((item) => ({
+        id: item.listing?.id,
+        title: item.listing?.title,
+        description: item.listing?.description,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        totalPrice: item.unitPrice * item.quantity
+      })) || [],
+      delivery: {
+        status: transaction.order?.delivery?.status,
+        shippingFee: shippingFee,
+        etaMinutes: transaction.order?.delivery?.etaMinutes,
+        pickupAddress: transaction.order?.delivery?.pickupAddress,
+        dropoffAddress: transaction.order?.delivery?.dropoffAddress,
+        startedAt: transaction.order?.delivery?.startedAt,
+        completedAt: transaction.order?.delivery?.completedAt
+      },
+      paymentDetails: {
+        method: transaction.method,
+        status: transaction.status,
+        currency: transaction.currency,
+        receiptUrl: transaction.receiptUrl
+      },
+      escrowDetails: {
+        status: transaction.escrowStatus,
+        releaseDate: transaction.releaseAt
+      },
+      review: transaction.review && transaction.review.length > 0 ? transaction.review[0] : null,
+      createdAt: transaction.createdAt,
+      updatedAt: transaction.updatedAt
+    });
+  } catch (err: any) {
+    console.error("getVendorPaymentDetail error:", err);
+    return errorResponse(res, err.message || "Failed to fetch transaction details");
+  }
+};
+
+/**
+ * Get customer complete transaction history
+ * Shows all orders, wallet transactions, payments in one unified view
+ */
+export const getCustomerTransactionHistory = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const { limit = 20, skip = 0, type, status, startDate, endDate } = req.query;
+
+    if (!userId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
+
+    // Fetch orders
+    const ordersWhere: any = { userId };
+    if (status) ordersWhere.status = status;
+    if (startDate || endDate) {
+      ordersWhere.createdAt = {};
+      if (startDate) ordersWhere.createdAt.gte = new Date(startDate as string);
+      if (endDate) ordersWhere.createdAt.lte = new Date(endDate as string);
+    }
+
+    const orders = await prisma.order.findMany({
+      where: ordersWhere,
+      include: {
+        transaction: {
+          include: {
+            seller: {
+              select: {
+                id: true,
+                user: {
+                  select: {
+                    name: true,
+                    email: true
+                  }
+                }
+              }
+            }
+          }
+        },
+        listings: {
+          include: {
+            listing: true
+          }
+        },
+        delivery: true,
+        vendor: {
+          select: {
+            id: true,
+            user: {
+              select: {
+                name: true,
+                email: true,
+                phone: true
+              }
+            }
+          }
+        }
+      },
+      orderBy: { createdAt: "desc" }
+    });
+
+    // Fetch wallet transactions
+    let wallet = await prisma.customerWallet.findUnique({ where: { userId } });
+    if (!wallet) {
+      wallet = await prisma.customerWallet.create({
+        data: { userId, balance: 0 }
+      });
+    }
+
+    const walletTxWhere: any = { walletId: wallet.id };
+    if (startDate || endDate) {
+      walletTxWhere.createdAt = {};
+      if (startDate) walletTxWhere.createdAt.gte = new Date(startDate as string);
+      if (endDate) walletTxWhere.createdAt.lte = new Date(endDate as string);
+    }
+
+    const walletTransactions = await prisma.customerWalletTransaction.findMany({
+      where: walletTxWhere,
+      orderBy: { createdAt: "desc" }
+    });
+
+    // Combine and format all transactions
+    const allTransactions: any[] = [];
+
+    // Add orders as transactions
+    orders.forEach((order) => {
+      const totalAmount = Number(order.totalAmount);
+      const shippingFee = order.delivery?.fareAmount ? Number(order.delivery.fareAmount) : 0;
+      const commission = order.transaction?.commissionAmount ? Number(order.transaction.commissionAmount) : 0;
+
+      allTransactions.push({
+        id: order.id,
+        type: "ORDER",
+        direction: "DEBIT",
+        amount: totalAmount,
+        description: `Order #${order.id.slice(0, 8)}`,
+        vendor: order.vendor?.user ? {
+          name: order.vendor.user.name,
+          email: order.vendor.user.email,
+          phone: order.vendor.user.phone
+        } : null,
+        items: order.listings?.map((item) => ({
+          id: item.listing?.id,
+          title: item.listing?.title,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          totalPrice: item.unitPrice * item.quantity
+        })) || [],
+        breakdown: {
+          subtotal: totalAmount - shippingFee,
+          shippingFee,
+          commission,
+          total: totalAmount
+        },
+        status: order.status,
+        payment: {
+          method: order.transaction?.method,
+          status: order.transaction?.status,
+          escrowStatus: order.transaction?.escrowStatus
+        },
+        delivery: order.delivery ? {
+          status: order.delivery.status,
+          shippingFee: shippingFee,
+          etaMinutes: order.delivery.etaMinutes,
+          pickupAddress: order.delivery.pickupAddress,
+          dropoffAddress: order.delivery.dropoffAddress,
+          startedAt: order.delivery.startedAt,
+          completedAt: order.delivery.completedAt
+        } : null,
+        createdAt: order.createdAt
+      });
+    });
+
+    // Add wallet transactions
+    walletTransactions.forEach((wtx) => {
+      allTransactions.push({
+        id: wtx.id,
+        type: "WALLET",
+        direction: wtx.type,
+        amount: Number(wtx.amount),
+        description: wtx.type === "CREDIT" ? "Wallet Top-up" : "Wallet Debit",
+        reference: wtx.reference,
+        createdAt: wtx.createdAt
+      });
+    });
+
+    // Filter by type if requested
+    let filtered = allTransactions;
+    if (type) {
+      filtered = allTransactions.filter((tx) => tx.type === type);
+    }
+
+    // Sort by date descending
+    filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    // Apply pagination
+    const paginatedTransactions = filtered.slice(Number(skip), Number(skip) + Number(limit));
+
+    // Calculate summary
+    const totalDebits = filtered.filter((tx) => tx.direction === "DEBIT").reduce((sum, tx) => sum + tx.amount, 0);
+    const totalCredits = filtered.filter((tx) => tx.direction === "CREDIT").reduce((sum, tx) => sum + tx.amount, 0);
+
+    return successResponse(res, "Customer transaction history fetched", {
+      transactions: paginatedTransactions,
+      wallet: {
+        balance: Number(wallet.balance),
+        currency: wallet.currency,
+        totalTransactions: walletTransactions.length
+      },
+      summary: {
+        totalTransactions: filtered.length,
+        totalOrders: orders.length,
+        totalDebits,
+        totalCredits,
+        netBalance: totalCredits - totalDebits
+      },
+      pagination: {
+        limit: Number(limit),
+        skip: Number(skip),
+        total: filtered.length,
+        hasMore: Number(skip) + Number(limit) < filtered.length
+      }
+    });
+  } catch (err: any) {
+    console.error("getCustomerTransactionHistory error:", err);
+    return errorResponse(res, err.message || "Failed to fetch transaction history");
+  }
+};
+
+/**
+ * Get customer order detail with payment breakdown
+ */
+export const getCustomerOrderDetail = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const { orderId } = req.params;
+
+    if (!userId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
+
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        transaction: {
+          include: {
+            seller: {
+              select: {
+                id: true,
+                user: {
+                  select: {
+                    name: true,
+                    email: true,
+                    phone: true
+                  }
+                }
+              }
+            }
+          }
+        },
+        listings: {
+          include: {
+            listing: true
+          }
+        },
+        delivery: true,
+        vendor: {
+          select: {
+            id: true,
+            user: {
+              select: {
+                name: true,
+                email: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    if (!order) {
+      return errorResponse(res, "Order not found", "ORDER_NOT_FOUND", 404);
+    }
+
+    // Verify authorization
+    if (order.userId !== userId) {
+      return errorResponse(res, "Not authorized to view this order", "NOT_AUTHORIZED", 403);
+    }
+
+    const totalAmount = Number(order.totalAmount);
+    const shippingFee = order.delivery?.fareAmount ? Number(order.delivery.fareAmount) : 0;
+    const commission = order.transaction?.commissionAmount ? Number(order.transaction.commissionAmount) : 0;
+
+    return successResponse(res, "Order details fetched", {
+      orderId: order.id,
+      vendorInfo: order.vendor?.user ? {
+        name: order.vendor.user.name,
+        email: order.vendor.user.email
+      } : null,
+      items: order.listings?.map((item) => ({
+        id: item.listing?.id,
+        title: item.listing?.title,
+        description: item.listing?.description,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        totalPrice: item.unitPrice * item.quantity
+      })) || [],
+      pricing: {
+        subtotal: totalAmount - shippingFee,
+        shippingFee,
+        platformFee: commission,
+        total: totalAmount
+      },
+      payment: {
+        method: order.transaction?.method,
+        status: order.transaction?.status,
+        escrowStatus: order.transaction?.escrowStatus,
+        receiptUrl: order.transaction?.receiptUrl
+      },
+      delivery: order.delivery ? {
+        status: order.delivery.status,
+        shippingFee: shippingFee,
+        etaMinutes: order.delivery.etaMinutes,
+        pickupAddress: order.delivery.pickupAddress,
+        dropoffAddress: order.delivery.dropoffAddress,
+        startedAt: order.delivery.startedAt,
+        completedAt: order.delivery.completedAt
+      } : null,
+      orderStatus: order.status,
+      serviceStatus: order.serviceStatus,
+      isDigital: order.isDigital,
+      disputed: order.disputed,
+      createdAt: order.createdAt,
+      completedAt: order.completedAt,
+      confirmedAt: order.confirmedAt
+    });
+  } catch (err: any) {
+    console.error("getCustomerOrderDetail error:", err);
+    return errorResponse(res, err.message || "Failed to fetch order details");
+  }
+};
+
 // Stripe webhook endpoint can be added later if needed
