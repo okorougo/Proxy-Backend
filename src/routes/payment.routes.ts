@@ -4,6 +4,7 @@ import {
   uploadReceipt, 
   completeTransaction, 
   stripePayment,
+  createWalletStripeIntent,
   fundWalletPaystack,
   fundWalletStripe,
   getWalletBalance,
@@ -35,14 +36,19 @@ router.post("/receipt", authMiddleware, uploadReceipt);
 
 // Buyer or Seller marks transaction complete
 router.post("/complete", authMiddleware, completeTransaction);
+
+// general payment intent creation (currency specified by caller)
 router.post("/create-payment-intent", authMiddleware, stripePayment);
 
 // ========== WALLET ENDPOINTS ==========
 
+// helper: create a Stripe intent for wallet funding (accepts NGN amount)
+router.post("/wallet/stripe-intent", authMiddleware, createWalletStripeIntent);
+
 // Fund wallet via Paystack
 router.post("/wallet/fund-paystack", authMiddleware, fundWalletPaystack);
 
-// Fund wallet via Stripe
+// Fund wallet via Stripe (after payment intent succeeded)
 router.post("/wallet/fund-stripe", authMiddleware, fundWalletStripe);
 
 // Get wallet balance

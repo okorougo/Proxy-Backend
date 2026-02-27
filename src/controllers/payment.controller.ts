@@ -144,6 +144,55 @@ export const stripePayment =  async (req: Request, res: Response) => {
   }
 };
 
+
+// create payment intent for funding wallet
+export const createWalletStripeIntent = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const { amountNgn, receipt_email } = req.body;
+
+    if (!userId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
+    if (!amountNgn || typeof amountNgn !== "number" || amountNgn <= 0) {
+      return errorResponse(res, "Invalid amount", "INVALID_AMOUNT", 400);
+    }
+
+    // convert NGN to USD cents using the same rate logic used when crediting wallet
+    const usdToNgn = await getUsdToNgnRate();
+    const usdAmount = amountNgn / usdToNgn;
+    const usdCents = Math.round(usdAmount * 100);
+    if (usdCents <= 0) {
+      return errorResponse(res, "Amount too small after currency conversion", "INVALID_AMOUNT", 400);
+    }
+
+    // create a fresh Stripe customer
+    const customer = await stripe.customers.create();
+    const ephemeralKey = await stripe.ephemeralKeys.create(
+      { customer: customer.id },
+      { apiVersion: '2024-09-30.acacia' }
+    );
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: usdCents,
+      currency: 'usd',
+      receipt_email,
+      customer: customer.id,
+      automatic_payment_methods: { enabled: true },
+    });
+
+    return res.json({
+      clientSecret: paymentIntent.client_secret,
+      ephemeralKey: ephemeralKey.secret,
+      customer: customer.id,
+      usdCents,
+    });
+  } catch (err: any) {
+    console.error("createWalletStripeIntent error", err);
+    return res
+      .status(500)
+      .json({ error: err.message || "Internal server error" });
+  }
+};
+
 // --- Optional: Webhook endpoint to listen for async events (3DS, succeeded, failed) ---
 // To use webhooks securely, set STRIPE_WEBHOOK_SECRET and send raw body for verification
 // Example config: use raw body only on this route
@@ -228,13 +277,37 @@ export const fundWalletPaystack = async (req: AuthRequest, res: Response) => {
 /**
  * Fund customer wallet via Stripe
  */
+
+// helper used by fundWalletStripe
+async function getUsdToNgnRate(): Promise<number> {
+  // prefer explicit environment variable so you can lock a rate during testing/deployment
+  const configured = parseFloat(process.env.USD_TO_NGN_RATE || "");
+  if (configured && configured > 0) {
+    return configured;
+  }
+
+  // fall back to a simple public API if env var is missing or invalid
+  try {
+    const resp = await axios.get("https://api.exchangerate-api.com/v4/latest/USD");
+    const rate = resp.data?.rates?.NGN;
+    if (rate && typeof rate === "number" && rate > 0) {
+      return rate;
+    }
+  } catch (e) {
+    console.warn("failed to fetch live USD/NGN rate, using fallback", e);
+  }
+
+  // final fallback hard‑coded value
+  return 1100;
+}
+
 export const fundWalletStripe = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
-    const { amount, paymentIntentId } = req.body;
+    // frontend should include the NGN amount they intended to add (for logging)
+    const { amountNgn, paymentIntentId } = req.body;
 
     if (!userId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
-    if (!amount || amount <= 0) return errorResponse(res, "Invalid amount", "INVALID_AMOUNT", 400);
     if (!paymentIntentId) return errorResponse(res, "Payment Intent ID required", "MISSING_INTENT_ID", 400);
 
     // Verify payment with Stripe
@@ -244,33 +317,38 @@ export const fundWalletStripe = async (req: AuthRequest, res: Response) => {
       return errorResponse(res, "Payment was not successful", "PAYMENT_NOT_SUCCESS", 400);
     }
 
-    // Ensure amount matches (amount is in cents from Stripe)
-    const stripeAmount = paymentIntent.amount / 100;
-    if (Math.abs(stripeAmount - amount) > 0.01) {
-      return errorResponse(res, "Amount mismatch", "AMOUNT_MISMATCH", 400);
+    // convert Stripe USD cents to NGN naira using shared rate helper
+    const stripeAmountCents = paymentIntent.amount;
+    const amountUsd = stripeAmountCents / 100;
+    const usdToNgn = await getUsdToNgnRate();
+    const nairaAmount = Number((amountUsd * usdToNgn).toFixed(2));
+
+    // optional sanity check with provided amount
+    if (amountNgn && Math.abs(amountNgn - nairaAmount) > 0.5) {
+      return errorResponse(res, "NGN amount mismatch", "AMOUNT_MISMATCH", 400);
     }
 
-    // Ensure customer wallet exists
+    // Ensure customer wallet exists (always NGN currency)
     let wallet = await prisma.customerWallet.findUnique({ where: { userId } });
     if (!wallet) {
       wallet = await prisma.customerWallet.create({
-        data: { userId, balance: 0, currency: "USD" }
+        data: { userId, balance: 0 } // currency defaults to NGN
       });
     }
 
-    // Update wallet and create transaction
+    // Update wallet and create transaction with NGN value
     const updated = await prisma.$transaction(async (tx) => {
       // Credit wallet
       const updatedWallet = await tx.customerWallet.update({
         where: { userId },
-        data: { balance: { increment: amount } }
+        data: { balance: { increment: nairaAmount } }
       });
 
-      // Log transaction
+      // Log transaction in Naira
       await tx.customerWalletTransaction.create({
         data: {
           walletId: wallet!.id,
-          amount: amount,
+          amount: nairaAmount,
           type: "CREDIT",
           reference: paymentIntentId
         }
@@ -282,7 +360,7 @@ export const fundWalletStripe = async (req: AuthRequest, res: Response) => {
     return successResponse(res, "Wallet funded via Stripe successfully", {
       walletId: updated.id,
       balance: updated.balance,
-      amountAdded: amount,
+      amountAdded: nairaAmount,
       currency: updated.currency,
       paymentMethod: "stripe"
     });
