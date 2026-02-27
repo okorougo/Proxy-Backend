@@ -32,6 +32,8 @@ export type TransactionAvgAggregateOutputType = {
   commissionRate: runtime.Decimal | null
   commissionAmount: runtime.Decimal | null
   vendorAmount: runtime.Decimal | null
+  deliveryFee: runtime.Decimal | null
+  riderEarnings: runtime.Decimal | null
 }
 
 export type TransactionSumAggregateOutputType = {
@@ -40,6 +42,8 @@ export type TransactionSumAggregateOutputType = {
   commissionRate: runtime.Decimal | null
   commissionAmount: runtime.Decimal | null
   vendorAmount: runtime.Decimal | null
+  deliveryFee: runtime.Decimal | null
+  riderEarnings: runtime.Decimal | null
 }
 
 export type TransactionMinAggregateOutputType = {
@@ -62,6 +66,8 @@ export type TransactionMinAggregateOutputType = {
   releaseAt: Date | null
   commissionAmount: runtime.Decimal | null
   vendorAmount: runtime.Decimal | null
+  deliveryFee: runtime.Decimal | null
+  riderEarnings: runtime.Decimal | null
 }
 
 export type TransactionMaxAggregateOutputType = {
@@ -84,6 +90,8 @@ export type TransactionMaxAggregateOutputType = {
   releaseAt: Date | null
   commissionAmount: runtime.Decimal | null
   vendorAmount: runtime.Decimal | null
+  deliveryFee: runtime.Decimal | null
+  riderEarnings: runtime.Decimal | null
 }
 
 export type TransactionCountAggregateOutputType = {
@@ -106,6 +114,8 @@ export type TransactionCountAggregateOutputType = {
   releaseAt: number
   commissionAmount: number
   vendorAmount: number
+  deliveryFee: number
+  riderEarnings: number
   _all: number
 }
 
@@ -116,6 +126,8 @@ export type TransactionAvgAggregateInputType = {
   commissionRate?: true
   commissionAmount?: true
   vendorAmount?: true
+  deliveryFee?: true
+  riderEarnings?: true
 }
 
 export type TransactionSumAggregateInputType = {
@@ -124,6 +136,8 @@ export type TransactionSumAggregateInputType = {
   commissionRate?: true
   commissionAmount?: true
   vendorAmount?: true
+  deliveryFee?: true
+  riderEarnings?: true
 }
 
 export type TransactionMinAggregateInputType = {
@@ -146,6 +160,8 @@ export type TransactionMinAggregateInputType = {
   releaseAt?: true
   commissionAmount?: true
   vendorAmount?: true
+  deliveryFee?: true
+  riderEarnings?: true
 }
 
 export type TransactionMaxAggregateInputType = {
@@ -168,6 +184,8 @@ export type TransactionMaxAggregateInputType = {
   releaseAt?: true
   commissionAmount?: true
   vendorAmount?: true
+  deliveryFee?: true
+  riderEarnings?: true
 }
 
 export type TransactionCountAggregateInputType = {
@@ -190,6 +208,8 @@ export type TransactionCountAggregateInputType = {
   releaseAt?: true
   commissionAmount?: true
   vendorAmount?: true
+  deliveryFee?: true
+  riderEarnings?: true
   _all?: true
 }
 
@@ -299,6 +319,8 @@ export type TransactionGroupByOutputType = {
   releaseAt: Date | null
   commissionAmount: runtime.Decimal | null
   vendorAmount: runtime.Decimal | null
+  deliveryFee: runtime.Decimal | null
+  riderEarnings: runtime.Decimal | null
   _count: TransactionCountAggregateOutputType | null
   _avg: TransactionAvgAggregateOutputType | null
   _sum: TransactionSumAggregateOutputType | null
@@ -344,6 +366,8 @@ export type TransactionWhereInput = {
   releaseAt?: Prisma.DateTimeNullableFilter<"Transaction"> | Date | string | null
   commissionAmount?: Prisma.DecimalNullableFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.DecimalNullableFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.DecimalNullableFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.DecimalNullableFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.XOR<Prisma.ListingNullableScalarRelationFilter, Prisma.ListingWhereInput> | null
   buyer?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   seller?: Prisma.XOR<Prisma.VendorApplicationScalarRelationFilter, Prisma.VendorApplicationWhereInput>
@@ -373,6 +397,8 @@ export type TransactionOrderByWithRelationInput = {
   releaseAt?: Prisma.SortOrderInput | Prisma.SortOrder
   commissionAmount?: Prisma.SortOrderInput | Prisma.SortOrder
   vendorAmount?: Prisma.SortOrderInput | Prisma.SortOrder
+  deliveryFee?: Prisma.SortOrderInput | Prisma.SortOrder
+  riderEarnings?: Prisma.SortOrderInput | Prisma.SortOrder
   listing?: Prisma.ListingOrderByWithRelationInput
   buyer?: Prisma.UserOrderByWithRelationInput
   seller?: Prisma.VendorApplicationOrderByWithRelationInput
@@ -405,6 +431,8 @@ export type TransactionWhereUniqueInput = Prisma.AtLeast<{
   releaseAt?: Prisma.DateTimeNullableFilter<"Transaction"> | Date | string | null
   commissionAmount?: Prisma.DecimalNullableFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.DecimalNullableFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.DecimalNullableFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.DecimalNullableFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.XOR<Prisma.ListingNullableScalarRelationFilter, Prisma.ListingWhereInput> | null
   buyer?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   seller?: Prisma.XOR<Prisma.VendorApplicationScalarRelationFilter, Prisma.VendorApplicationWhereInput>
@@ -434,6 +462,8 @@ export type TransactionOrderByWithAggregationInput = {
   releaseAt?: Prisma.SortOrderInput | Prisma.SortOrder
   commissionAmount?: Prisma.SortOrderInput | Prisma.SortOrder
   vendorAmount?: Prisma.SortOrderInput | Prisma.SortOrder
+  deliveryFee?: Prisma.SortOrderInput | Prisma.SortOrder
+  riderEarnings?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.TransactionCountOrderByAggregateInput
   _avg?: Prisma.TransactionAvgOrderByAggregateInput
   _max?: Prisma.TransactionMaxOrderByAggregateInput
@@ -464,6 +494,8 @@ export type TransactionScalarWhereWithAggregatesInput = {
   releaseAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Transaction"> | Date | string | null
   commissionAmount?: Prisma.DecimalNullableWithAggregatesFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.DecimalNullableWithAggregatesFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.DecimalNullableWithAggregatesFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.DecimalNullableWithAggregatesFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type TransactionCreateInput = {
@@ -482,6 +514,8 @@ export type TransactionCreateInput = {
   releaseAt?: Date | string | null
   commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingCreateNestedOneWithoutTransactionsInput
   buyer: Prisma.UserCreateNestedOneWithoutBuyerTransactionsInput
   seller: Prisma.VendorApplicationCreateNestedOneWithoutSellerTransactionsInput
@@ -511,6 +545,8 @@ export type TransactionUncheckedCreateInput = {
   releaseAt?: Date | string | null
   commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutTransactionInput
   Delivery?: Prisma.DeliveryUncheckedCreateNestedManyWithoutTransactionInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutTransactionInput
@@ -532,6 +568,8 @@ export type TransactionUpdateInput = {
   releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingUpdateOneWithoutTransactionsNestedInput
   buyer?: Prisma.UserUpdateOneRequiredWithoutBuyerTransactionsNestedInput
   seller?: Prisma.VendorApplicationUpdateOneRequiredWithoutSellerTransactionsNestedInput
@@ -561,6 +599,8 @@ export type TransactionUncheckedUpdateInput = {
   releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedUpdateManyWithoutTransactionNestedInput
   Delivery?: Prisma.DeliveryUncheckedUpdateManyWithoutTransactionNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutTransactionNestedInput
@@ -586,6 +626,8 @@ export type TransactionCreateManyInput = {
   releaseAt?: Date | string | null
   commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type TransactionUpdateManyMutationInput = {
@@ -604,6 +646,8 @@ export type TransactionUpdateManyMutationInput = {
   releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type TransactionUncheckedUpdateManyInput = {
@@ -626,6 +670,8 @@ export type TransactionUncheckedUpdateManyInput = {
   releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type TransactionListRelationFilter = {
@@ -663,6 +709,8 @@ export type TransactionCountOrderByAggregateInput = {
   releaseAt?: Prisma.SortOrder
   commissionAmount?: Prisma.SortOrder
   vendorAmount?: Prisma.SortOrder
+  deliveryFee?: Prisma.SortOrder
+  riderEarnings?: Prisma.SortOrder
 }
 
 export type TransactionAvgOrderByAggregateInput = {
@@ -671,6 +719,8 @@ export type TransactionAvgOrderByAggregateInput = {
   commissionRate?: Prisma.SortOrder
   commissionAmount?: Prisma.SortOrder
   vendorAmount?: Prisma.SortOrder
+  deliveryFee?: Prisma.SortOrder
+  riderEarnings?: Prisma.SortOrder
 }
 
 export type TransactionMaxOrderByAggregateInput = {
@@ -693,6 +743,8 @@ export type TransactionMaxOrderByAggregateInput = {
   releaseAt?: Prisma.SortOrder
   commissionAmount?: Prisma.SortOrder
   vendorAmount?: Prisma.SortOrder
+  deliveryFee?: Prisma.SortOrder
+  riderEarnings?: Prisma.SortOrder
 }
 
 export type TransactionMinOrderByAggregateInput = {
@@ -715,6 +767,8 @@ export type TransactionMinOrderByAggregateInput = {
   releaseAt?: Prisma.SortOrder
   commissionAmount?: Prisma.SortOrder
   vendorAmount?: Prisma.SortOrder
+  deliveryFee?: Prisma.SortOrder
+  riderEarnings?: Prisma.SortOrder
 }
 
 export type TransactionSumOrderByAggregateInput = {
@@ -723,6 +777,8 @@ export type TransactionSumOrderByAggregateInput = {
   commissionRate?: Prisma.SortOrder
   commissionAmount?: Prisma.SortOrder
   vendorAmount?: Prisma.SortOrder
+  deliveryFee?: Prisma.SortOrder
+  riderEarnings?: Prisma.SortOrder
 }
 
 export type TransactionScalarRelationFilter = {
@@ -976,6 +1032,8 @@ export type TransactionCreateWithoutBuyerInput = {
   releaseAt?: Date | string | null
   commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingCreateNestedOneWithoutTransactionsInput
   seller: Prisma.VendorApplicationCreateNestedOneWithoutSellerTransactionsInput
   review?: Prisma.ReviewCreateNestedManyWithoutTransactionInput
@@ -1003,6 +1061,8 @@ export type TransactionUncheckedCreateWithoutBuyerInput = {
   releaseAt?: Date | string | null
   commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutTransactionInput
   Delivery?: Prisma.DeliveryUncheckedCreateNestedManyWithoutTransactionInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutTransactionInput
@@ -1057,6 +1117,8 @@ export type TransactionScalarWhereInput = {
   releaseAt?: Prisma.DateTimeNullableFilter<"Transaction"> | Date | string | null
   commissionAmount?: Prisma.DecimalNullableFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.DecimalNullableFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.DecimalNullableFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.DecimalNullableFilter<"Transaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type TransactionCreateWithoutSellerInput = {
@@ -1075,6 +1137,8 @@ export type TransactionCreateWithoutSellerInput = {
   releaseAt?: Date | string | null
   commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingCreateNestedOneWithoutTransactionsInput
   buyer: Prisma.UserCreateNestedOneWithoutBuyerTransactionsInput
   review?: Prisma.ReviewCreateNestedManyWithoutTransactionInput
@@ -1102,6 +1166,8 @@ export type TransactionUncheckedCreateWithoutSellerInput = {
   releaseAt?: Date | string | null
   commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutTransactionInput
   Delivery?: Prisma.DeliveryUncheckedCreateNestedManyWithoutTransactionInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutTransactionInput
@@ -1149,6 +1215,8 @@ export type TransactionCreateWithoutListingInput = {
   releaseAt?: Date | string | null
   commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyer: Prisma.UserCreateNestedOneWithoutBuyerTransactionsInput
   seller: Prisma.VendorApplicationCreateNestedOneWithoutSellerTransactionsInput
   review?: Prisma.ReviewCreateNestedManyWithoutTransactionInput
@@ -1176,6 +1244,8 @@ export type TransactionUncheckedCreateWithoutListingInput = {
   releaseAt?: Date | string | null
   commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutTransactionInput
   Delivery?: Prisma.DeliveryUncheckedCreateNestedManyWithoutTransactionInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutTransactionInput
@@ -1223,6 +1293,8 @@ export type TransactionCreateWithoutOrderInput = {
   releaseAt?: Date | string | null
   commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingCreateNestedOneWithoutTransactionsInput
   buyer: Prisma.UserCreateNestedOneWithoutBuyerTransactionsInput
   seller: Prisma.VendorApplicationCreateNestedOneWithoutSellerTransactionsInput
@@ -1250,6 +1322,8 @@ export type TransactionUncheckedCreateWithoutOrderInput = {
   releaseAt?: Date | string | null
   commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutTransactionInput
   Delivery?: Prisma.DeliveryUncheckedCreateNestedManyWithoutTransactionInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutTransactionInput
@@ -1287,6 +1361,8 @@ export type TransactionUpdateWithoutOrderInput = {
   releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingUpdateOneWithoutTransactionsNestedInput
   buyer?: Prisma.UserUpdateOneRequiredWithoutBuyerTransactionsNestedInput
   seller?: Prisma.VendorApplicationUpdateOneRequiredWithoutSellerTransactionsNestedInput
@@ -1314,6 +1390,8 @@ export type TransactionUncheckedUpdateWithoutOrderInput = {
   releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedUpdateManyWithoutTransactionNestedInput
   Delivery?: Prisma.DeliveryUncheckedUpdateManyWithoutTransactionNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutTransactionNestedInput
@@ -1335,6 +1413,8 @@ export type TransactionCreateWithoutOrderItemsInput = {
   releaseAt?: Date | string | null
   commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingCreateNestedOneWithoutTransactionsInput
   buyer: Prisma.UserCreateNestedOneWithoutBuyerTransactionsInput
   seller: Prisma.VendorApplicationCreateNestedOneWithoutSellerTransactionsInput
@@ -1363,6 +1443,8 @@ export type TransactionUncheckedCreateWithoutOrderItemsInput = {
   releaseAt?: Date | string | null
   commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutTransactionInput
   Delivery?: Prisma.DeliveryUncheckedCreateNestedManyWithoutTransactionInput
 }
@@ -1399,6 +1481,8 @@ export type TransactionUpdateWithoutOrderItemsInput = {
   releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingUpdateOneWithoutTransactionsNestedInput
   buyer?: Prisma.UserUpdateOneRequiredWithoutBuyerTransactionsNestedInput
   seller?: Prisma.VendorApplicationUpdateOneRequiredWithoutSellerTransactionsNestedInput
@@ -1427,6 +1511,8 @@ export type TransactionUncheckedUpdateWithoutOrderItemsInput = {
   releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedUpdateManyWithoutTransactionNestedInput
   Delivery?: Prisma.DeliveryUncheckedUpdateManyWithoutTransactionNestedInput
 }
@@ -1447,6 +1533,8 @@ export type TransactionCreateWithoutReviewInput = {
   releaseAt?: Date | string | null
   commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingCreateNestedOneWithoutTransactionsInput
   buyer: Prisma.UserCreateNestedOneWithoutBuyerTransactionsInput
   seller: Prisma.VendorApplicationCreateNestedOneWithoutSellerTransactionsInput
@@ -1475,6 +1563,8 @@ export type TransactionUncheckedCreateWithoutReviewInput = {
   releaseAt?: Date | string | null
   commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   Delivery?: Prisma.DeliveryUncheckedCreateNestedManyWithoutTransactionInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutTransactionInput
 }
@@ -1511,6 +1601,8 @@ export type TransactionUpdateWithoutReviewInput = {
   releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingUpdateOneWithoutTransactionsNestedInput
   buyer?: Prisma.UserUpdateOneRequiredWithoutBuyerTransactionsNestedInput
   seller?: Prisma.VendorApplicationUpdateOneRequiredWithoutSellerTransactionsNestedInput
@@ -1539,6 +1631,8 @@ export type TransactionUncheckedUpdateWithoutReviewInput = {
   releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   Delivery?: Prisma.DeliveryUncheckedUpdateManyWithoutTransactionNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutTransactionNestedInput
 }
@@ -1559,6 +1653,8 @@ export type TransactionCreateWithoutDeliveryInput = {
   releaseAt?: Date | string | null
   commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingCreateNestedOneWithoutTransactionsInput
   buyer: Prisma.UserCreateNestedOneWithoutBuyerTransactionsInput
   seller: Prisma.VendorApplicationCreateNestedOneWithoutSellerTransactionsInput
@@ -1587,6 +1683,8 @@ export type TransactionUncheckedCreateWithoutDeliveryInput = {
   releaseAt?: Date | string | null
   commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutTransactionInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutTransactionInput
 }
@@ -1623,6 +1721,8 @@ export type TransactionUpdateWithoutDeliveryInput = {
   releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingUpdateOneWithoutTransactionsNestedInput
   buyer?: Prisma.UserUpdateOneRequiredWithoutBuyerTransactionsNestedInput
   seller?: Prisma.VendorApplicationUpdateOneRequiredWithoutSellerTransactionsNestedInput
@@ -1651,6 +1751,8 @@ export type TransactionUncheckedUpdateWithoutDeliveryInput = {
   releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedUpdateManyWithoutTransactionNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutTransactionNestedInput
 }
@@ -1674,6 +1776,8 @@ export type TransactionCreateManyBuyerInput = {
   releaseAt?: Date | string | null
   commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type TransactionUpdateWithoutBuyerInput = {
@@ -1692,6 +1796,8 @@ export type TransactionUpdateWithoutBuyerInput = {
   releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingUpdateOneWithoutTransactionsNestedInput
   seller?: Prisma.VendorApplicationUpdateOneRequiredWithoutSellerTransactionsNestedInput
   review?: Prisma.ReviewUpdateManyWithoutTransactionNestedInput
@@ -1719,6 +1825,8 @@ export type TransactionUncheckedUpdateWithoutBuyerInput = {
   releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedUpdateManyWithoutTransactionNestedInput
   Delivery?: Prisma.DeliveryUncheckedUpdateManyWithoutTransactionNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutTransactionNestedInput
@@ -1743,6 +1851,8 @@ export type TransactionUncheckedUpdateManyWithoutBuyerInput = {
   releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type TransactionCreateManySellerInput = {
@@ -1764,6 +1874,8 @@ export type TransactionCreateManySellerInput = {
   releaseAt?: Date | string | null
   commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type TransactionUpdateWithoutSellerInput = {
@@ -1782,6 +1894,8 @@ export type TransactionUpdateWithoutSellerInput = {
   releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   listing?: Prisma.ListingUpdateOneWithoutTransactionsNestedInput
   buyer?: Prisma.UserUpdateOneRequiredWithoutBuyerTransactionsNestedInput
   review?: Prisma.ReviewUpdateManyWithoutTransactionNestedInput
@@ -1809,6 +1923,8 @@ export type TransactionUncheckedUpdateWithoutSellerInput = {
   releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedUpdateManyWithoutTransactionNestedInput
   Delivery?: Prisma.DeliveryUncheckedUpdateManyWithoutTransactionNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutTransactionNestedInput
@@ -1833,6 +1949,8 @@ export type TransactionUncheckedUpdateManyWithoutSellerInput = {
   releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type TransactionCreateManyListingInput = {
@@ -1854,6 +1972,8 @@ export type TransactionCreateManyListingInput = {
   releaseAt?: Date | string | null
   commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type TransactionUpdateWithoutListingInput = {
@@ -1872,6 +1992,8 @@ export type TransactionUpdateWithoutListingInput = {
   releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyer?: Prisma.UserUpdateOneRequiredWithoutBuyerTransactionsNestedInput
   seller?: Prisma.VendorApplicationUpdateOneRequiredWithoutSellerTransactionsNestedInput
   review?: Prisma.ReviewUpdateManyWithoutTransactionNestedInput
@@ -1899,6 +2021,8 @@ export type TransactionUncheckedUpdateWithoutListingInput = {
   releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   review?: Prisma.ReviewUncheckedUpdateManyWithoutTransactionNestedInput
   Delivery?: Prisma.DeliveryUncheckedUpdateManyWithoutTransactionNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutTransactionNestedInput
@@ -1923,6 +2047,8 @@ export type TransactionUncheckedUpdateManyWithoutListingInput = {
   releaseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   commissionAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   vendorAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  riderEarnings?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 
@@ -1994,6 +2120,8 @@ export type TransactionSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   releaseAt?: boolean
   commissionAmount?: boolean
   vendorAmount?: boolean
+  deliveryFee?: boolean
+  riderEarnings?: boolean
   listing?: boolean | Prisma.Transaction$listingArgs<ExtArgs>
   buyer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   seller?: boolean | Prisma.VendorApplicationDefaultArgs<ExtArgs>
@@ -2024,6 +2152,8 @@ export type TransactionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   releaseAt?: boolean
   commissionAmount?: boolean
   vendorAmount?: boolean
+  deliveryFee?: boolean
+  riderEarnings?: boolean
   listing?: boolean | Prisma.Transaction$listingArgs<ExtArgs>
   buyer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   seller?: boolean | Prisma.VendorApplicationDefaultArgs<ExtArgs>
@@ -2050,6 +2180,8 @@ export type TransactionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   releaseAt?: boolean
   commissionAmount?: boolean
   vendorAmount?: boolean
+  deliveryFee?: boolean
+  riderEarnings?: boolean
   listing?: boolean | Prisma.Transaction$listingArgs<ExtArgs>
   buyer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   seller?: boolean | Prisma.VendorApplicationDefaultArgs<ExtArgs>
@@ -2076,9 +2208,11 @@ export type TransactionSelectScalar = {
   releaseAt?: boolean
   commissionAmount?: boolean
   vendorAmount?: boolean
+  deliveryFee?: boolean
+  riderEarnings?: boolean
 }
 
-export type TransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "listingId" | "orderId" | "buyerId" | "sellerId" | "amountCents" | "currency" | "method" | "status" | "receiptUrl" | "createdAt" | "updatedAt" | "amountPaid" | "paystackRef" | "escrowStatus" | "commissionRate" | "releaseAt" | "commissionAmount" | "vendorAmount", ExtArgs["result"]["transaction"]>
+export type TransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "listingId" | "orderId" | "buyerId" | "sellerId" | "amountCents" | "currency" | "method" | "status" | "receiptUrl" | "createdAt" | "updatedAt" | "amountPaid" | "paystackRef" | "escrowStatus" | "commissionRate" | "releaseAt" | "commissionAmount" | "vendorAmount" | "deliveryFee" | "riderEarnings", ExtArgs["result"]["transaction"]>
 export type TransactionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   listing?: boolean | Prisma.Transaction$listingArgs<ExtArgs>
   buyer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -2133,6 +2267,8 @@ export type $TransactionPayload<ExtArgs extends runtime.Types.Extensions.Interna
     releaseAt: Date | null
     commissionAmount: runtime.Decimal | null
     vendorAmount: runtime.Decimal | null
+    deliveryFee: runtime.Decimal | null
+    riderEarnings: runtime.Decimal | null
   }, ExtArgs["result"]["transaction"]>
   composites: {}
 }
@@ -2582,6 +2718,8 @@ export interface TransactionFieldRefs {
   readonly releaseAt: Prisma.FieldRef<"Transaction", 'DateTime'>
   readonly commissionAmount: Prisma.FieldRef<"Transaction", 'Decimal'>
   readonly vendorAmount: Prisma.FieldRef<"Transaction", 'Decimal'>
+  readonly deliveryFee: Prisma.FieldRef<"Transaction", 'Decimal'>
+  readonly riderEarnings: Prisma.FieldRef<"Transaction", 'Decimal'>
 }
     
 

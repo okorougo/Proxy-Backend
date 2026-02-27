@@ -661,9 +661,10 @@ export const createMultiVendorOrder = async (req: AuthRequest, res: Response) =>
         });
 
         // 5️⃣ Calculate commission & vendor amount
+        // ⚠️ IMPORTANT: Commission is ONLY on items, NOT on delivery fee
         const commissionRate = 10; // 10% platform commission (can fetch from config)
-        const commissionAmount = totalAmount * (commissionRate / 100);
-        const vendorAmount = totalAmount - commissionAmount;
+        const commissionAmount = itemsTotal * (commissionRate / 100);
+        const vendorAmount = itemsTotal - commissionAmount; // vendor only gets from items (not delivery fee)
 
         // 6️⃣ Create order + order items
         const order = await tx.order.create({
@@ -683,6 +684,11 @@ export const createMultiVendorOrder = async (req: AuthRequest, res: Response) =>
         });
 
         // 7️⃣ Create transaction with escrow
+        // Set releaseAt to 7 days from now (default escrow hold period)
+        // If delivery completes sooner, releaseAt will be set to now for immediate release
+        const releaseAtDate = new Date();
+        releaseAtDate.setDate(releaseAtDate.getDate() + 7);
+
         const transaction = await tx.transaction.create({
           data: {
             orderId: order.id,
@@ -693,17 +699,27 @@ export const createMultiVendorOrder = async (req: AuthRequest, res: Response) =>
             method: paymentType,
             status: "COMPLETED",
             escrowStatus: "HELD",
+            releaseAt: releaseAtDate,  // 7 days from now (can be updated to now() when delivery completes)
             commissionRate,
             commissionAmount,
             vendorAmount,
+            deliveryFee: deliveryFee > 0 ? deliveryFee : null, // store delivery fee separately
+            riderEarnings: null, // will be filled when delivery is assigned to rider or marked as self-delivery
           }
         });
 
         // 8️⃣ Create delivery if physical
         let delivery = null;
         if (deliveryData) {
+          // Mark if vendor will self-deliver or if rider will pick it up
           delivery = await tx.delivery.create({
-            data: { ...deliveryData, orderId: order.id, transactionId: transaction.id }
+            data: {
+              ...deliveryData,
+              orderId: order.id,
+              transactionId: transaction.id,
+              isSelfDelivery: false, // initially false; will become true if vendor picks it up
+              riderId: null, // will be assigned when rider accepts
+            }
           });
         }
 
@@ -1381,21 +1397,20 @@ export const getVendorBanksDetails = async (req:AuthRequest, res:Response) => {
 };
 export const completeSelfDelivery = async (req: AuthRequest, res: Response) => {
   const { deliveryId, otp } = req.body;
-  const vendorId = req.user?.id;
+  const vendorUserId = req.user?.id;
 
-    const vendor = await prisma.vendorApplication.findUnique({
-    where: { userId: vendorId },
+  const vendor = await prisma.vendorApplication.findUnique({
+    where: { userId: vendorUserId },
   });
-    if (!vendor)      return errorResponse(res, "Vendor not found", "NO_VENDOR", 404);
+  if (!vendor) return errorResponse(res, "Vendor not found", "NO_VENDOR", 404);
 
   const delivery = await prisma.delivery.findUnique({
     where: { id: deliveryId },
-    include: { order: { include: { transaction: true, vendor: { include: { wallet: true } }, user: true } } },
+    include: { order: { include: { transaction: true, user: true } } },
   });
 
   if (!delivery || !delivery.order)
-     return errorResponse(res, "Invalid delivery");
-
+    return errorResponse(res, "Invalid delivery");
 
   if (delivery.order.vendorId !== vendor.id)
     return errorResponse(res, "Unauthorized");
@@ -1406,10 +1421,19 @@ export const completeSelfDelivery = async (req: AuthRequest, res: Response) => {
     if (otp !== delivery.OTP) return errorResponse(res, "Invalid OTP provided");
   }
 
+  // Update delivery and mark escrow as ready for immediate release
+  // ✅ Do NOT directly credit wallets here
+  // ✅ Set releaseAt to NOW so escrow processor releases immediately
+  // ✅ Set isSelfDelivery so processor gives vendor the full delivery fee
   await prisma.$transaction([
     prisma.delivery.update({
       where: { id: deliveryId },
-      data: { status: "DELIVERED", completedAt: new Date(), OTP: null },
+      data: {
+        status: "DELIVERED",
+        completedAt: new Date(),
+        OTP: null,
+        isSelfDelivery: true, // mark that vendor delivered it themselves
+      },
     }),
     prisma.order.update({
       where: { id: delivery.order.id },
@@ -1417,21 +1441,10 @@ export const completeSelfDelivery = async (req: AuthRequest, res: Response) => {
     }),
     prisma.transaction.update({
       where: { id: delivery.order.transaction.id },
-      data: { escrowStatus: "RELEASED", releaseAt: new Date() },
-    }),
-    prisma.vendorWallet.update({
-      where: { vendorId: vendor.id },
       data: {
-        balance: { increment: Number(delivery.order.transaction.vendorAmount) },
-        totalEarned: { increment: Number(delivery.order.transaction.vendorAmount) },
-        walletTransaction: {
-          create: {
-            vendorId: vendor.id,
-            amount: Number(delivery.order.transaction.vendorAmount),
-            type: "CREDIT",
-            remark: `Service completed for Order ${delivery.order.id}`,
-          },
-        },
+        // Keep escrowStatus as "HELD" but set releaseAt to now for immediate processing
+        releaseAt: new Date(),
+        // releaseEscrowFunds will see isSelfDelivery=true and give vendor the full delivery fee
       },
     }),
   ]);
@@ -1468,7 +1481,7 @@ export const completeSelfDelivery = async (req: AuthRequest, res: Response) => {
     console.error("completeSelfDelivery notify error:", err);
   }
 
-  return successResponse(res, "Self-delivery completed and funds released");
+  return successResponse(res, "Self-delivery completed — funds will be released from escrow");
 };
 
 export const vendorStartDelivery = async (req: AuthRequest, res: Response) => {

@@ -454,7 +454,11 @@ export const releaseEscrowFunds = async (req: AuthRequest, res: Response) => {
         releaseAt: { lte: now }
       },
       include: {
-        order: true,
+        order: {
+          include: {
+            delivery: true
+          }
+        },
         seller: true
       }
     });
@@ -469,14 +473,35 @@ export const releaseEscrowFunds = async (req: AuthRequest, res: Response) => {
       for (const transaction of transactionsToRelease) {
         const vendorAmount = Number(transaction.vendorAmount || 0);
         const commissionAmount = Number(transaction.commissionAmount || 0);
+        const deliveryFee = Number(transaction.deliveryFee || 0);
+        const delivery = transaction.order?.delivery;
 
-        // Update transaction status
+        // Determine how to split delivery fee
+        let riderEarnings = 0;
+        let vendorSelfDeliveryBonus = 0;
+
+        if (deliveryFee > 0) {
+          if (delivery?.riderId) {
+            // Rider picked it up → rider gets 90%, platform gets 10%
+            riderEarnings = deliveryFee * 0.9;
+          } else if (delivery?.isSelfDelivery) {
+            // Vendor self-delivered → vendor gets full fee
+            vendorSelfDeliveryBonus = deliveryFee;
+          }
+        }
+
+        const totalVendorRelease = vendorAmount + vendorSelfDeliveryBonus;
+
+        // Update transaction
         await tx.transaction.update({
           where: { id: transaction.id },
-          data: { escrowStatus: "RELEASED" }
+          data: {
+            escrowStatus: "RELEASED",
+            riderEarnings: riderEarnings > 0 ? riderEarnings : null
+          }
         });
 
-        // Find or create escrow and revenue wallets
+        // Find wallets
         const escrowWallet = await tx.platformWallet.findFirst({
           where: { type: "ESCROW" }
         });
@@ -488,7 +513,7 @@ export const releaseEscrowFunds = async (req: AuthRequest, res: Response) => {
           throw new Error("Platform wallets not found");
         }
 
-        // Move from ESCROW to REVENUE and Vendor
+        // Debit escrow
         await tx.platformWallet.update({
           where: { id: escrowWallet.id },
           data: {
@@ -496,30 +521,64 @@ export const releaseEscrowFunds = async (req: AuthRequest, res: Response) => {
           }
         });
 
-        // Credit platform revenue
+        // Credit platform (commission + 10% delivery fee if rider)
+        const platformDeliveryFee = deliveryFee > 0 && delivery?.riderId ? deliveryFee * 0.1 : 0;
         await tx.platformWallet.update({
           where: { id: revenueWallet.id },
           data: {
-            balance: { increment: commissionAmount }
+            balance: { increment: commissionAmount + platformDeliveryFee }
           }
         });
 
-        // Credit vendor wallet
+        // Credit vendor
         await tx.vendorWallet.update({
           where: { vendorId: transaction.sellerId },
           data: {
-            balance: { increment: vendorAmount },
-            totalEarned: { increment: vendorAmount },
+            balance: { increment: totalVendorRelease },
+            totalEarned: { increment: totalVendorRelease },
             walletTransaction: {
               create: {
-                amount: vendorAmount,
+                amount: totalVendorRelease,
                 type: "CREDIT",
-                remark: `Escrow released for order ${transaction.orderId.slice(0, 6)}`,
+                remark: `Escrow released for order ${transaction.orderId.slice(0, 6)}${vendorSelfDeliveryBonus > 0 ? ' (self-delivery)' : ''}`,
                 vendorId: transaction.sellerId
               }
             }
           }
         });
+
+        // Credit rider if applicable
+        if (riderEarnings > 0 && delivery?.riderId) {
+          const rider = await tx.rider.findUnique({
+            where: { id: delivery.riderId },
+            include: { wallet: true }
+          });
+
+          if (rider) {
+            let riderWallet = rider.wallet;
+            if (!riderWallet) {
+              riderWallet = await tx.riderWallet.create({
+                data: { riderId: rider.id, balance: 0, totalEarned: 0 }
+              });
+            }
+
+            await tx.riderWallet.update({
+              where: { id: riderWallet.id },
+              data: {
+                balance: { increment: riderEarnings },
+                totalEarned: { increment: riderEarnings },
+                walletTransactions: {
+                  create: {
+                    amount: riderEarnings,
+                    type: "CREDIT",
+                    reference: delivery.id,
+                    remark: `Delivery for order ${transaction.orderId.slice(0, 6)}`
+                  }
+                }
+              }
+            });
+          }
+        }
 
         releasedCount++;
       }

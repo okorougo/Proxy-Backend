@@ -296,6 +296,7 @@ export type RiderWhereInput = {
   kyc?: Prisma.XOR<Prisma.RiderKycNullableScalarRelationFilter, Prisma.RiderKycWhereInput> | null
   vehicle?: Prisma.XOR<Prisma.RiderVehicleNullableScalarRelationFilter, Prisma.RiderVehicleWhereInput> | null
   deliveries?: Prisma.DeliveryListRelationFilter
+  wallet?: Prisma.XOR<Prisma.RiderWalletNullableScalarRelationFilter, Prisma.RiderWalletWhereInput> | null
 }
 
 export type RiderOrderByWithRelationInput = {
@@ -317,6 +318,7 @@ export type RiderOrderByWithRelationInput = {
   kyc?: Prisma.RiderKycOrderByWithRelationInput
   vehicle?: Prisma.RiderVehicleOrderByWithRelationInput
   deliveries?: Prisma.DeliveryOrderByRelationAggregateInput
+  wallet?: Prisma.RiderWalletOrderByWithRelationInput
 }
 
 export type RiderWhereUniqueInput = Prisma.AtLeast<{
@@ -341,6 +343,7 @@ export type RiderWhereUniqueInput = Prisma.AtLeast<{
   kyc?: Prisma.XOR<Prisma.RiderKycNullableScalarRelationFilter, Prisma.RiderKycWhereInput> | null
   vehicle?: Prisma.XOR<Prisma.RiderVehicleNullableScalarRelationFilter, Prisma.RiderVehicleWhereInput> | null
   deliveries?: Prisma.DeliveryListRelationFilter
+  wallet?: Prisma.XOR<Prisma.RiderWalletNullableScalarRelationFilter, Prisma.RiderWalletWhereInput> | null
 }, "id" | "userId">
 
 export type RiderOrderByWithAggregationInput = {
@@ -403,6 +406,7 @@ export type RiderCreateInput = {
   kyc?: Prisma.RiderKycCreateNestedOneWithoutRiderInput
   vehicle?: Prisma.RiderVehicleCreateNestedOneWithoutRiderInput
   deliveries?: Prisma.DeliveryCreateNestedManyWithoutRiderInput
+  wallet?: Prisma.RiderWalletCreateNestedOneWithoutRiderInput
 }
 
 export type RiderUncheckedCreateInput = {
@@ -423,6 +427,7 @@ export type RiderUncheckedCreateInput = {
   kyc?: Prisma.RiderKycUncheckedCreateNestedOneWithoutRiderInput
   vehicle?: Prisma.RiderVehicleUncheckedCreateNestedOneWithoutRiderInput
   deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutRiderInput
+  wallet?: Prisma.RiderWalletUncheckedCreateNestedOneWithoutRiderInput
 }
 
 export type RiderUpdateInput = {
@@ -443,6 +448,7 @@ export type RiderUpdateInput = {
   kyc?: Prisma.RiderKycUpdateOneWithoutRiderNestedInput
   vehicle?: Prisma.RiderVehicleUpdateOneWithoutRiderNestedInput
   deliveries?: Prisma.DeliveryUpdateManyWithoutRiderNestedInput
+  wallet?: Prisma.RiderWalletUpdateOneWithoutRiderNestedInput
 }
 
 export type RiderUncheckedUpdateInput = {
@@ -463,6 +469,7 @@ export type RiderUncheckedUpdateInput = {
   kyc?: Prisma.RiderKycUncheckedUpdateOneWithoutRiderNestedInput
   vehicle?: Prisma.RiderVehicleUncheckedUpdateOneWithoutRiderNestedInput
   deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutRiderNestedInput
+  wallet?: Prisma.RiderWalletUncheckedUpdateOneWithoutRiderNestedInput
 }
 
 export type RiderCreateManyInput = {
@@ -666,6 +673,20 @@ export type RiderUpdateOneRequiredWithoutVehicleNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.RiderUpdateToOneWithWhereWithoutVehicleInput, Prisma.RiderUpdateWithoutVehicleInput>, Prisma.RiderUncheckedUpdateWithoutVehicleInput>
 }
 
+export type RiderCreateNestedOneWithoutWalletInput = {
+  create?: Prisma.XOR<Prisma.RiderCreateWithoutWalletInput, Prisma.RiderUncheckedCreateWithoutWalletInput>
+  connectOrCreate?: Prisma.RiderCreateOrConnectWithoutWalletInput
+  connect?: Prisma.RiderWhereUniqueInput
+}
+
+export type RiderUpdateOneRequiredWithoutWalletNestedInput = {
+  create?: Prisma.XOR<Prisma.RiderCreateWithoutWalletInput, Prisma.RiderUncheckedCreateWithoutWalletInput>
+  connectOrCreate?: Prisma.RiderCreateOrConnectWithoutWalletInput
+  upsert?: Prisma.RiderUpsertWithoutWalletInput
+  connect?: Prisma.RiderWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RiderUpdateToOneWithWhereWithoutWalletInput, Prisma.RiderUpdateWithoutWalletInput>, Prisma.RiderUncheckedUpdateWithoutWalletInput>
+}
+
 export type RiderCreateWithoutUserInput = {
   id?: string
   fullName: string
@@ -683,6 +704,7 @@ export type RiderCreateWithoutUserInput = {
   kyc?: Prisma.RiderKycCreateNestedOneWithoutRiderInput
   vehicle?: Prisma.RiderVehicleCreateNestedOneWithoutRiderInput
   deliveries?: Prisma.DeliveryCreateNestedManyWithoutRiderInput
+  wallet?: Prisma.RiderWalletCreateNestedOneWithoutRiderInput
 }
 
 export type RiderUncheckedCreateWithoutUserInput = {
@@ -702,6 +724,7 @@ export type RiderUncheckedCreateWithoutUserInput = {
   kyc?: Prisma.RiderKycUncheckedCreateNestedOneWithoutRiderInput
   vehicle?: Prisma.RiderVehicleUncheckedCreateNestedOneWithoutRiderInput
   deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutRiderInput
+  wallet?: Prisma.RiderWalletUncheckedCreateNestedOneWithoutRiderInput
 }
 
 export type RiderCreateOrConnectWithoutUserInput = {
@@ -737,6 +760,7 @@ export type RiderUpdateWithoutUserInput = {
   kyc?: Prisma.RiderKycUpdateOneWithoutRiderNestedInput
   vehicle?: Prisma.RiderVehicleUpdateOneWithoutRiderNestedInput
   deliveries?: Prisma.DeliveryUpdateManyWithoutRiderNestedInput
+  wallet?: Prisma.RiderWalletUpdateOneWithoutRiderNestedInput
 }
 
 export type RiderUncheckedUpdateWithoutUserInput = {
@@ -756,6 +780,7 @@ export type RiderUncheckedUpdateWithoutUserInput = {
   kyc?: Prisma.RiderKycUncheckedUpdateOneWithoutRiderNestedInput
   vehicle?: Prisma.RiderVehicleUncheckedUpdateOneWithoutRiderNestedInput
   deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutRiderNestedInput
+  wallet?: Prisma.RiderWalletUncheckedUpdateOneWithoutRiderNestedInput
 }
 
 export type RiderCreateWithoutDeliveriesInput = {
@@ -775,6 +800,7 @@ export type RiderCreateWithoutDeliveriesInput = {
   user: Prisma.UserCreateNestedOneWithoutRiderInput
   kyc?: Prisma.RiderKycCreateNestedOneWithoutRiderInput
   vehicle?: Prisma.RiderVehicleCreateNestedOneWithoutRiderInput
+  wallet?: Prisma.RiderWalletCreateNestedOneWithoutRiderInput
 }
 
 export type RiderUncheckedCreateWithoutDeliveriesInput = {
@@ -794,6 +820,7 @@ export type RiderUncheckedCreateWithoutDeliveriesInput = {
   rejectionNote?: string | null
   kyc?: Prisma.RiderKycUncheckedCreateNestedOneWithoutRiderInput
   vehicle?: Prisma.RiderVehicleUncheckedCreateNestedOneWithoutRiderInput
+  wallet?: Prisma.RiderWalletUncheckedCreateNestedOneWithoutRiderInput
 }
 
 export type RiderCreateOrConnectWithoutDeliveriesInput = {
@@ -829,6 +856,7 @@ export type RiderUpdateWithoutDeliveriesInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutRiderNestedInput
   kyc?: Prisma.RiderKycUpdateOneWithoutRiderNestedInput
   vehicle?: Prisma.RiderVehicleUpdateOneWithoutRiderNestedInput
+  wallet?: Prisma.RiderWalletUpdateOneWithoutRiderNestedInput
 }
 
 export type RiderUncheckedUpdateWithoutDeliveriesInput = {
@@ -848,6 +876,7 @@ export type RiderUncheckedUpdateWithoutDeliveriesInput = {
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kyc?: Prisma.RiderKycUncheckedUpdateOneWithoutRiderNestedInput
   vehicle?: Prisma.RiderVehicleUncheckedUpdateOneWithoutRiderNestedInput
+  wallet?: Prisma.RiderWalletUncheckedUpdateOneWithoutRiderNestedInput
 }
 
 export type RiderCreateWithoutKycInput = {
@@ -867,6 +896,7 @@ export type RiderCreateWithoutKycInput = {
   user: Prisma.UserCreateNestedOneWithoutRiderInput
   vehicle?: Prisma.RiderVehicleCreateNestedOneWithoutRiderInput
   deliveries?: Prisma.DeliveryCreateNestedManyWithoutRiderInput
+  wallet?: Prisma.RiderWalletCreateNestedOneWithoutRiderInput
 }
 
 export type RiderUncheckedCreateWithoutKycInput = {
@@ -886,6 +916,7 @@ export type RiderUncheckedCreateWithoutKycInput = {
   rejectionNote?: string | null
   vehicle?: Prisma.RiderVehicleUncheckedCreateNestedOneWithoutRiderInput
   deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutRiderInput
+  wallet?: Prisma.RiderWalletUncheckedCreateNestedOneWithoutRiderInput
 }
 
 export type RiderCreateOrConnectWithoutKycInput = {
@@ -921,6 +952,7 @@ export type RiderUpdateWithoutKycInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutRiderNestedInput
   vehicle?: Prisma.RiderVehicleUpdateOneWithoutRiderNestedInput
   deliveries?: Prisma.DeliveryUpdateManyWithoutRiderNestedInput
+  wallet?: Prisma.RiderWalletUpdateOneWithoutRiderNestedInput
 }
 
 export type RiderUncheckedUpdateWithoutKycInput = {
@@ -940,6 +972,7 @@ export type RiderUncheckedUpdateWithoutKycInput = {
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicle?: Prisma.RiderVehicleUncheckedUpdateOneWithoutRiderNestedInput
   deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutRiderNestedInput
+  wallet?: Prisma.RiderWalletUncheckedUpdateOneWithoutRiderNestedInput
 }
 
 export type RiderCreateWithoutVehicleInput = {
@@ -959,6 +992,7 @@ export type RiderCreateWithoutVehicleInput = {
   user: Prisma.UserCreateNestedOneWithoutRiderInput
   kyc?: Prisma.RiderKycCreateNestedOneWithoutRiderInput
   deliveries?: Prisma.DeliveryCreateNestedManyWithoutRiderInput
+  wallet?: Prisma.RiderWalletCreateNestedOneWithoutRiderInput
 }
 
 export type RiderUncheckedCreateWithoutVehicleInput = {
@@ -978,6 +1012,7 @@ export type RiderUncheckedCreateWithoutVehicleInput = {
   rejectionNote?: string | null
   kyc?: Prisma.RiderKycUncheckedCreateNestedOneWithoutRiderInput
   deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutRiderInput
+  wallet?: Prisma.RiderWalletUncheckedCreateNestedOneWithoutRiderInput
 }
 
 export type RiderCreateOrConnectWithoutVehicleInput = {
@@ -1013,6 +1048,7 @@ export type RiderUpdateWithoutVehicleInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutRiderNestedInput
   kyc?: Prisma.RiderKycUpdateOneWithoutRiderNestedInput
   deliveries?: Prisma.DeliveryUpdateManyWithoutRiderNestedInput
+  wallet?: Prisma.RiderWalletUpdateOneWithoutRiderNestedInput
 }
 
 export type RiderUncheckedUpdateWithoutVehicleInput = {
@@ -1031,6 +1067,103 @@ export type RiderUncheckedUpdateWithoutVehicleInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kyc?: Prisma.RiderKycUncheckedUpdateOneWithoutRiderNestedInput
+  deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutRiderNestedInput
+  wallet?: Prisma.RiderWalletUncheckedUpdateOneWithoutRiderNestedInput
+}
+
+export type RiderCreateWithoutWalletInput = {
+  id?: string
+  fullName: string
+  dateOfBirth: string
+  phone: string
+  vehicleType: string
+  status?: $Enums.RiderStatus
+  isOnline?: boolean
+  currentLat?: number | null
+  currentLng?: number | null
+  lastSeenAt?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  rejectionNote?: string | null
+  user: Prisma.UserCreateNestedOneWithoutRiderInput
+  kyc?: Prisma.RiderKycCreateNestedOneWithoutRiderInput
+  vehicle?: Prisma.RiderVehicleCreateNestedOneWithoutRiderInput
+  deliveries?: Prisma.DeliveryCreateNestedManyWithoutRiderInput
+}
+
+export type RiderUncheckedCreateWithoutWalletInput = {
+  id?: string
+  fullName: string
+  dateOfBirth: string
+  userId: string
+  phone: string
+  vehicleType: string
+  status?: $Enums.RiderStatus
+  isOnline?: boolean
+  currentLat?: number | null
+  currentLng?: number | null
+  lastSeenAt?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  rejectionNote?: string | null
+  kyc?: Prisma.RiderKycUncheckedCreateNestedOneWithoutRiderInput
+  vehicle?: Prisma.RiderVehicleUncheckedCreateNestedOneWithoutRiderInput
+  deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutRiderInput
+}
+
+export type RiderCreateOrConnectWithoutWalletInput = {
+  where: Prisma.RiderWhereUniqueInput
+  create: Prisma.XOR<Prisma.RiderCreateWithoutWalletInput, Prisma.RiderUncheckedCreateWithoutWalletInput>
+}
+
+export type RiderUpsertWithoutWalletInput = {
+  update: Prisma.XOR<Prisma.RiderUpdateWithoutWalletInput, Prisma.RiderUncheckedUpdateWithoutWalletInput>
+  create: Prisma.XOR<Prisma.RiderCreateWithoutWalletInput, Prisma.RiderUncheckedCreateWithoutWalletInput>
+  where?: Prisma.RiderWhereInput
+}
+
+export type RiderUpdateToOneWithWhereWithoutWalletInput = {
+  where?: Prisma.RiderWhereInput
+  data: Prisma.XOR<Prisma.RiderUpdateWithoutWalletInput, Prisma.RiderUncheckedUpdateWithoutWalletInput>
+}
+
+export type RiderUpdateWithoutWalletInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  vehicleType?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumRiderStatusFieldUpdateOperationsInput | $Enums.RiderStatus
+  isOnline?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  currentLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  currentLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lastSeenAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  user?: Prisma.UserUpdateOneRequiredWithoutRiderNestedInput
+  kyc?: Prisma.RiderKycUpdateOneWithoutRiderNestedInput
+  vehicle?: Prisma.RiderVehicleUpdateOneWithoutRiderNestedInput
+  deliveries?: Prisma.DeliveryUpdateManyWithoutRiderNestedInput
+}
+
+export type RiderUncheckedUpdateWithoutWalletInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  vehicleType?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumRiderStatusFieldUpdateOperationsInput | $Enums.RiderStatus
+  isOnline?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  currentLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  currentLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  lastSeenAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rejectionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kyc?: Prisma.RiderKycUncheckedUpdateOneWithoutRiderNestedInput
+  vehicle?: Prisma.RiderVehicleUncheckedUpdateOneWithoutRiderNestedInput
   deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutRiderNestedInput
 }
 
@@ -1084,6 +1217,7 @@ export type RiderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   kyc?: boolean | Prisma.Rider$kycArgs<ExtArgs>
   vehicle?: boolean | Prisma.Rider$vehicleArgs<ExtArgs>
   deliveries?: boolean | Prisma.Rider$deliveriesArgs<ExtArgs>
+  wallet?: boolean | Prisma.Rider$walletArgs<ExtArgs>
   _count?: boolean | Prisma.RiderCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["rider"]>
 
@@ -1146,6 +1280,7 @@ export type RiderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   kyc?: boolean | Prisma.Rider$kycArgs<ExtArgs>
   vehicle?: boolean | Prisma.Rider$vehicleArgs<ExtArgs>
   deliveries?: boolean | Prisma.Rider$deliveriesArgs<ExtArgs>
+  wallet?: boolean | Prisma.Rider$walletArgs<ExtArgs>
   _count?: boolean | Prisma.RiderCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type RiderIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1162,6 +1297,7 @@ export type $RiderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     kyc: Prisma.$RiderKycPayload<ExtArgs> | null
     vehicle: Prisma.$RiderVehiclePayload<ExtArgs> | null
     deliveries: Prisma.$DeliveryPayload<ExtArgs>[]
+    wallet: Prisma.$RiderWalletPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1576,6 +1712,7 @@ export interface Prisma__RiderClient<T, Null = never, ExtArgs extends runtime.Ty
   kyc<T extends Prisma.Rider$kycArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Rider$kycArgs<ExtArgs>>): Prisma.Prisma__RiderKycClient<runtime.Types.Result.GetResult<Prisma.$RiderKycPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   vehicle<T extends Prisma.Rider$vehicleArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Rider$vehicleArgs<ExtArgs>>): Prisma.Prisma__RiderVehicleClient<runtime.Types.Result.GetResult<Prisma.$RiderVehiclePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   deliveries<T extends Prisma.Rider$deliveriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Rider$deliveriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  wallet<T extends Prisma.Rider$walletArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Rider$walletArgs<ExtArgs>>): Prisma.Prisma__RiderWalletClient<runtime.Types.Result.GetResult<Prisma.$RiderWalletPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2074,6 +2211,25 @@ export type Rider$deliveriesArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.DeliveryScalarFieldEnum | Prisma.DeliveryScalarFieldEnum[]
+}
+
+/**
+ * Rider.wallet
+ */
+export type Rider$walletArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RiderWallet
+   */
+  select?: Prisma.RiderWalletSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RiderWallet
+   */
+  omit?: Prisma.RiderWalletOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RiderWalletInclude<ExtArgs> | null
+  where?: Prisma.RiderWalletWhereInput
 }
 
 /**

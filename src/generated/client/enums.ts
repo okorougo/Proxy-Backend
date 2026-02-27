@@ -103,7 +103,8 @@ export const PaymentMethod = {
   TRANSFER: 'TRANSFER',
   PAYSTACK: 'PAYSTACK',
   FLUTTERWAVE: 'FLUTTERWAVE',
-  STRIPE: 'STRIPE'
+  STRIPE: 'STRIPE',
+  WALLET: 'WALLET'
 } as const
 
 export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]

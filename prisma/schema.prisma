@@ -327,7 +327,9 @@ model Transaction {
   commissionRate   Decimal?          @db.Decimal(5, 2)
   releaseAt        DateTime?
   commissionAmount Decimal?          @db.Decimal(18, 2)
-  vendorAmount     Decimal?          @db.Decimal(18, 2)
+  vendorAmount     Decimal?          @db.Decimal(18, 2)  // amount vendor gets from items (after commission)
+  deliveryFee      Decimal?          @db.Decimal(18, 2)  // separate delivery fee
+  riderEarnings    Decimal?          @db.Decimal(18, 2)  // amount allocated to rider (filled when released)
 }
 
 model Session {
@@ -570,6 +572,7 @@ model Rider {
   kyc           RiderKyc?
   vehicle       RiderVehicle?
   deliveries    Delivery[]
+  wallet        RiderWallet?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   rejectionNote String?
@@ -601,6 +604,31 @@ model RiderVehicle {
   backViewUrl  String?
   documentUrl  String? // registration doc or insurance
   createdAt    DateTime @default(now())
+}
+
+model RiderWallet {
+  id          String   @id @default(uuid())
+  riderId     String   @unique
+  balance     Decimal @db.Decimal(18,2)    @default(0.00) // available for withdrawal
+  totalEarned Decimal @db.Decimal(18,2)    @default(0.00)
+  currency    String   @default("NGN")
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+
+  rider              Rider  @relation(fields: [riderId], references: [id])
+  walletTransactions RiderWalletTransaction[]
+}
+
+model RiderWalletTransaction {
+  id        String   @id @default(uuid())
+  riderId   String
+  amount    Decimal  @db.Decimal(18, 2)
+  type      String   // "CREDIT" or "DEBIT"
+  reference String?  // deliveryId
+  remark    String?
+  createdAt DateTime @default(now())
+
+  rider RiderWallet @relation(fields: [riderId], references: [id], onDelete: Cascade)
 }
 
 enum DeliveryStatus {

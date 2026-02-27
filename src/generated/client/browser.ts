@@ -167,3 +167,13 @@ export type RiderKyc = Prisma.RiderKycModel
  * 
  */
 export type RiderVehicle = Prisma.RiderVehicleModel
+/**
+ * Model RiderWallet
+ * 
+ */
+export type RiderWallet = Prisma.RiderWalletModel
+/**
+ * Model RiderWalletTransaction
+ * 
+ */
+export type RiderWalletTransaction = Prisma.RiderWalletTransactionModel

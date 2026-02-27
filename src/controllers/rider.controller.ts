@@ -829,60 +829,62 @@ export const completeDelivery = async (req: Request, res: Response) => {
 
     const delivery = await prisma.delivery.findUnique({
       where: { id: deliveryId },
-      include: { order: true },
+      include: { order: { include: { transaction: true } } },
     });
-    if(otp !== delivery?.OTP){
+
+    if (!delivery) return errorResponse(res, "Delivery not found");
+    if (otp !== delivery?.OTP) {
       return errorResponse(res, "Invalid OTP provided");
     }
-    if (!delivery) return errorResponse(res, "Delivery not found");
     if (delivery.status !== "IN_TRANSIT")
       return errorResponse(res, "Cannot complete this delivery");
+    if (delivery.riderId !== rider.id)
+      return errorResponse(res, "Unauthorized: you are not the assigned rider");
 
+    // Update delivery status to DELIVERED
     const updated = await prisma.delivery.update({
       where: { id: deliveryId },
       data: { status: "DELIVERED", completedAt: new Date(), OTP: null },
-      include: { order: {
-        include:{
-          transaction:true
-        }
-      } },
+      include: { order: { include: { transaction: true } } },
     });
-    await prisma.vendorWallet.update({
-      where: { vendorId: updated.order.vendorId },
+
+    // Mark escrow as ready for immediate release (keep HELD status, set releaseAt to now)
+    // This ensures:
+    // - Vendor gets: itemAmount - commission + (selfDelivery bonus if applicable)
+    // - Rider gets: 90% of delivery fee
+    // - Platform gets: 10% commission + 10% delivery fee (if rider picked up)
+    await prisma.transaction.update({
+      where: { id: updated.order.transaction.id },
       data: {
-        balance: { increment: updated.order.transaction?.amountPaid || 0 },
-        totalEarned: { increment: updated.order.transaction?.amountPaid || 0 },
-        walletTransaction: {
-          create: {
-            amount: updated.order.transaction?.amountPaid || 0,
-            type: "CREDIT",
-            remark: `Order ${updated.order.id} completed`,
-            vendorId: updated.order.vendorId,
-          },
-        },
+        releaseAt: new Date(),  // Set to now so releaseEscrowFunds processes immediately
       },
     });
 
-    // Notify user and vendor
+    // Also update order status
+    await prisma.order.update({
+      where: { id: updated.order.id },
+      data: { status: "DELIVERED" },
+    });
+
+    // Notify user and vendor via socket
     io.to(updated.order.userId).emit("delivery_completed", { deliveryId });
     io.to(updated.order.vendorId).emit("delivery_completed", { deliveryId });
 
+    // Send push notification to customer
     const sessions = await prisma.session.findMany({
-      where: { userId, deviceToken: { not: null } },
+      where: { userId: updated.order.userId, deviceToken: { not: null } },
     });
     for (const s of sessions) {
       if (s.devicePlatform === "expo")
         await sendExpo(
           s.deviceToken!,
           "Order Delivered",
-          ` your order #${updated.orderId
-            .toString()
-            .slice(0, 6)} has been delivered to you`,
+          `Your order #${updated.orderId.toString().slice(0, 6)} has been delivered`,
           { type: "Order", status: "DELIVERED" }
         );
     }
 
-    return successResponse(res, "Delivery completed successfully", updated);
+    return successResponse(res, "Delivery completed successfully — funds will be released from escrow", updated);
   } catch (error) {
     console.error("completeDelivery error:", error);
     return errorResponse(res, "Failed to complete delivery");

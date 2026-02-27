@@ -80,7 +80,9 @@ export const ModelName = {
   VendorBank: 'VendorBank',
   Rider: 'Rider',
   RiderKyc: 'RiderKyc',
-  RiderVehicle: 'RiderVehicle'
+  RiderVehicle: 'RiderVehicle',
+  RiderWallet: 'RiderWallet',
+  RiderWalletTransaction: 'RiderWalletTransaction'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -340,7 +342,9 @@ export const TransactionScalarFieldEnum = {
   commissionRate: 'commissionRate',
   releaseAt: 'releaseAt',
   commissionAmount: 'commissionAmount',
-  vendorAmount: 'vendorAmount'
+  vendorAmount: 'vendorAmount',
+  deliveryFee: 'deliveryFee',
+  riderEarnings: 'riderEarnings'
 } as const
 
 export type TransactionScalarFieldEnum = (typeof TransactionScalarFieldEnum)[keyof typeof TransactionScalarFieldEnum]
@@ -574,6 +578,32 @@ export const RiderVehicleScalarFieldEnum = {
 } as const
 
 export type RiderVehicleScalarFieldEnum = (typeof RiderVehicleScalarFieldEnum)[keyof typeof RiderVehicleScalarFieldEnum]
+
+
+export const RiderWalletScalarFieldEnum = {
+  id: 'id',
+  riderId: 'riderId',
+  balance: 'balance',
+  totalEarned: 'totalEarned',
+  currency: 'currency',
+  updatedAt: 'updatedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type RiderWalletScalarFieldEnum = (typeof RiderWalletScalarFieldEnum)[keyof typeof RiderWalletScalarFieldEnum]
+
+
+export const RiderWalletTransactionScalarFieldEnum = {
+  id: 'id',
+  riderId: 'riderId',
+  amount: 'amount',
+  type: 'type',
+  reference: 'reference',
+  remark: 'remark',
+  createdAt: 'createdAt'
+} as const
+
+export type RiderWalletTransactionScalarFieldEnum = (typeof RiderWalletTransactionScalarFieldEnum)[keyof typeof RiderWalletTransactionScalarFieldEnum]
 
 
 export const SortOrder = {

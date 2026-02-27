@@ -413,7 +413,9 @@ export const ModelName = {
   VendorBank: 'VendorBank',
   Rider: 'Rider',
   RiderKyc: 'RiderKyc',
-  RiderVehicle: 'RiderVehicle'
+  RiderVehicle: 'RiderVehicle',
+  RiderWallet: 'RiderWallet',
+  RiderWalletTransaction: 'RiderWalletTransaction'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -429,7 +431,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "category" | "subCategory" | "vendorApplication" | "kycVerification" | "listing" | "digitalFile" | "location" | "media" | "order" | "orderItem" | "message" | "report" | "auditLog" | "transaction" | "session" | "review" | "delivery" | "vendorWallet" | "commissionConfig" | "withdrawalRequest" | "customerWallet" | "customerWalletTransaction" | "platformWallet" | "platformWalletTransaction" | "walletTransaction" | "vendorBank" | "rider" | "riderKyc" | "riderVehicle"
+    modelProps: "user" | "category" | "subCategory" | "vendorApplication" | "kycVerification" | "listing" | "digitalFile" | "location" | "media" | "order" | "orderItem" | "message" | "report" | "auditLog" | "transaction" | "session" | "review" | "delivery" | "vendorWallet" | "commissionConfig" | "withdrawalRequest" | "customerWallet" | "customerWalletTransaction" | "platformWallet" | "platformWalletTransaction" | "walletTransaction" | "vendorBank" | "rider" | "riderKyc" | "riderVehicle" | "riderWallet" | "riderWalletTransaction"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2653,6 +2655,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RiderWallet: {
+      payload: Prisma.$RiderWalletPayload<ExtArgs>
+      fields: Prisma.RiderWalletFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RiderWalletFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiderWalletPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RiderWalletFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiderWalletPayload>
+        }
+        findFirst: {
+          args: Prisma.RiderWalletFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiderWalletPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RiderWalletFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiderWalletPayload>
+        }
+        findMany: {
+          args: Prisma.RiderWalletFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiderWalletPayload>[]
+        }
+        create: {
+          args: Prisma.RiderWalletCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiderWalletPayload>
+        }
+        createMany: {
+          args: Prisma.RiderWalletCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RiderWalletCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiderWalletPayload>[]
+        }
+        delete: {
+          args: Prisma.RiderWalletDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiderWalletPayload>
+        }
+        update: {
+          args: Prisma.RiderWalletUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiderWalletPayload>
+        }
+        deleteMany: {
+          args: Prisma.RiderWalletDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RiderWalletUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RiderWalletUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiderWalletPayload>[]
+        }
+        upsert: {
+          args: Prisma.RiderWalletUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiderWalletPayload>
+        }
+        aggregate: {
+          args: Prisma.RiderWalletAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRiderWallet>
+        }
+        groupBy: {
+          args: Prisma.RiderWalletGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RiderWalletGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RiderWalletCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RiderWalletCountAggregateOutputType> | number
+        }
+      }
+    }
+    RiderWalletTransaction: {
+      payload: Prisma.$RiderWalletTransactionPayload<ExtArgs>
+      fields: Prisma.RiderWalletTransactionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RiderWalletTransactionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiderWalletTransactionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RiderWalletTransactionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiderWalletTransactionPayload>
+        }
+        findFirst: {
+          args: Prisma.RiderWalletTransactionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiderWalletTransactionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RiderWalletTransactionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiderWalletTransactionPayload>
+        }
+        findMany: {
+          args: Prisma.RiderWalletTransactionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiderWalletTransactionPayload>[]
+        }
+        create: {
+          args: Prisma.RiderWalletTransactionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiderWalletTransactionPayload>
+        }
+        createMany: {
+          args: Prisma.RiderWalletTransactionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RiderWalletTransactionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiderWalletTransactionPayload>[]
+        }
+        delete: {
+          args: Prisma.RiderWalletTransactionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiderWalletTransactionPayload>
+        }
+        update: {
+          args: Prisma.RiderWalletTransactionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiderWalletTransactionPayload>
+        }
+        deleteMany: {
+          args: Prisma.RiderWalletTransactionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RiderWalletTransactionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RiderWalletTransactionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiderWalletTransactionPayload>[]
+        }
+        upsert: {
+          args: Prisma.RiderWalletTransactionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiderWalletTransactionPayload>
+        }
+        aggregate: {
+          args: Prisma.RiderWalletTransactionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRiderWalletTransaction>
+        }
+        groupBy: {
+          args: Prisma.RiderWalletTransactionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RiderWalletTransactionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RiderWalletTransactionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RiderWalletTransactionCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2933,7 +3083,9 @@ export const TransactionScalarFieldEnum = {
   commissionRate: 'commissionRate',
   releaseAt: 'releaseAt',
   commissionAmount: 'commissionAmount',
-  vendorAmount: 'vendorAmount'
+  vendorAmount: 'vendorAmount',
+  deliveryFee: 'deliveryFee',
+  riderEarnings: 'riderEarnings'
 } as const
 
 export type TransactionScalarFieldEnum = (typeof TransactionScalarFieldEnum)[keyof typeof TransactionScalarFieldEnum]
@@ -3167,6 +3319,32 @@ export const RiderVehicleScalarFieldEnum = {
 } as const
 
 export type RiderVehicleScalarFieldEnum = (typeof RiderVehicleScalarFieldEnum)[keyof typeof RiderVehicleScalarFieldEnum]
+
+
+export const RiderWalletScalarFieldEnum = {
+  id: 'id',
+  riderId: 'riderId',
+  balance: 'balance',
+  totalEarned: 'totalEarned',
+  currency: 'currency',
+  updatedAt: 'updatedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type RiderWalletScalarFieldEnum = (typeof RiderWalletScalarFieldEnum)[keyof typeof RiderWalletScalarFieldEnum]
+
+
+export const RiderWalletTransactionScalarFieldEnum = {
+  id: 'id',
+  riderId: 'riderId',
+  amount: 'amount',
+  type: 'type',
+  reference: 'reference',
+  remark: 'remark',
+  createdAt: 'createdAt'
+} as const
+
+export type RiderWalletTransactionScalarFieldEnum = (typeof RiderWalletTransactionScalarFieldEnum)[keyof typeof RiderWalletTransactionScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -3625,6 +3803,8 @@ export type GlobalOmitConfig = {
   rider?: Prisma.RiderOmit
   riderKyc?: Prisma.RiderKycOmit
   riderVehicle?: Prisma.RiderVehicleOmit
+  riderWallet?: Prisma.RiderWalletOmit
+  riderWalletTransaction?: Prisma.RiderWalletTransactionOmit
 }
 
 /* Types for Logging */
