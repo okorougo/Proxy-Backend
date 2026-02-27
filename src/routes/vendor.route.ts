@@ -21,6 +21,7 @@ import {
   getVendorBanksDetails,
   completeSelfDelivery,
   vendorStartDelivery,
+  previewOrder,
 } from "../controllers/vendor.controller";
 
 const router = Router();
@@ -30,6 +31,8 @@ router.get("/applications", authMiddleware, adminOnly, getAllVendorApplications)
 router.patch("/approve/:id", authMiddleware, adminOnly, approveVendor);
 router.patch("/reject/:id", authMiddleware, adminOnly, rejectVendor);
 router.post("/create-delivery", authMiddleware, createMultiVendorOrder);
+// preview calculates items total + delivery fee but does not create any records
+router.post("/delivery/preview", authMiddleware, previewOrder);
 router.post("/add-location",addeVendorLocation );
 router.get("/orders", authMiddleware, getVendorOrders);
 router.get("/dashboard", authMiddleware, getVendorDashboardStats);

@@ -539,6 +539,91 @@ export const getVendorOrders = async (req: AuthRequest, res: Response) => {
 
 type CartItem = { id: string; quantity: number };
 
+export const previewOrder = async (req: AuthRequest, res: Response) => {
+  try {
+    const {
+      items,
+      dropoffAddress,
+      dropoffLat,
+      dropoffLng,
+    } = req.body;
+
+    if (!Array.isArray(items) || items.length === 0)
+      return errorResponse(res, "Cart items required");
+
+    // fetch listings exactly as in createMultiVendorOrder
+    const listingIds = Array.from(new Set((items as CartItem[]).map(i => i.id)));
+    const listings = await prisma.listing.findMany({
+      where: { id: { in: listingIds } },
+      include: {
+        seller: { include: { vendorApplication: true } },
+        media: true
+      }
+    });
+
+    if (listings.length === 0) return errorResponse(res, "Listings not found");
+
+    const listingMap = new Map<string, typeof listings[number]>(
+      listings.map(l => [l.id, l])
+    );
+
+    const grouped: Record<string, { listing: any; quantity: number }[]> = {};
+    for (const it of items as CartItem[]) {
+      const listing = listingMap.get(it.id);
+      if (!listing) return errorResponse(res, `Listing ${it.id} not found`);
+      const vendorId = listing.seller?.vendorApplication?.id;
+      if (!vendorId) return errorResponse(res, `Vendor not approved for listing ${listing.id}`);
+      if (!grouped[vendorId]) grouped[vendorId] = [];
+      grouped[vendorId].push({ listing, quantity: Number(it.quantity || 1) });
+    }
+
+    let grandItemsTotal = 0;
+    let grandDeliveryFee = 0;
+    const breakdown: Array<{ vendorId: string; itemsTotal: number; deliveryFee: number }> = [];
+
+    for (const [vendorId, vendorItems] of Object.entries(grouped)) {
+      let itemsTotal = 0;
+      const isDigital = vendorItems.every(i => i.listing.isDigital);
+      const isRenderedService = vendorItems.every(i => i.listing.isRenderedService);
+      for (const v of vendorItems) {
+        const unitPrice = Number(v.listing.price ?? 0);
+        const qty = Number(v.quantity ?? 1);
+        itemsTotal += unitPrice * qty;
+      }
+
+      let deliveryFee = 0;
+      if (!isDigital && dropoffLat && dropoffLng && dropoffAddress) {
+        const vendorLocation = await prisma.location.findFirst({ where: { vendorId } });
+        if (!vendorLocation) throw new Error("Vendor location not found");
+
+        const distanceKm = haversineDistance(
+          vendorLocation.lat,
+          vendorLocation.lng,
+          Number(dropoffLat),
+          Number(dropoffLng)
+        );
+        const BASE_FARE = 600, RATE_PER_KM = 120, SERVICE_FEE = 100;
+        deliveryFee = Math.round(BASE_FARE + distanceKm * RATE_PER_KM + SERVICE_FEE);
+      }
+
+      grandItemsTotal += itemsTotal;
+      grandDeliveryFee += deliveryFee;
+      breakdown.push({ vendorId, itemsTotal, deliveryFee });
+    }
+
+    const total = grandItemsTotal + grandDeliveryFee;
+    return successResponse(res, "Order preview generated", {
+      itemsTotal: grandItemsTotal,
+      deliveryFee: grandDeliveryFee,
+      total,
+      breakdown
+    });
+  } catch (err: any) {
+    console.error("previewOrder error:", err);
+    return errorResponse(res, err.message || "Failed to preview order");
+  }
+};
+
 export const createMultiVendorOrder = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
