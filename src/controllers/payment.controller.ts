@@ -1558,4 +1558,140 @@ export const getCustomerOrderDetail = async (req: AuthRequest, res: Response) =>
   }
 };
 
+/**
+ * Get rider's transactions held by escrow
+ * Returns all deliveries assigned to the rider where payment is held in escrow
+ */
+export const getRiderHeldEscrowTransactions = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const { limit = 20, skip = 0 } = req.query;
+
+    if (!userId) return errorResponse(res, "Unauthorized", "UNAUTHORIZED", 401);
+
+    // Get the rider record
+    const rider = await prisma.rider.findUnique({
+      where: { userId }
+    });
+
+    if (!rider) {
+      return errorResponse(res, "Rider profile not found", "RIDER_NOT_FOUND", 404);
+    }
+
+    // Get all deliveries for this rider with their transactions
+    const deliveries = await prisma.delivery.findMany({
+      where: { riderId: rider.id },
+      include: {
+        transaction: {
+          include: {
+            order: {
+              include: {
+                listings: {
+                  include: {
+                    listing: true
+                  }
+                }
+              }
+            },
+            seller: {
+              select: {
+                id: true,
+                user: {
+                  select: {
+                    name: true,
+                    email: true,
+                    phone: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      take: Number(limit),
+      skip: Number(skip),
+      orderBy: { createdAt: "desc" }
+    });
+
+    // Filter for held escrow transactions only
+    const heldEscrowDeliveries = deliveries.filter(
+      (d) => d.transaction && d.transaction.escrowStatus === "HELD"
+    );
+
+    // Format response
+    const transactions = heldEscrowDeliveries.map((delivery) => {
+      const tx = delivery.transaction!;
+      const shippingFee = delivery.fareAmount ? Number(delivery.fareAmount) : 0;
+      const vendorAmount = tx.vendorAmount ? Number(tx.vendorAmount) : 0;
+      const commission = tx.commissionAmount ? Number(tx.commissionAmount) : 0;
+      const riderEarnings = tx.riderEarnings ? Number(tx.riderEarnings) : 0;
+      const totalAmount = Number(tx.amountCents) / 100;
+
+      return {
+        transactionId: tx.id,
+        orderId: tx.orderId,
+        deliveryId: delivery.id,
+        status: tx.status,
+        escrowStatus: tx.escrowStatus,
+        paymentMethod: tx.method,
+        createdAt: tx.createdAt,
+        releaseAt: tx.releaseAt,
+        seller: {
+          name: tx.seller.user.name,
+          email: tx.seller.user.email,
+          phone: tx.seller.user.phone
+        },
+        delivery: {
+          status: delivery.status,
+          pickupAddress: delivery.pickupAddress,
+          dropoffAddress: delivery.dropoffAddress,
+          distanceKm: delivery.distanceKm,
+          etaMinutes: delivery.etaMinutes,
+          startedAt: delivery.startedAt,
+          completedAt: delivery.completedAt
+        },
+        items: tx.order?.listings?.map((item) => ({
+          title: item.listing?.title,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          totalPrice: item.unitPrice * item.quantity
+        })) || [],
+        pricing: {
+          subtotal: totalAmount - shippingFee,
+          shippingFee,
+          platformCommission: commission,
+          vendorEarnings: vendorAmount,
+          riderEarnings: riderEarnings,
+          total: totalAmount
+        }
+      };
+    });
+
+    const total = await prisma.delivery.count({
+      where: {
+        riderId: rider.id,
+        transaction: { escrowStatus: "HELD" }
+      }
+    });
+
+    return successResponse(res, "Rider held escrow transactions fetched", {
+      transactions,
+      pagination: {
+        total,
+        limit: Number(limit),
+        skip: Number(skip),
+        remaining: Math.max(0, total - (Number(skip) + Number(limit)))
+      },
+      riderInfo: {
+        riderId: rider.id,
+        name: rider.fullName,
+        phoneNumber: rider.phone
+      }
+    });
+  } catch (err: any) {
+    console.error("getRiderHeldEscrowTransactions error:", err);
+    return errorResponse(res, err.message || "Failed to fetch held escrow transactions");
+  }
+};
+
 // Stripe webhook endpoint can be added later if needed

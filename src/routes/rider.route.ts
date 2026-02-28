@@ -22,6 +22,7 @@ import {
   getSingleRiderDelivery,
   markArrivalAtPickup
 } from "../controllers/rider.controller";
+import { getRiderHeldEscrowTransactions } from "../controllers/payment.controller";
 import { adminOnly } from "../middleware/admin";
 
 const router = express.Router();
@@ -78,6 +79,7 @@ router.post("/toggle-online", toggleRiderOnline);
 router.get("/nearby", getNearbyRiders);
 router.get("/history", authMiddleware, getRiderDeliveryHistory);
 router.get("/active-deliveries", authMiddleware, getActiveDeliveries);
+router.get("/held-escrow-transactions", authMiddleware, getRiderHeldEscrowTransactions);
 router.post("/pickup/:deliveryId", authMiddleware, markArrivalAtPickup);
 router.post("/start-pickup/:deliveryId", authMiddleware, startDelivery);
 router.post("/complete-delivery/:deliveryId", authMiddleware, completeDelivery);
