@@ -323,6 +323,9 @@ export const fundWalletStripe = async (req: AuthRequest, res: Response) => {
     const usdToNgn = await getUsdToNgnRate();
     const nairaAmount = Number((amountUsd * usdToNgn).toFixed(2));
 
+
+    console.log("Stripe payment verified. USD cents:", stripeAmountCents, "≈ USD:", amountUsd.toFixed(2), "≈ NGN:", nairaAmount.toFixed(2));
+
     // optional sanity check with provided amount
     if (amountNgn && Math.abs(amountNgn - nairaAmount) > 0.5) {
       return errorResponse(res, "NGN amount mismatch", "AMOUNT_MISMATCH", 400);
