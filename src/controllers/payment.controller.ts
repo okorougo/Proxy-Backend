@@ -323,7 +323,7 @@ export const fundWalletStripe = async (req: AuthRequest, res: Response) => {
     const usdToNgn = await getUsdToNgnRate();
     const nairaAmount = Number((amountUsd * usdToNgn).toFixed(2));
 
-
+    console.log("Frontend Amoutn", amountNgn)
     console.log("Stripe payment verified. USD cents:", stripeAmountCents, "≈ USD:", amountUsd.toFixed(2), "≈ NGN:", nairaAmount.toFixed(2));
 
     // optional sanity check with provided amount
