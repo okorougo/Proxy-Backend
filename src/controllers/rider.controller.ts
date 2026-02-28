@@ -247,7 +247,6 @@ export const updateRiderLocation = async (req: AuthRequest, res: Response) => {
     });
 
     // 🔊 Emit to socket room so vendors/admins can see updates
-    const io = req.app.get("io");
     io.emit("rider_location_update", {
       riderId,
       lat: parseFloat(lat),

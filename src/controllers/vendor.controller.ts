@@ -1188,7 +1188,6 @@ export const pushOrderToRiders = async (req: AuthRequest, res: Response) => {
       return R * c <= 10;
     });
 
-    const io = req.app.get("io"); // ✅ use io from app context
 
     // 📡 Broadcast to all rider sessions
     for (const rider of nearbyRiders) {

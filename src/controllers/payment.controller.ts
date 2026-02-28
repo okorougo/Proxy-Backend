@@ -340,15 +340,6 @@ export const fundWalletStripe = async (req: AuthRequest, res: Response) => {
       console.warn("Metadata missing, recalculated nairaAmount", nairaAmount);
     }
 
-    console.log("Frontend Amount", amountNgn);
-    console.log(
-      "Stripe payment verified. USD cents:",
-      stripeAmountCents,
-      "≈ USD:",
-      amountUsd.toFixed(2),
-      "≈ NGN:",
-      nairaAmount.toFixed(2)
-    );
 
     // optional sanity check with provided amount (still keep small tolerance)
     if (amountNgn && Math.abs(amountNgn - nairaAmount) > 0.5) {
