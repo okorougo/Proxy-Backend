@@ -171,12 +171,18 @@ export const createWalletStripeIntent = async (req: AuthRequest, res: Response) 
       { apiVersion: '2024-09-30.acacia' }
     );
 
+    // store the original NGN amount and rate so we can verify later with the
+    // exact same numbers instead of re‑fetching a possibly changed rate
     const paymentIntent = await stripe.paymentIntents.create({
       amount: usdCents,
       currency: 'usd',
       receipt_email,
       customer: customer.id,
       automatic_payment_methods: { enabled: true },
+      metadata: {
+        amountNgn: amountNgn.toString(),
+        usdToNgn: usdToNgn.toString(),
+      },
     });
 
     return res.json({
@@ -317,16 +323,34 @@ export const fundWalletStripe = async (req: AuthRequest, res: Response) => {
       return errorResponse(res, "Payment was not successful", "PAYMENT_NOT_SUCCESS", 400);
     }
 
-    // convert Stripe USD cents to NGN naira using shared rate helper
+    // convert Stripe USD cents to NGN naira using either the rate/amount
+    // recorded in metadata (preferred) or fall back to a fresh lookup if for
+    // some reason metadata is missing.
     const stripeAmountCents = paymentIntent.amount;
     const amountUsd = stripeAmountCents / 100;
-    const usdToNgn = await getUsdToNgnRate();
-    const nairaAmount = Number((amountUsd * usdToNgn).toFixed(2));
 
-    console.log("Frontend Amoutn", amountNgn)
-    console.log("Stripe payment verified. USD cents:", stripeAmountCents, "≈ USD:", amountUsd.toFixed(2), "≈ NGN:", nairaAmount.toFixed(2));
+    // try to read stored values from metadata first
+    let nairaAmount: number;
+    if (paymentIntent.metadata && paymentIntent.metadata.amountNgn) {
+      nairaAmount = parseFloat(paymentIntent.metadata.amountNgn);
+      console.log("Using NGN amount from metadata", nairaAmount);
+    } else {
+      const usdToNgn = await getUsdToNgnRate();
+      nairaAmount = Number((amountUsd * usdToNgn).toFixed(2));
+      console.warn("Metadata missing, recalculated nairaAmount", nairaAmount);
+    }
 
-    // optional sanity check with provided amount
+    console.log("Frontend Amount", amountNgn);
+    console.log(
+      "Stripe payment verified. USD cents:",
+      stripeAmountCents,
+      "≈ USD:",
+      amountUsd.toFixed(2),
+      "≈ NGN:",
+      nairaAmount.toFixed(2)
+    );
+
+    // optional sanity check with provided amount (still keep small tolerance)
     if (amountNgn && Math.abs(amountNgn - nairaAmount) > 0.5) {
       return errorResponse(res, "NGN amount mismatch", "AMOUNT_MISMATCH", 400);
     }
