@@ -6,6 +6,7 @@ import { errorResponse, successResponse } from "../utils/response";
 import Stripe from "stripe";
 import axios from "axios";
 import dotenv from "dotenv";
+import { refundTransactionEscrow } from "../utils/escrowHelper";
 dotenv.config();
 
 // Upload receipt (buyer or seller)
@@ -609,6 +610,44 @@ export const releaseEscrowFunds = async (req: AuthRequest, res: Response) => {
   } catch (err: any) {
     console.error("releaseEscrowFunds error:", err);
     return errorResponse(res, err.message || "Failed to release escrow funds");
+  }
+};
+
+/**
+ * Automatically refund escrow for any cancelled orders.
+ * Can be triggered manually via endpoint or by scheduler.
+ */
+export const refundEscrowFunds = async (req: AuthRequest, res: Response) => {
+  try {
+    // find held transactions where the associated order was cancelled
+    const toRefund = await prisma.transaction.findMany({
+      where: {
+        escrowStatus: "HELD",
+        order: { status: "CANCELLED" }
+      }
+    });
+
+    if (toRefund.length === 0) {
+      return successResponse(res, "No escrow funds to refund", { count: 0 });
+    }
+
+    let refundedCount = 0;
+
+    for (const txn of toRefund) {
+      try {
+        await refundTransactionEscrow(txn.id, txn.buyerId);
+        refundedCount++;
+      } catch (err) {
+        console.error(`failed to refund ${txn.id}:`, err);
+      }
+    }
+
+    return successResponse(res, `Refunded ${refundedCount} transaction(s)`, {
+      count: refundedCount
+    });
+  } catch (err: any) {
+    console.error("refundEscrowFunds error:", err);
+    return errorResponse(res, err.message || "Failed to refund escrow funds");
   }
 };
 

@@ -11,6 +11,7 @@ import {
   getWalletTransactionHistory,
   releaseEscrowFunds,
   disputeOrder,
+  refundEscrowFunds,
   getCommissionConfig,
   setCommissionConfig,
   requestWithdrawal,
@@ -70,6 +71,10 @@ router.get("/rider/wallet/history/:transactionId", authMiddleware, getRiderWalle
 
 // Release escrow funds (cron or admin triggered)
 router.post("/escrow/release", authMiddleware, releaseEscrowFunds);
+
+// Automatically refund held escrow for cancelled orders
+// This endpoint can also be called from a cron job if desired.
+router.post("/escrow/refund", authMiddleware, refundEscrowFunds);
 
 // Dispute order and initiate refund
 router.post("/orders/dispute", authMiddleware, disputeOrder);

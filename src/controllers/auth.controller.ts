@@ -189,29 +189,10 @@ export const registerVendor = async (req: Request, res: Response) => {
         },
       });
 
-      // Optional: send email OTP verification
-
-      const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6 digit
-      const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 5 mins
-      const html = `
-        <div style="font-family: Arial, sans-serif; padding: 20px;">
-          <h2 style="color:#0ea5a4;">Proxy Account Verification</h2>
-          <p>Hello ${name},</p>
-          <p>Welcome to Proxy! Please verify your email with this code:</p>
-          <h1 style="color:#065f5b;">${otp}</h1>
-          <p>This code will expire in 15 minutes.</p>
-        </div>
-      `;
-      await sendEmail(email, "Verify Your Email - Proxy", html);
       // If the phone number of an existing user is being used, and the current user is not the same as the existing phone user, return error
       if (existingPhoneUser && existingPhoneUser.email !== email) {
         return errorResponse(res, "Phone number already exists", "PHONE_EXISTS", 409);
       }
-      await prisma.user.upsert({
-        where: email ? { email } : { phone },
-        update: { otpCode: otp, otpExpiresAt: expiresAt },
-        create: { email, phone, otpCode: otp, otpExpiresAt: expiresAt },
-      });
     }
 
       // If vendor already applied

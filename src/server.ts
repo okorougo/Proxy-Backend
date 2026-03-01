@@ -39,6 +39,7 @@ const PORT = process.env.PORT || 4321;
 const server = http.createServer(app);
 
 app.use(passport.initialize());
+// schedule hourly escrow job; releases funds and automatically refunds cancelled orders
 scheduleEscrowRelease();
 // Ensure platform wallets (ESCROW, REVENUE) and default commission exist
 initializePlatformWallets().catch((err) =>

@@ -137,6 +137,15 @@ export const verifyNinNumber = async (req: AuthRequest, res: Response) => {
       return errorResponse(res, "NIN is required");
     }
 
+    // ensure NIN isn't already registered in our system
+    const existing = await prisma.kycVerification.findFirst({
+      where: { nin }
+    });
+
+    if (existing) {
+      return errorResponse(res, "NIN already exists in database", null, 409);
+    }
+
     // Call NIN verification service
     const verificationResult = await ninBvnService.verifyNin(nin);
 
