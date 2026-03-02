@@ -1590,8 +1590,6 @@ export const vendorStartDelivery = async (req: AuthRequest, res: Response) => {
   if (delivery.order.vendorId !== vendor.id)
     return errorResponse(res, "Unauthorized");
 
-  // Generate OTP for delivery confirmation
-  const otp = generateOtp();
 
   // Update delivery: vendor started coming
   const updated = await prisma.delivery.update({
@@ -1620,7 +1618,7 @@ export const vendorStartDelivery = async (req: AuthRequest, res: Response) => {
       "Delivery in Progress - Your OTP",
       `Hello ${delivery.order.user.name},\n\nYour vendor has started the delivery for order #${delivery.order.id
         .toString()
-        .slice(0, 6)}. Please use the following OTP to verify the delivery when it arrives:\n\n<strong style="font-size: 24px; color: #2563eb;">${otp}</strong>\n\nThis OTP is valid for this delivery. Do not share it with anyone.\n\nThank you for using our service!`
+        .slice(0, 6)}. Please use the following OTP to verify the delivery when it arrives:\n\n<strong style="font-size: 24px; color: #2563eb;">${updated.OTP}</strong>\n\nThis OTP is valid for this delivery. Do not share it with anyone.\n\nThank you for using our service!`
     );
   } catch (emailErr) {
     console.error("Failed to send OTP email:", emailErr);
