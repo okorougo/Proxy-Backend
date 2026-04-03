@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import prisma from "../lib/prisma";
 import { sendEmail } from "../services/emailService";
+import { sendOtpViaTermii } from "../services/smsService";
 import { AuthRequest } from "../middleware/auth";
 import dotEnv from "dotenv";
 import { errorResponse, successResponse } from "../utils/response";
@@ -114,7 +115,7 @@ export const sendOtp = async (req: AuthRequest, res: Response) => {
     </div>
   </div>
 `;
-  // TODO: integrate email (nodemailer) or SMS (Twilio) here
+  // Send OTP via email or SMS
   if (verifyOption === "email") {
     sendEmail(email, "Verify your Proxy account - OTP Code", html).catch(
       (err) => {
@@ -123,8 +124,18 @@ export const sendOtp = async (req: AuthRequest, res: Response) => {
     );
     return successResponse(res, "OTP sent to email");
   } else if (verifyOption === "phone") {
-    // Integrate SMS sending service here
-    return successResponse(res, "OTP sent to phone");
+    // Send SMS via Termii
+    const smsSent = await sendOtpViaTermii(phone, otp);
+    if (smsSent) {
+      return successResponse(res, "OTP sent to phone");
+    } else {
+      return errorResponse(
+        res,
+        "Failed to send OTP to phone",
+        "SMS_SEND_ERROR",
+        500
+      );
+    }
   }
 };
 

@@ -8,6 +8,7 @@ async function main() {
     description: "Clothing, shoes, bags, and accessories.",
     iconLib: "Ionicons",
     iconName: "shirt-outline",
+    imageUrl: "",
     subcategories: [
       { name: "Men's Wear" },
       { name: "Women's Wear" },
